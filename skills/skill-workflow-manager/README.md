@@ -26,13 +26,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-workflow-manager
 ```
 
-Install the published `v0.1.0` release:
+Install the published `v0.1.1` release:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager \
-  --ref v0.1.0
+  --ref v0.1.1
 ```
 
 Install from a GitHub tree URL:
@@ -45,7 +45,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 Install with Codex using the `skill-installer` skill:
 
 - Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
-- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.0.`
+- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1.`
 
 ## Start Here
 

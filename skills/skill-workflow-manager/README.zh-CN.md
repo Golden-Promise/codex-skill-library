@@ -26,13 +26,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-workflow-manager
 ```
 
-固定安装已发布的 `v0.1.0` 版本：
+固定安装已发布的 `v0.1.1` 版本：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager \
-  --ref v0.1.0
+  --ref v0.1.1
 ```
 
 也可以直接使用 GitHub tree URL：
@@ -45,7 +45,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 如果通过 Codex 中的 `skill-installer` 技能安装，可以直接这样说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager。`
-- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.0。`
+- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.1。`
 
 ## 开始阅读
 
