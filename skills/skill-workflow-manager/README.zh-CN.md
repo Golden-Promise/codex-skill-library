@@ -33,15 +33,6 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
 ```
 
-如果你把这个包单独发布成一个仓库，则使用：
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<single-skill-repo> \
-  --path . \
-  --name skill-workflow-manager
-```
-
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。

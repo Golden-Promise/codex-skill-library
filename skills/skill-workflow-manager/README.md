@@ -33,15 +33,6 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
 ```
 
-If you publish this package as its own repository instead, use:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<single-skill-repo> \
-  --path . \
-  --name skill-workflow-manager
-```
-
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).

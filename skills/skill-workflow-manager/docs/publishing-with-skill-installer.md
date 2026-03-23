@@ -17,35 +17,9 @@ Publish this package to GitHub in a way that is easy to:
 - install with `skill-installer`
 - maintain without mixing release notes into runtime skill documentation
 
-## Recommended Packaging Options
+## Repository Layout In This Repo
 
-### Option A: Single-Skill Repository
-
-Use this when the repository contains only `skill-workflow-manager`.
-
-```text
-repo-root/
-  README.md
-  docs/
-  SKILL.md
-  agents/
-  scripts/
-  references/
-  tests/
-```
-
-Install it with:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<repo> \
-  --path . \
-  --name skill-workflow-manager
-```
-
-### Option B: Multi-Skill Repository
-
-Use this when the repository contains several published skills.
+This package is published inside the multi-skill repository `codex-skill-library`.
 
 ```text
 repo-root/
@@ -72,8 +46,6 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager
 ```
-
-This layout is usually the cleaner long-term choice.
 
 ## Repository Files In This Repo
 
@@ -121,13 +93,4 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
-```
-
-If the package lives at repo root instead, use:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<repo> \
-  --path . \
-  --name skill-workflow-manager
 ```

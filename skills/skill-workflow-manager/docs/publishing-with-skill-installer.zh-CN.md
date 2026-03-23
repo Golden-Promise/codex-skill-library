@@ -17,35 +17,9 @@ English version: [publishing-with-skill-installer.md](publishing-with-skill-inst
 - 可以被 `skill-installer` 正常安装
 - 发布说明不污染运行时 skill 文档
 
-## 推荐发布方式
+## 当前仓库中的发布结构
 
-### 方案 A：单 Skill 仓库
-
-适用于仓库里只发布 `skill-workflow-manager` 这一个 skill。
-
-```text
-repo-root/
-  README.md
-  docs/
-  SKILL.md
-  agents/
-  scripts/
-  references/
-  tests/
-```
-
-安装命令：
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<repo> \
-  --path . \
-  --name skill-workflow-manager
-```
-
-### 方案 B：多 Skill 仓库
-
-适用于一个仓库里发布多个 skill。
+这个包当前发布在多-skill 仓库 `codex-skill-library` 中。
 
 ```text
 repo-root/
@@ -72,8 +46,6 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager
 ```
-
-从长期维护角度看，这通常是更整洁的方案。
 
 ## 当前仓库中的根文件
 
@@ -121,13 +93,4 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
-```
-
-如果当前包位于仓库根目录，则使用：
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/<repo> \
-  --path . \
-  --name skill-workflow-manager
 ```
