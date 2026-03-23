@@ -2,20 +2,28 @@
 
 [English](README.md)
 
-用共享库工作流维护 Codex skill：保持一个 canonical 来源，并按需把它安全地暴露给一个或多个项目。
+用“全局共享库优先”的方式维护 Codex skill：默认以 `$CODEX_HOME/skills` 为共享库，再按需把 skill 暴露给具体项目。
 
 ## 这个包可以帮你做什么
 
-- 创建或刷新 canonical skill 包
-- 把已下载的本地 skill 导入受管共享库
+- 在默认 Codex 共享库中创建或刷新 canonical skill 包
+- 把已下载的本地 skill 导入该共享库
 - 给项目接入、移除或同步 skill 链接
-- 为项目自举可管理的 skill 目录结构，并避免遗留重复的来源目录
+- 仅在你明确需要项目内托管时，为项目自举可管理的本地 skill 结构，并避免遗留重复来源目录
 - 把暂存的 skill 包注册到运行时技能目录，供 Codex 直接发现
 - 在不写入文件的前提下校验现有 skill 包
 
 ## 适合什么场景
 
-如果你希望某个 skill 只有一个权威来源，同时又希望多个项目都能通过轻量链接发现和使用它，这个包会很合适。
+如果你希望某个 skill 以 `$CODEX_HOME/skills` 作为权威共享来源，同时又希望多个项目按需通过轻量链接发现和使用它，这个包会很合适。
+
+## 推荐模型
+
+建议按两层来使用：
+
+- 默认共享库：把 canonical skill 放在 `$CODEX_HOME/skills`
+- 可选项目链接：通过 `<project-root>/.agents/skills` 暴露给具体项目
+- 项目内自举：只有当你明确希望 skill 随项目一起托管时，才使用 `<project-root>/_skill-library`
 
 ## 安装方式
 
@@ -61,27 +69,33 @@ python3 <目标根目录>/skill-workflow-manager/scripts/manage_skill.py \
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
-2. 如果你只想快速复制提示词，打开 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
-3. 如果你已经知道自己要用哪种模式，可以直接参考下面的常用命令。
+2. 默认优先使用 `$CODEX_HOME/skills` 这条全局共享库路径。
+3. 如果你只想快速复制提示词，打开 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
+4. 只有在你明确希望 skill 跟项目一起托管时，才使用项目内自举。
 
 ## 常用命令
 
-创建或刷新一个受管 skill：
+在共享库中创建或刷新一个 skill：
 
 ```bash
 python3 scripts/manage_skill.py \
   demo-skill \
-  --project-root <project-root> \
   --purpose "Use this skill when the user wants help with demo-skill tasks."
 ```
 
-导入前检查一个已下载的本地 skill：
+把一个已下载的本地 skill 导入共享库：
 
 ```bash
 python3 scripts/manage_skill.py \
-  --inspect-import \
-  --import-path <import-path> \
-  --project-root <project-root>
+  --import-path <import-path>
+```
+
+把共享库中的现有 skill 接入项目：
+
+```bash
+python3 scripts/manage_skill.py \
+  --project-root <project-root> \
+  --project-skills demo-skill
 ```
 
 无写入地校验当前包：
@@ -94,6 +108,14 @@ python3 scripts/manage_skill.py --validate-only
 
 ```bash
 python3 scripts/manage_skill.py --register-runtime-skill
+```
+
+仅当你希望 skill 变成项目内托管结构时，再做项目自举：
+
+```bash
+python3 scripts/manage_skill.py \
+  --bootstrap-project-layout \
+  --project-root <project-root>
 ```
 
 以机器可读格式列出共享库中的 skill：

@@ -1116,7 +1116,11 @@ def resolve_validate_target(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Create, update, validate, and link skills using the shared-library workflow."
+        description=(
+            "Create, update, validate, import, and link skills using a shared-library "
+            "workflow. When installed in Codex, the default library root is usually "
+            "$CODEX_HOME/skills."
+        )
     )
     parser.add_argument(
         "skill_name",
@@ -1127,7 +1131,7 @@ def parse_args() -> argparse.Namespace:
         "--library-root",
         help=(
             f"Canonical shared-library root. Defaults to ${DEFAULT_LIBRARY_ENV} or "
-            "the parent library directory inferred from this script."
+            "the parent skills directory inferred from this script."
         ),
     )
     parser.add_argument(
@@ -1199,7 +1203,7 @@ def parse_args() -> argparse.Namespace:
         "--bootstrap-project-layout",
         action="store_true",
         help=(
-            "Initialize a project root for shared-library management by ensuring "
+            "Initialize a project root for project-local managed skills by ensuring "
             "_skill-library and .agents/skills exist and by linking the current "
             "skill package into that managed layout."
         ),

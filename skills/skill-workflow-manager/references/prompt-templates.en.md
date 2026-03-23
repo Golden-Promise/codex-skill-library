@@ -22,7 +22,7 @@ For workflow selection, CLI details, and tradeoffs, read [use-cases.md](use-case
 ### Create
 
 ```text
-$skill-workflow-manager Create <skill-name>, use it for <purpose>, attach it to <project-root>, and validate it at the end.
+$skill-workflow-manager Create <skill-name> in the shared Codex library, use it for <purpose>, and validate it at the end.
 ```
 
 ### Update
@@ -86,7 +86,7 @@ $skill-workflow-manager Inspect <import-path> first. Do not import it yet. Tell 
 ### Import A Downloaded Local Skill
 
 ```text
-$skill-workflow-manager Import <import-path> into the shared library and attach it to <project-root>. Use the safer copy mode unless I say otherwise.
+$skill-workflow-manager Import <import-path> into the shared Codex library. Use the safer copy mode unless I say otherwise.
 ```
 
 If you are already in the target project directory:
@@ -98,7 +98,7 @@ $skill-workflow-manager I am already in the target project directory. Import <im
 ### Bootstrap A Standalone Skill Package
 
 ```text
-$skill-workflow-manager Turn this standalone downloaded skill package into a managed project. Infer the project root, create _skill-library and .agents/skills, and validate the result at the end.
+$skill-workflow-manager Turn this standalone downloaded skill package into a project-local managed layout. Infer the project root, create _skill-library and .agents/skills, and validate the result at the end.
 ```
 
 ### Register A Staged Package For Direct Codex Use

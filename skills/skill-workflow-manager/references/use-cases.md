@@ -8,6 +8,7 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 ## Start Here
 
 - If you already know the workflow and only need copy-ready wording, open [prompt-templates.en.md](prompt-templates.en.md).
+- Treat `$CODEX_HOME/skills` as the default shared library unless the user explicitly wants a project-local managed layout.
 - If you need to choose the correct operation, start with the decision map below.
 - Read-only modes can add `--format json` when you need machine-readable output for CI or automation.
 
@@ -15,7 +16,7 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 
 | Goal | Use this mode | Core flags |
 | --- | --- | --- |
-| Create or refresh one managed skill | Create or update | `<skill-name> --project-root <project-root> --purpose "<purpose>"` |
+| Create or refresh one shared-library skill | Create or update | `<skill-name> --purpose "<purpose>"` |
 | Preview risky changes first | Dry run | `--dry-run` |
 | See what already exists | Inventory | `--list-library-skills` or `--list-project-skills` |
 | Attach or repair project links | Project link | `--project-skills ...` or `<skill-name> --project-root ...` |
@@ -32,6 +33,7 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 | --- | --- |
 | `<skill-dir>` | The directory that contains this skill package |
 | `<skill-name>` | The canonical hyphen-case skill name |
+| `<library-root>` | The canonical shared-library root, usually `$CODEX_HOME/skills` |
 | `<project-root>` | The target project root |
 | `<import-path>` | A downloaded local skill directory outside the library |
 | `<target-root>` | A staging directory that contains `skill-workflow-manager` |
@@ -44,6 +46,8 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 - Use inventory mode when the user wants to list library skills or project links.
 - Use project-link mode when the skill already exists and the user only wants attachment changes.
 - Use `--inspect-import` before importing an unfamiliar downloaded skill.
+- Treat `$CODEX_HOME/skills` as the default canonical library and add project links only when needed.
+- Use project-local bootstrap only when the user explicitly wants a skill to live inside one project.
 - Use `copy` import mode by default. Use `move` only when the shared-library copy should become the sole source.
 - Use runtime registration when a staged package should become directly discoverable in Codex without moving it into the canonical shared library first.
 
@@ -59,14 +63,15 @@ Command pattern:
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
   <skill-name> \
-  --project-root <project-root> \
   --purpose "<purpose>"
 ```
 
 Notes:
 
+- This is the default path for skills that should live in the shared Codex library.
 - Add `--overwrite-skill-md` only when the user explicitly wants to rewrite the main template.
 - Add `--overwrite-openai` only when `agents/openai.yaml` should be regenerated.
+- Add `--project-root` only when the same request should also ensure a project link.
 - For copy-ready request wording, see [prompt-templates.en.md](prompt-templates.en.md).
 
 ## 2. Preview Risky Changes
@@ -201,14 +206,15 @@ Command pattern:
 
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
-  --import-path <import-path> \
-  --project-root <project-root>
+  --import-path <import-path>
 ```
 
 Notes:
 
+- This is the default adoption path for a downloaded skill that should become part of the shared Codex library.
 - Use `--import-mode move` only when the original download directory should stop being the source of truth.
 - If the imported name conflicts, retry with an explicit positional `<skill-name>`.
+- Add `--project-root <project-root>` only when the same request should also attach the imported skill to one project.
 - When the import source lives outside the project root, the script records it in `.agents/skill-workflow-manager/external-sources.json`.
 
 ## 8. Bootstrap A Standalone Download Into A Managed Project Layout
@@ -228,8 +234,9 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 Notes:
 
+- This is not the default way to manage globally shared skills.
 - If the script can infer the project root safely, `--project-root` may be omitted.
-- This is the bridge from a standalone package to the shared-library workflow.
+- This is the bridge from a standalone package to a project-local managed layout.
 - When bootstrap adopts a standalone in-project package, it removes the original source folder after validation so the project does not keep two `skill-workflow-manager` directories.
 
 ## 9. Register A Staged Package For Direct Codex Discovery
@@ -256,6 +263,7 @@ python3 <skill-dir>/scripts/manage_skill.py \
 Notes:
 
 - By default, the script registers the package that contains `manage_skill.py`.
+- Use this as a follow-up to a staged install, not as the default installation path.
 - If the package is already installed directly inside the runtime skills root, registration becomes a no-op.
 - This mode only handles Codex runtime discovery. It does not create `_skill-library`, update project links, or replace project bootstrap.
 

@@ -2,20 +2,28 @@
 
 [简体中文](README.zh-CN.md)
 
-Maintain Codex skills with one canonical source, optional project discovery links, and a shared-library workflow that stays consistent over time.
+Maintain Codex skills with a global-first shared-library workflow built around `$CODEX_HOME/skills`, plus optional project discovery links when a project needs them.
 
 ## What This Package Helps With
 
-- creating or refreshing a canonical skill package
-- importing a downloaded local skill into a managed library
+- creating or refreshing a canonical skill package in the default Codex shared library
+- importing a downloaded local skill into that shared library
 - attaching, detaching, or syncing project discovery links
-- bootstrapping a managed project layout for skills without leaving a duplicate source folder behind
+- bootstrapping a project-local managed layout when you intentionally want project-contained skill management
 - registering a staged skill package into the runtime skills root for direct Codex discovery
 - validating an existing skill package without writing files
 
 ## Best For
 
-This package is especially useful when you want one source of truth for a skill while still exposing it to one or more projects through lightweight links.
+This package works best when you treat `$CODEX_HOME/skills` as the natural shared skill library and add project links only when a project needs local discovery.
+
+## Recommended Model
+
+Use this package in two layers:
+
+- Default shared library: keep canonical skills in `$CODEX_HOME/skills`
+- Optional project links: expose selected skills through `<project-root>/.agents/skills`
+- Project-local bootstrap: use `<project-root>/_skill-library` only when you explicitly want a project-contained managed layout
 
 ## Install
 
@@ -61,27 +69,33 @@ python3 <target-root>/skill-workflow-manager/scripts/manage_skill.py \
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).
-2. Use [references/prompt-templates.en.md](references/prompt-templates.en.md) when you want copy-ready prompt wording.
-3. Use the CLI patterns below when you already know which mode you need.
+2. Default to the global shared-library flow in `$CODEX_HOME/skills`.
+3. Use [references/prompt-templates.en.md](references/prompt-templates.en.md) when you want copy-ready prompt wording.
+4. Reach for project-local bootstrap only when the skill should live under one project rather than the global shared library.
 
 ## Common Commands
 
-Create or refresh a managed skill:
+Create or refresh a shared-library skill:
 
 ```bash
 python3 scripts/manage_skill.py \
   demo-skill \
-  --project-root <project-root> \
   --purpose "Use this skill when the user wants help with demo-skill tasks."
 ```
 
-Inspect a downloaded local skill before import:
+Import a downloaded local skill into the shared library:
 
 ```bash
 python3 scripts/manage_skill.py \
-  --inspect-import \
-  --import-path <import-path> \
-  --project-root <project-root>
+  --import-path <import-path>
+```
+
+Attach an existing shared-library skill to a project:
+
+```bash
+python3 scripts/manage_skill.py \
+  --project-root <project-root> \
+  --project-skills demo-skill
 ```
 
 Validate the current package without writing files:
@@ -94,6 +108,14 @@ Register the current package into the runtime skills root:
 
 ```bash
 python3 scripts/manage_skill.py --register-runtime-skill
+```
+
+Bootstrap a project-local managed layout only when the skill should live inside one project:
+
+```bash
+python3 scripts/manage_skill.py \
+  --bootstrap-project-layout \
+  --project-root <project-root>
 ```
 
 List library skills in machine-readable form:

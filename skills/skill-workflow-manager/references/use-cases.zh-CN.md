@@ -8,6 +8,7 @@ English version: [use-cases.md](use-cases.md)
 ## 开始阅读
 
 - 如果你已经知道工作流，只想直接复制请求，打开 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。
+- 默认把 `$CODEX_HOME/skills` 视为共享库；只有在用户明确要项目内托管时，才使用项目级受管布局。
 - 如果你还在判断该用哪种操作，先看下面的决策图。
 - 如果你需要给 CI 或自动化脚本使用，只读模式都可以追加 `--format json`。
 
@@ -15,7 +16,7 @@ English version: [use-cases.md](use-cases.md)
 
 | 目标 | 使用模式 | 核心参数 |
 | --- | --- | --- |
-| 创建或刷新一个受管 skill | 创建 / 更新 | `<skill-name> --project-root <project-root> --purpose "<purpose>"` |
+| 创建或刷新一个共享库 skill | 创建 / 更新 | `<skill-name> --purpose "<purpose>"` |
 | 先预览风险改动 | 预演 | `--dry-run` |
 | 查看当前已有内容 | 清单 | `--list-library-skills` 或 `--list-project-skills` |
 | 给项目接入 skill 或修复链接 | 项目链接 | `--project-skills ...` 或 `<skill-name> --project-root ...` |
@@ -32,6 +33,7 @@ English version: [use-cases.md](use-cases.md)
 | --- | --- |
 | `<skill-dir>` | 当前 skill 包所在目录 |
 | `<skill-name>` | canonical 的连字符命名 skill 名称 |
+| `<library-root>` | canonical 共享库根目录，通常是 `$CODEX_HOME/skills` |
 | `<project-root>` | 目标项目根目录 |
 | `<import-path>` | 共享库之外、待导入的本地 skill 目录 |
 | `<目标根目录>` | 包含 `skill-workflow-manager` 的暂存目录 |
@@ -44,6 +46,8 @@ English version: [use-cases.md](use-cases.md)
 - 用户只想查看共享库或项目当前挂载情况时，用清单模式。
 - skill 已存在，只想调整项目接入关系时，用项目链接模式。
 - 导入陌生的本地 skill 前，优先使用 `--inspect-import`。
+- 默认把 `$CODEX_HOME/skills` 作为 canonical 共享库，需要时再为项目补链接。
+- 只有当用户明确希望 skill 跟项目一起托管时，才使用项目内自举。
 - 默认使用 `copy` 导入；只有当共享库副本要成为唯一正式来源时才使用 `move`。
 - 当一个暂存包需要直接被 Codex 发现，但又不想先迁入 canonical 共享库时，用运行时注册模式。
 
@@ -59,14 +63,15 @@ English version: [use-cases.md](use-cases.md)
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
   <skill-name> \
-  --project-root <project-root> \
   --purpose "<purpose>"
 ```
 
 补充说明：
 
+- 这是“把 skill 放进 Codex 共享库”的默认路径。
 - 只有在用户明确要求重写主模板时，才加 `--overwrite-skill-md`。
 - 只有在需要重生成 `agents/openai.yaml` 时，才加 `--overwrite-openai`。
+- 只有当同一请求还要顺手保证项目链接存在时，才加 `--project-root`。
 - 如果你想直接复制请求措辞，去看 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。
 
 ## 2. 预演高风险改动
@@ -201,14 +206,15 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
-  --import-path <import-path> \
-  --project-root <project-root>
+  --import-path <import-path>
 ```
 
 补充说明：
 
+- 这是把下载包接入 Codex 共享库的默认方式。
 - 只有在原下载目录不再需要保留时，才使用 `--import-mode move`。
 - 如果导入名冲突，用显式位置参数 `<skill-name>` 重试。
+- 只有当同一请求还要接入某个项目时，才额外加 `--project-root <project-root>`。
 - 当导入源位于项目根目录之外时，脚本会把来源记录到 `.agents/skill-workflow-manager/external-sources.json`。
 
 ## 8. 将独立下载包自举为受管项目结构
@@ -228,8 +234,9 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 补充说明：
 
+- 这不是全局共享 skill 的默认管理方式。
 - 如果脚本能安全推断项目根目录，可以省略 `--project-root`。
-- 这是把独立下载包接回共享库工作流的桥接方式。
+- 这是把独立下载包接回“项目内受管布局”的桥接方式。
 - 当自举接管项目内的独立下载包时，脚本会在校验通过后清理原始来源目录，避免项目里同时保留两个 `skill-workflow-manager` 目录。
 
 ## 9. 把暂存包注册为可直接发现的运行时 Skill
@@ -256,6 +263,7 @@ python3 <skill-dir>/scripts/manage_skill.py \
 补充说明：
 
 - 默认情况下，脚本会注册包含 `manage_skill.py` 的当前包。
+- 这更适合作为“暂存安装之后的补一步”，而不是默认安装路径。
 - 如果该包本来就已经直接位于运行时技能根目录中，注册会成为 no-op。
 - 这个模式只处理 Codex 的运行时发现，不会创建 `_skill-library`、不会更新项目链接，也不会替代项目自举。
 

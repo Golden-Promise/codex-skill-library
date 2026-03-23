@@ -22,7 +22,7 @@ English version: [prompt-templates.en.md](prompt-templates.en.md)
 ### 创建
 
 ```text
-$skill-workflow-manager 创建 <skill-name>，用途是 <purpose>，接入 <project-root>，最后校验。
+$skill-workflow-manager 在 Codex 共享库里创建 <skill-name>，用途是 <purpose>，最后校验。
 ```
 
 ### 更新
@@ -86,7 +86,7 @@ $skill-workflow-manager 先预检 <import-path>，不要导入，只告诉我结
 ### 导入已下载的本地 Skill
 
 ```text
-$skill-workflow-manager 把 <import-path> 导入共享库，并接入 <project-root>。如果没有特别说明，默认使用更安全的 copy 模式。
+$skill-workflow-manager 把 <import-path> 导入 Codex 共享库。如果没有特别说明，默认使用更安全的 copy 模式。
 ```
 
 如果你已经在目标项目目录里：
@@ -98,7 +98,7 @@ $skill-workflow-manager 我现在就在目标项目目录。请把 <import-path>
 ### 把独立下载包自举成受管项目
 
 ```text
-$skill-workflow-manager 把当前这个单独下载的 skill 包初始化为受管项目。请自动推断 project root，创建 _skill-library 和 .agents/skills，并在最后校验结果。
+$skill-workflow-manager 把当前这个单独下载的 skill 包初始化为项目内受管布局。请自动推断 project root，创建 _skill-library 和 .agents/skills，并在最后校验结果。
 ```
 
 ### 把暂存包注册成可直接使用的运行时 Skill

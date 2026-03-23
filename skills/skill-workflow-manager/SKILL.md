@@ -1,13 +1,13 @@
 ---
 name: skill-workflow-manager
-description: Use this skill when the user wants to create, update, standardize, import, or relink a Codex skill with a shared-library workflow. It maintains one canonical source, manages project discovery links, and updates skill metadata consistently.
+description: Use this skill when the user wants to create, update, standardize, import, or relink a Codex skill with a shared-library workflow. It treats $CODEX_HOME/skills as the default shared library, manages optional project discovery links, and updates skill metadata consistently.
 ---
 
 # Skill Workflow Manager
 
 ## Purpose
 
-Manage a skill as one canonical source plus optional project discovery links.
+Manage skills in the default Codex shared library plus optional project discovery links.
 Use this skill for skill lifecycle work only.
 
 ## Use This Skill When
@@ -15,25 +15,29 @@ Use this skill for skill lifecycle work only.
 - create or update a managed skill
 - inspect or import a downloaded local skill into the library
 - attach, detach, or exact-sync selected skills for a project
-- repair project discovery links, bootstrap a managed project layout, or register a staged package for direct Codex discovery
+- repair project discovery links
+- bootstrap a project-local managed layout when the user explicitly wants project-contained skill management
+- register a staged package for direct Codex discovery
 
 Do not use this skill for unrelated coding tasks.
 
 ## Working Model
 
-1. Keep exactly one canonical source at `<library-root>/<skill-name>`.
-2. Expose that skill to projects through `<project-root>/.agents/skills/<skill-name>`.
-3. Update `SKILL.md` and `agents/openai.yaml` together.
-4. Keep `SKILL.md` concise and move longer examples or policy details into `references/`.
-5. Validate after create or update work unless the user explicitly asks to skip it.
+1. Treat `$CODEX_HOME/skills/<skill-name>` as the default canonical shared-library location unless the user explicitly chooses another library root.
+2. Expose a shared-library skill to projects through `<project-root>/.agents/skills/<skill-name>` only when project discovery is needed.
+3. Use `<project-root>/_skill-library/<skill-name>` only when the user explicitly wants a project-contained managed layout.
+4. Update `SKILL.md` and `agents/openai.yaml` together.
+5. Keep `SKILL.md` concise and move longer examples or policy details into `references/`.
+6. Validate after create or update work unless the user explicitly asks to skip it.
 
 ## Workflow
 
-1. Classify the request as create/update, inspect/import, project link management, bootstrap, or runtime registration.
+1. Classify the request as create/update, inspect/import, project link management, project-local bootstrap, or runtime registration.
 2. Use `scripts/manage_skill.py` for deterministic filesystem work.
 3. Prefer `--dry-run` or `--inspect-import` before risky changes.
-4. Default to `--import-mode copy`; use `move` only when the shared-library copy should become the sole source.
-5. Report the canonical path, any links changed, and the validation result or remaining manual follow-up.
+4. Prefer the global shared-library flow in `$CODEX_HOME/skills`; use project-local bootstrap only when the user explicitly wants vendored project management.
+5. Default to `--import-mode copy`; use `move` only when the shared-library copy should become the sole source.
+6. Report the canonical path, any links changed, and the validation result or remaining manual follow-up.
 
 ## Rules
 
@@ -49,15 +53,19 @@ Use `scripts/manage_skill.py` with portable placeholders:
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
   <skill-name> \
-  --project-root <project-root> \
   --purpose "<purpose>"
 ```
 
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
   --inspect-import \
-  --import-path <downloaded-skill> \
-  --project-root <project-root>
+  --import-path <downloaded-skill>
+```
+
+```bash
+python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
+  --project-root <project-root> \
+  --project-skills <skill-name>
 ```
 
 ```bash

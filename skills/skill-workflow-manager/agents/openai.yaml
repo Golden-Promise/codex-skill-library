@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Workflow Manager"
-  short_description: "Manage shared-library skill workflows"
-  default_prompt: "Use $skill-workflow-manager to create, update, import, or relink a skill with the shared-library workflow."
+  short_description: "Manage Codex shared-library skills and project links"
+  default_prompt: "Use $skill-workflow-manager to manage skills in the default Codex shared library, import downloaded skills, and maintain optional project links."
