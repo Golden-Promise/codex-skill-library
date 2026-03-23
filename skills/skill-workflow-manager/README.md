@@ -44,8 +44,9 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 Install with Codex using the `skill-installer` skill:
 
-- Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
-- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1.`
+- Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager, and install it to <target-root>.`
+- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1, and install it to <target-root>.`
+- More precisely, `<target-root>` is the install root, and the final directory will be `<target-root>/skill-workflow-manager`.
 
 ## Start Here
 
