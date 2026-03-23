@@ -226,6 +226,7 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 - 如果脚本能安全推断项目根目录，可以省略 `--project-root`。
 - 这是把独立下载包接回共享库工作流的桥接方式。
+- 当自举接管项目内的独立下载包时，脚本会在校验通过后清理原始来源目录，避免项目里同时保留两个 `skill-workflow-manager` 目录。
 
 ## 9. 无写入地校验现有 Skill
 

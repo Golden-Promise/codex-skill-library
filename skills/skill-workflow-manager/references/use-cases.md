@@ -226,6 +226,7 @@ Notes:
 
 - If the script can infer the project root safely, `--project-root` may be omitted.
 - This is the bridge from a standalone package to the shared-library workflow.
+- When bootstrap adopts a standalone in-project package, it removes the original source folder after validation so the project does not keep two `skill-workflow-manager` directories.
 
 ## 9. Validate An Existing Skill Without Writing Files
 

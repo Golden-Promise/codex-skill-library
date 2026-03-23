@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -65,6 +66,15 @@ class ManageSkillTests(unittest.TestCase):
             check=False,
             text=True,
             capture_output=True,
+        )
+
+    def run_script_from_path(self, script_path: Path, cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            ["python3", str(script_path), *args],
+            check=False,
+            text=True,
+            capture_output=True,
+            cwd=str(cwd),
         )
 
     def test_default_prompt_generation_is_consistent(self):
@@ -233,6 +243,62 @@ class ManageSkillTests(unittest.TestCase):
                 os_module.chdir(previous_cwd)
 
         self.assertIsNone(inferred)
+
+    def test_bootstrap_project_layout_removes_in_project_runtime_source(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = Path(tmpdir) / "demo-project"
+            source_dir = project_root / "skill-workflow-manager"
+            scripts_dir = source_dir / "scripts"
+            write_skill_dir(source_dir, skill_name="skill-workflow-manager")
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            script_copy = scripts_dir / "manage_skill.py"
+            shutil.copy2(SCRIPT_PATH, script_copy)
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            result = self.run_script_from_path(
+                script_copy,
+                project_root,
+                "--bootstrap-project-layout",
+            )
+
+            canonical_dir = project_root / "_skill-library" / "skill-workflow-manager"
+            project_link = project_root / ".agents" / "skills" / "skill-workflow-manager"
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Bootstrap source cleanup (removed)", result.stdout)
+            self.assertTrue(canonical_dir.exists())
+            self.assertFalse(source_dir.exists())
+            self.assertTrue(project_link.is_symlink())
+            self.assertEqual(project_link.resolve(), canonical_dir.resolve())
+
+    def test_bootstrap_project_layout_removes_duplicate_source_when_canonical_exists(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = Path(tmpdir) / "demo-project"
+            source_dir = project_root / "skill-workflow-manager"
+            canonical_dir = project_root / "_skill-library" / "skill-workflow-manager"
+            scripts_dir = source_dir / "scripts"
+            write_skill_dir(source_dir, skill_name="skill-workflow-manager")
+            write_skill_dir(canonical_dir, skill_name="skill-workflow-manager")
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            script_copy = scripts_dir / "manage_skill.py"
+            shutil.copy2(SCRIPT_PATH, script_copy)
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            result = self.run_script_from_path(
+                script_copy,
+                project_root,
+                "--bootstrap-project-layout",
+            )
+
+            project_link = project_root / ".agents" / "skills" / "skill-workflow-manager"
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Keeping", result.stdout)
+            self.assertIn("Bootstrap source cleanup (removed)", result.stdout)
+            self.assertTrue(canonical_dir.exists())
+            self.assertFalse(source_dir.exists())
+            self.assertTrue(project_link.is_symlink())
+            self.assertEqual(project_link.resolve(), canonical_dir.resolve())
 
 
 if __name__ == "__main__":

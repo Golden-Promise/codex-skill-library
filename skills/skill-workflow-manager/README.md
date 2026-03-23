@@ -9,7 +9,7 @@ Maintain Codex skills with one canonical source, optional project discovery link
 - creating or refreshing a canonical skill package
 - importing a downloaded local skill into a managed library
 - attaching, detaching, or syncing project discovery links
-- bootstrapping a managed project layout for skills
+- bootstrapping a managed project layout for skills without leaving a duplicate source folder behind
 - validating an existing skill package without writing files
 
 ## Best For

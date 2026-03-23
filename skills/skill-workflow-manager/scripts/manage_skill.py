@@ -48,6 +48,7 @@ class ExecutionContext:
     project_root_inferred_from_cwd: bool
     kept_existing_canonical: bool
     report_compat_root: bool
+    bootstrap_cleanup_source: Path | None
 
 
 def normalize_skill_name(raw_name: str) -> str:
@@ -948,6 +949,25 @@ def unlink_symlink(link_path: Path, dry_run: bool = False) -> str:
     )
 
 
+def remove_path(path: Path, dry_run: bool = False) -> str:
+    if path.is_symlink():
+        if dry_run:
+            return "would remove symlink"
+        path.unlink()
+        return "removed symlink"
+    if not path.exists():
+        return "absent"
+    if path.is_dir():
+        if dry_run:
+            return "would remove"
+        shutil.rmtree(path)
+        return "removed"
+    if dry_run:
+        return "would remove file"
+    path.unlink()
+    return "removed file"
+
+
 def ensure_existing_skill_dir(library_root: Path, skill_name: str) -> Path:
     skill_dir = library_root / skill_name
     if not skill_dir.exists():
@@ -1231,6 +1251,8 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
     kept_existing_canonical = False
     project_root_inferred_from_cwd = False
     effective_bootstrap_project_layout = args.bootstrap_project_layout
+    bootstrap_cleanup_source: Path | None = None
+    bootstrap_source_candidate: Path | None = None
 
     if project_root is None:
         inferred_cwd_project_root = infer_project_root_from_cwd(import_path, runtime_skill_dir)
@@ -1258,6 +1280,8 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
             return 1
         import_path = runtime_skill_dir
         auto_bootstrap_import = True
+    if effective_bootstrap_project_layout and import_path is not None:
+        bootstrap_source_candidate = import_path
 
     inferred_import_name = detect_skill_name_from_source(import_path) if import_path else ""
     skill_name = normalize_skill_name(args.skill_name) if args.skill_name else inferred_import_name
@@ -1285,6 +1309,19 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
             import_path = None
             auto_bootstrap_import = False
             kept_existing_canonical = True
+    if (
+        effective_bootstrap_project_layout
+        and bootstrap_source_candidate is not None
+        and project_root is not None
+        and skill_name
+    ):
+        canonical_candidate = library_root / skill_name
+        if (
+            path_is_within(bootstrap_source_candidate, project_root)
+            and bootstrap_source_candidate.resolve()
+            != canonical_candidate.resolve(strict=False)
+        ):
+            bootstrap_cleanup_source = bootstrap_source_candidate
     if args.skill_name and not skill_name:
         raise UsageError("[ERROR] Skill name must include at least one letter or digit.")
     if skill_name and len(skill_name) > MAX_NAME_LENGTH:
@@ -1356,6 +1393,7 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         project_root_inferred_from_cwd=project_root_inferred_from_cwd,
         kept_existing_canonical=kept_existing_canonical,
         report_compat_root=report_compat_root,
+        bootstrap_cleanup_source=bootstrap_cleanup_source,
     )
 
 
@@ -1670,6 +1708,12 @@ def finalize_mutation_mode(ctx: ExecutionContext, canonical_skill_dir: Path | No
         print("[NEXT] Validation skipped by request.")
     elif ctx.project_skills or ctx.unlink_skills or ctx.sync_project_skills:
         print("[NEXT] Project skill operation complete.")
+    if ctx.bootstrap_cleanup_source is not None and canonical_skill_dir is not None:
+        cleanup_status = remove_path(ctx.bootstrap_cleanup_source, dry_run=ctx.args.dry_run)
+        print(
+            f"[OK] Bootstrap source cleanup ({cleanup_status}): "
+            f"{ctx.bootstrap_cleanup_source}"
+        )
     return 0
 
 
