@@ -42,6 +42,11 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
 ```
 
+Install with Codex using the `skill-installer` skill:
+
+- Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
+- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.0.`
+
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).

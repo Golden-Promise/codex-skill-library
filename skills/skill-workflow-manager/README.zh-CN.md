@@ -42,6 +42,11 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
 ```
 
+如果通过 Codex 中的 `skill-installer` 技能安装，可以直接这样说：
+
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager。`
+- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.0。`
+
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
