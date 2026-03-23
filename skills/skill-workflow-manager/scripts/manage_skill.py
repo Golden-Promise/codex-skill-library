@@ -16,9 +16,7 @@ from pathlib import Path
 
 DEFAULT_LIBRARY_ENV = "CODEX_SKILL_LIBRARY_ROOT"
 DEFAULT_COMPAT_ENV = "CODEX_SKILL_COMPAT_ROOT"
-DEFAULT_CODEX_HOME_ENV = "CODEX_HOME"
 DEFAULT_LIBRARY_DIRNAME = "_skill-library"
-DEFAULT_RUNTIME_SKILLS_DIRNAME = "skills"
 EXTERNAL_SOURCE_REGISTRY_DIRNAME = "skill-workflow-manager"
 EXTERNAL_SOURCE_REGISTRY_FILENAME = "external-sources.json"
 MAX_NAME_LENGTH = 64
@@ -42,7 +40,6 @@ class ExecutionContext:
     skill_name: str
     library_root: Path
     compat_root: Path | None
-    runtime_skills_root: Path | None
     resources: list[str]
     project_skills: list[str]
     unlink_skills: list[str]
@@ -174,15 +171,6 @@ def detect_compat_root(
     if (candidate / ".agents" / "skills").exists():
         return candidate
     return None
-
-
-def detect_runtime_skills_root(explicit_root: str | None) -> Path:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    codex_home = os.environ.get(DEFAULT_CODEX_HOME_ENV)
-    if codex_home:
-        return (Path(codex_home).expanduser().resolve() / DEFAULT_RUNTIME_SKILLS_DIRNAME)
-    return (Path.home() / ".codex" / DEFAULT_RUNTIME_SKILLS_DIRNAME).resolve()
 
 
 def infer_project_root_for_bootstrap(
@@ -1183,13 +1171,6 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--runtime-skills-root",
-        help=(
-            "Optional runtime skills root for direct Codex discovery. "
-            f"Defaults to ${DEFAULT_CODEX_HOME_ENV}/{DEFAULT_RUNTIME_SKILLS_DIRNAME}."
-        ),
-    )
-    parser.add_argument(
         "--no-compat-link",
         action="store_true",
         help="Skip creating the compatibility link for create/update operations",
@@ -1206,14 +1187,6 @@ def parse_args() -> argparse.Namespace:
             "Initialize a project root for project-local managed skills by ensuring "
             "_skill-library and .agents/skills exist and by linking the current "
             "skill package into that managed layout."
-        ),
-    )
-    parser.add_argument(
-        "--register-runtime-skill",
-        action="store_true",
-        help=(
-            "Register a skill package into the runtime skills root so Codex can "
-            "discover it directly."
         ),
     )
     parser.add_argument(
@@ -1284,11 +1257,6 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
     effective_bootstrap_project_layout = args.bootstrap_project_layout
     bootstrap_cleanup_source: Path | None = None
     bootstrap_source_candidate: Path | None = None
-    runtime_skills_root = (
-        detect_runtime_skills_root(args.runtime_skills_root)
-        if args.register_runtime_skill
-        else None
-    )
 
     if project_root is None:
         inferred_cwd_project_root = infer_project_root_from_cwd(import_path, runtime_skill_dir)
@@ -1401,13 +1369,12 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         bool(sync_project_skills),
         bool(args.bootstrap_project),
         bool(args.bootstrap_project_layout),
-        bool(args.register_runtime_skill),
     ]
     if sum(project_modes) > 1:
         raise UsageError(
             "[ERROR] Use only one of --project-skills, --unlink-skills, "
-            "--sync-project-skills, --bootstrap-project, --bootstrap-project-layout, "
-            "or --register-runtime-skill at a time."
+            "--sync-project-skills, --bootstrap-project, or "
+            "--bootstrap-project-layout at a time."
         )
 
     if args.bootstrap_project and not project_skills:
@@ -1423,7 +1390,6 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         skill_name=skill_name,
         library_root=library_root,
         compat_root=compat_root,
-        runtime_skills_root=runtime_skills_root,
         resources=resources,
         project_skills=project_skills,
         unlink_skills=unlink_skills,
@@ -1455,7 +1421,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
         and not args.list_library_skills
         and not args.list_project_skills
         and not args.bootstrap_project_layout
-        and not args.register_runtime_skill
         and not args.validate_only
     ):
         raise UsageError(
@@ -1479,7 +1444,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
             or ctx.sync_project_skills
             or args.bootstrap_project
             or args.bootstrap_project_layout
-            or args.register_runtime_skill
             or args.dry_run
             or args.resources
             or args.purpose
@@ -1491,7 +1455,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
             or args.skip_validate
             or args.inspect_import
             or args.compat_root
-            or args.runtime_skills_root
             or args.no_compat_link
         ):
             raise UsageError(
@@ -1516,7 +1479,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
             or ctx.sync_project_skills
             or args.bootstrap_project
             or args.bootstrap_project_layout
-            or args.register_runtime_skill
             or args.dry_run
             or args.resources
             or args.purpose
@@ -1527,7 +1489,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
             or args.overwrite_openai
             or args.skip_validate
             or args.inspect_import
-            or args.runtime_skills_root
         ):
             raise UsageError(
                 "[ERROR] Listing modes are read-only and cannot be combined with create, import, "
@@ -1537,37 +1498,6 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
 
     if args.inspect_import and not ctx.skill_name:
         raise UsageError("[ERROR] Could not determine a canonical skill name for inspection.")
-
-    if args.register_runtime_skill:
-        if (
-            args.list_library_skills
-            or args.list_project_skills
-            or ctx.project_skills
-            or ctx.unlink_skills
-            or ctx.sync_project_skills
-            or args.bootstrap_project
-            or args.bootstrap_project_layout
-            or args.inspect_import
-            or args.resources
-            or args.purpose
-            or args.display_name
-            or args.short_description
-            or args.default_prompt
-            or args.overwrite_skill_md
-            or args.overwrite_openai
-            or args.compat_root
-            or args.no_compat_link
-        ):
-            raise UsageError(
-                "[ERROR] --register-runtime-skill can be combined only with an optional "
-                "<skill-name>, --import-path, --library-root, --runtime-skills-root, "
-                "--dry-run, and --skip-validate."
-            )
-        if args.import_mode != "copy":
-            raise UsageError(
-                "[ERROR] --register-runtime-skill does not use --import-mode. "
-                "Remove that flag or keep the default copy mode."
-            )
 
 
 def print_execution_context(ctx: ExecutionContext) -> None:
@@ -1593,97 +1523,8 @@ def print_execution_context(ctx: ExecutionContext) -> None:
         )
     if ctx.report_compat_root and ctx.skill_name:
         print(f"[INFO] Compatibility root: {ctx.compat_root}")
-    if args.register_runtime_skill and ctx.runtime_skills_root:
-        print(f"[INFO] Runtime skills root: {ctx.runtime_skills_root}")
     if args.dry_run:
         print("[INFO] Dry-run mode enabled. No files will be modified.")
-
-
-def resolve_runtime_registration_source(
-    ctx: ExecutionContext,
-) -> tuple[Path, str]:
-    if ctx.import_path is not None:
-        source_dir = ctx.import_path
-        detected_name = detect_skill_name_from_source(source_dir)
-        if ctx.skill_name and detected_name and ctx.skill_name != detected_name:
-            raise ValueError(
-                f"Explicit skill name '{ctx.skill_name}' does not match import source "
-                f"name '{detected_name}'."
-            )
-        skill_name = ctx.skill_name or detected_name
-    elif ctx.skill_name:
-        source_dir = ensure_existing_skill_dir(ctx.library_root, ctx.skill_name)
-        skill_name = ctx.skill_name
-    else:
-        source_dir = ctx.runtime_skill_dir
-        skill_name = detect_skill_name_from_source(source_dir)
-
-    if not source_dir.exists():
-        raise FileNotFoundError(f"Runtime registration source does not exist: {source_dir}")
-    if not source_dir.is_dir():
-        raise NotADirectoryError(
-            f"Runtime registration source is not a directory: {source_dir}"
-        )
-    if not skill_name:
-        raise ValueError(
-            "Could not determine a skill name for runtime registration. "
-            "Provide <skill-name> or --import-path explicitly."
-        )
-
-    return source_dir, skill_name
-
-
-def ensure_runtime_skill_registration(
-    runtime_skills_root: Path,
-    skill_name: str,
-    source_dir: Path,
-    dry_run: bool = False,
-) -> tuple[Path, str]:
-    registration_path = runtime_skills_root / skill_name
-    if (
-        registration_path.exists()
-        and not registration_path.is_symlink()
-        and registration_path.resolve() == source_dir.resolve()
-    ):
-        return registration_path, "already present"
-    status = ensure_symlink(registration_path, source_dir, dry_run=dry_run)
-    return registration_path, status
-
-
-def handle_runtime_registration_mode(ctx: ExecutionContext) -> int:
-    print_execution_context(ctx)
-
-    try:
-        source_dir, runtime_skill_name = resolve_runtime_registration_source(ctx)
-        if not ctx.args.skip_validate:
-            if ctx.args.dry_run:
-                print(
-                    f"[NEXT] Dry-run complete. Validation would run for {source_dir} "
-                    "before registering the runtime skill."
-                )
-            else:
-                validation_status = report_validation(source_dir)
-                if validation_status != 0:
-                    return validation_status
-        else:
-            print("[NEXT] Validation skipped by request.")
-
-        registration_path, registration_status = ensure_runtime_skill_registration(
-            ctx.runtime_skills_root,
-            runtime_skill_name,
-            source_dir,
-            dry_run=ctx.args.dry_run,
-        )
-    except (FileExistsError, FileNotFoundError, NotADirectoryError, ValueError) as error:
-        print(f"[ERROR] {error}")
-        return 1
-
-    print(f"[INFO] Runtime registration source: {source_dir}")
-    print(
-        f"[OK] Runtime skill registration ({registration_status}): "
-        f"{registration_path}"
-    )
-    return 0
 
 
 def handle_validate_only_mode(ctx: ExecutionContext) -> int:
@@ -1912,8 +1753,6 @@ def main() -> int:
         if args.format == "text":
             print_execution_context(ctx)
         return handle_inspect_mode(ctx)
-    if args.register_runtime_skill:
-        return handle_runtime_registration_mode(ctx)
     return handle_mutation_mode(ctx)
 
 

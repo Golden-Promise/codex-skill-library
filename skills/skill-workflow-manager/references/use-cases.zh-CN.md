@@ -24,7 +24,6 @@ English version: [use-cases.md](use-cases.md)
 | 导入前检查本地 skill | 导入预检 | `--inspect-import --import-path <import-path>` |
 | 接管一个已下载的本地 skill | 导入 | `--import-path <import-path>` |
 | 将独立下载包转为受管布局 | 自举 | `--bootstrap-project-layout` |
-| 让暂存包能被 Codex 直接发现 | 运行时注册 | `--register-runtime-skill` |
 | 无写入地校验现有 skill | 校验 | `--validate-only` |
 
 ## 通用占位符
@@ -36,8 +35,6 @@ English version: [use-cases.md](use-cases.md)
 | `<library-root>` | canonical 共享库根目录，通常是 `$CODEX_HOME/skills` |
 | `<project-root>` | 目标项目根目录 |
 | `<import-path>` | 共享库之外、待导入的本地 skill 目录 |
-| `<目标根目录>` | 包含 `skill-workflow-manager` 的暂存目录 |
-| `<运行时技能根目录>` | 运行时技能根目录，通常是 `$CODEX_HOME/skills` |
 | `<purpose>` | 目标 skill 的 frontmatter `description` |
 
 ## 工作规则
@@ -49,7 +46,6 @@ English version: [use-cases.md](use-cases.md)
 - 默认把 `$CODEX_HOME/skills` 作为 canonical 共享库，需要时再为项目补链接。
 - 只有当用户明确希望 skill 跟项目一起托管时，才使用项目内自举。
 - 默认使用 `copy` 导入；只有当共享库副本要成为唯一正式来源时才使用 `move`。
-- 当一个暂存包需要直接被 Codex 发现，但又不想先迁入 canonical 共享库时，用运行时注册模式。
 
 ## 1. 创建或刷新受管 Skill
 
@@ -239,35 +235,7 @@ python3 <skill-dir>/scripts/manage_skill.py \
 - 这是把独立下载包接回“项目内受管布局”的桥接方式。
 - 当自举接管项目内的独立下载包时，脚本会在校验通过后清理原始来源目录，避免项目里同时保留两个 `skill-workflow-manager` 目录。
 
-## 9. 把暂存包注册为可直接发现的运行时 Skill
-
-适用场景：
-
-- skill 包已经存在于其他目录
-- 你希望 Codex 能通过 `$CODEX_HOME/skills` 直接发现它
-- 你不想重新安装，也不想重新复制整个包
-
-命令模式：
-
-```bash
-python3 <目标根目录>/skill-workflow-manager/scripts/manage_skill.py \
-  --register-runtime-skill
-```
-
-```bash
-python3 <skill-dir>/scripts/manage_skill.py \
-  --register-runtime-skill \
-  --runtime-skills-root <运行时技能根目录>
-```
-
-补充说明：
-
-- 默认情况下，脚本会注册包含 `manage_skill.py` 的当前包。
-- 这更适合作为“暂存安装之后的补一步”，而不是默认安装路径。
-- 如果该包本来就已经直接位于运行时技能根目录中，注册会成为 no-op。
-- 这个模式只处理 Codex 的运行时发现，不会创建 `_skill-library`、不会更新项目链接，也不会替代项目自举。
-
-## 10. 无写入地校验现有 Skill
+## 9. 无写入地校验现有 Skill
 
 适用场景：
 

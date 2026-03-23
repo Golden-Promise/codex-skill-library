@@ -100,9 +100,3 @@ $skill-workflow-manager 我现在就在目标项目目录。请把 <import-path>
 ```text
 $skill-workflow-manager 把当前这个单独下载的 skill 包初始化为项目内受管布局。请自动推断 project root，创建 _skill-library 和 .agents/skills，并在最后校验结果。
 ```
-
-### 把暂存包注册成可直接使用的运行时 Skill
-
-```text
-$skill-workflow-manager 把这个暂存的 skill 包注册到运行时技能目录，让 Codex 可以直接发现和使用它。
-```

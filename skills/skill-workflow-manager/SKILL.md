@@ -17,7 +17,6 @@ Use this skill for skill lifecycle work only.
 - attach, detach, or exact-sync selected skills for a project
 - repair project discovery links
 - bootstrap a project-local managed layout when the user explicitly wants project-contained skill management
-- register a staged package for direct Codex discovery
 
 Do not use this skill for unrelated coding tasks.
 
@@ -32,7 +31,7 @@ Do not use this skill for unrelated coding tasks.
 
 ## Workflow
 
-1. Classify the request as create/update, inspect/import, project link management, project-local bootstrap, or runtime registration.
+1. Classify the request as create/update, inspect/import, project link management, or project-local bootstrap.
 2. Use `scripts/manage_skill.py` for deterministic filesystem work.
 3. Prefer `--dry-run` or `--inspect-import` before risky changes.
 4. Prefer the global shared-library flow in `$CODEX_HOME/skills`; use project-local bootstrap only when the user explicitly wants vendored project management.
@@ -76,11 +75,6 @@ python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
 
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
-  --register-runtime-skill
-```
-
-```bash
-python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
   --validate-only
 ```
 
@@ -92,8 +86,6 @@ Key flags:
 - `--project-skills skill-a,skill-b`
 - `--unlink-skills skill-a`
 - `--sync-project-skills skill-a,skill-b`
-- `--register-runtime-skill`
-- `--runtime-skills-root <runtime-skills-root>`
 - `--overwrite-skill-md`
 - `--overwrite-openai`
 - `--validate-only`

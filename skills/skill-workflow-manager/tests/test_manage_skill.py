@@ -224,11 +224,6 @@ class ManageSkillTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("--format json is supported only", result.stdout)
 
-    def test_register_runtime_skill_rejects_import_mode_override(self):
-        result = self.run_script("--register-runtime-skill", "--import-mode", "move")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("--register-runtime-skill does not use --import-mode", result.stdout)
-
     def test_infer_project_root_from_cwd_ignores_skill_dir_context(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             runtime_skill_dir = Path(tmpdir) / "runtime-skill"
@@ -304,48 +299,6 @@ class ManageSkillTests(unittest.TestCase):
             self.assertFalse(source_dir.exists())
             self.assertTrue(project_link.is_symlink())
             self.assertEqual(project_link.resolve(), canonical_dir.resolve())
-
-    def test_register_runtime_skill_links_staged_current_package(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            staged_root = Path(tmpdir) / "staged-root"
-            staged_dir = staged_root / "skill-workflow-manager"
-            runtime_root = Path(tmpdir) / "codex-home" / "skills"
-            shutil.copytree(ROOT_DIR, staged_dir)
-            script_copy = staged_dir / "scripts" / "manage_skill.py"
-
-            result = self.run_script_from_path(
-                script_copy,
-                staged_dir,
-                "--register-runtime-skill",
-                "--runtime-skills-root",
-                str(runtime_root),
-            )
-
-            runtime_link = runtime_root / "skill-workflow-manager"
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("Runtime skill registration (linked)", result.stdout)
-            self.assertTrue(runtime_link.is_symlink())
-            self.assertEqual(runtime_link.resolve(), staged_dir.resolve())
-
-    def test_register_runtime_skill_keeps_existing_runtime_source_dir(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            runtime_root = Path(tmpdir) / "codex-home" / "skills"
-            installed_dir = runtime_root / "skill-workflow-manager"
-            shutil.copytree(ROOT_DIR, installed_dir)
-            script_copy = installed_dir / "scripts" / "manage_skill.py"
-
-            result = self.run_script_from_path(
-                script_copy,
-                installed_dir,
-                "--register-runtime-skill",
-                "--runtime-skills-root",
-                str(runtime_root),
-            )
-
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("Runtime skill registration (already present)", result.stdout)
-            self.assertTrue(installed_dir.exists())
 
 
 if __name__ == "__main__":

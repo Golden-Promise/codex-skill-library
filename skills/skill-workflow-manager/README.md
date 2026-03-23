@@ -10,7 +10,6 @@ Maintain Codex skills with a global-first shared-library workflow built around `
 - importing a downloaded local skill into that shared library
 - attaching, detaching, or syncing project discovery links
 - bootstrapping a project-local managed layout when you intentionally want project-contained skill management
-- registering a staged skill package into the runtime skills root for direct Codex discovery
 - validating an existing skill package without writing files
 
 ## Best For
@@ -55,16 +54,8 @@ Install with Codex using the `skill-installer` skill:
 
 - Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
 - For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1.`
-- To stage it in another directory, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager, and install it to <target-root>.`
-- More precisely, `<target-root>` is the install root, and the staged directory will be `<target-root>/skill-workflow-manager`.
-- A staged install is not automatically discoverable as a Codex skill. To use it as a skill, either install to `$CODEX_HOME/skills` or link `<target-root>/skill-workflow-manager` into `$CODEX_HOME/skills/skill-workflow-manager` or `<project-root>/.agents/skills/skill-workflow-manager`.
 
-After a staged install, register it for direct Codex use:
-
-```bash
-python3 <target-root>/skill-workflow-manager/scripts/manage_skill.py \
-  --register-runtime-skill
-```
+If you install it to another target root for manual inspection, Codex will not auto-discover it as a runtime skill. The recommended path for direct use is still the default install into `$CODEX_HOME/skills`.
 
 ## Start Here
 
@@ -104,12 +95,6 @@ Validate the current package without writing files:
 python3 scripts/manage_skill.py --validate-only
 ```
 
-Register the current package into the runtime skills root:
-
-```bash
-python3 scripts/manage_skill.py --register-runtime-skill
-```
-
 Bootstrap a project-local managed layout only when the skill should live inside one project:
 
 ```bash
@@ -132,7 +117,7 @@ python3 scripts/manage_skill.py \
 | --- | --- |
 | `SKILL.md` | Runtime entry point for Codex |
 | `agents/openai.yaml` | Metadata and default prompt wiring |
-| `scripts/manage_skill.py` | Deterministic CLI for create, import, link, and validate flows |
+| `scripts/manage_skill.py` | Deterministic CLI for create, import, link, bootstrap, and validate flows |
 | `references/` | Reader-facing workflow guides and prompt references |
 | `docs/` | Maintainer-oriented notes for publishing this package |
 | `tests/` | Regression coverage for the management script |

@@ -10,7 +10,6 @@
 - 把已下载的本地 skill 导入该共享库
 - 给项目接入、移除或同步 skill 链接
 - 仅在你明确需要项目内托管时，为项目自举可管理的本地 skill 结构，并避免遗留重复来源目录
-- 把暂存的 skill 包注册到运行时技能目录，供 Codex 直接发现
 - 在不写入文件的前提下校验现有 skill 包
 
 ## 适合什么场景
@@ -55,16 +54,8 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - 如果你希望它能被 Codex 直接当作技能使用，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager。`
 - 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.1。`
-- 如果只是想先安装到其他目录暂存或审阅，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并安装到 <目标根目录>。`
-- 更准确地说，`<目标根目录>` 会作为安装根，暂存后的目录会是 `<目标根目录>/skill-workflow-manager`。
-- 但这种“安装到其他目录”的方式不会自动让 Codex 发现这个技能。若要把它作为技能使用，请安装到 `$CODEX_HOME/skills`，或者把 `<目标根目录>/skill-workflow-manager` 链接到 `$CODEX_HOME/skills/skill-workflow-manager` 或 `<project-root>/.agents/skills/skill-workflow-manager`。
 
-如果已经暂存到其他目录，想让 Codex 直接发现它，可以继续执行：
-
-```bash
-python3 <目标根目录>/skill-workflow-manager/scripts/manage_skill.py \
-  --register-runtime-skill
-```
+如果你只是把它安装到其他目标目录做手动审阅或脚本执行，Codex 不会把那个目录自动当成运行时技能目录。要在 Codex 里直接使用，仍然建议安装到默认的 `$CODEX_HOME/skills`。
 
 ## 开始阅读
 
@@ -104,12 +95,6 @@ python3 scripts/manage_skill.py \
 python3 scripts/manage_skill.py --validate-only
 ```
 
-把当前包注册到运行时技能目录：
-
-```bash
-python3 scripts/manage_skill.py --register-runtime-skill
-```
-
 仅当你希望 skill 变成项目内托管结构时，再做项目自举：
 
 ```bash
@@ -132,7 +117,7 @@ python3 scripts/manage_skill.py \
 | --- | --- |
 | `SKILL.md` | Codex 运行时入口 |
 | `agents/openai.yaml` | 元数据和默认 prompt 配置 |
-| `scripts/manage_skill.py` | 创建、导入、链接和校验流程的确定性 CLI |
+| `scripts/manage_skill.py` | 创建、导入、链接、自举和校验流程的确定性 CLI |
 | `references/` | 面向读者的工作流说明和提示词参考 |
 | `docs/` | 面向维护者的发布说明 |
 | `tests/` | 管理脚本的回归测试 |
