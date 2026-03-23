@@ -18,12 +18,21 @@ This package is especially useful when you want one source of truth for a skill 
 
 ## Install
 
-Install from `codex-skill-library`:
+Install the latest version from `codex-skill-library`:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager
+```
+
+Install the published `v0.1.0` release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo <owner>/codex-skill-library \
+  --path skills/skill-workflow-manager \
+  --ref v0.1.0
 ```
 
 Install from a GitHub tree URL:

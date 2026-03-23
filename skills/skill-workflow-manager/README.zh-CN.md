@@ -18,12 +18,21 @@
 
 ## 安装方式
 
-从 `codex-skill-library` 安装：
+从 `codex-skill-library` 安装最新版：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager
+```
+
+固定安装已发布的 `v0.1.0` 版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo <owner>/codex-skill-library \
+  --path skills/skill-workflow-manager \
+  --ref v0.1.0
 ```
 
 也可以直接使用 GitHub tree URL：
