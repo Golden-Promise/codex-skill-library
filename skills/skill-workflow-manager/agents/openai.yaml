@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Workflow Manager"
+  short_description: "Manage shared-library skill workflows"
+  default_prompt: "Use $skill-workflow-manager to create, update, import, or relink a skill with the shared-library workflow."
