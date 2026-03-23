@@ -44,9 +44,11 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 如果通过 Codex 中的 `skill-installer` 技能安装，可以直接这样说：
 
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并安装到 <目标根目录>。`
-- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.1，安装到 <目标根目录>。`
-- 更准确地说，`<目标根目录>` 会作为安装根，最终目录会是 `<目标根目录>/skill-workflow-manager`。
+- 如果你希望它能被 Codex 直接当作技能使用，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager。`
+- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.1。`
+- 如果只是想先安装到其他目录暂存或审阅，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并安装到 <目标根目录>。`
+- 更准确地说，`<目标根目录>` 会作为安装根，暂存后的目录会是 `<目标根目录>/skill-workflow-manager`。
+- 但这种“安装到其他目录”的方式不会自动让 Codex 发现这个技能。若要把它作为技能使用，请安装到 `$CODEX_HOME/skills`，或者把 `<目标根目录>/skill-workflow-manager` 链接到 `$CODEX_HOME/skills/skill-workflow-manager` 或 `<project-root>/.agents/skills/skill-workflow-manager`。
 
 ## 开始阅读
 

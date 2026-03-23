@@ -44,9 +44,11 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 Install with Codex using the `skill-installer` skill:
 
-- Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager, and install it to <target-root>.`
-- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1, and install it to <target-root>.`
-- More precisely, `<target-root>` is the install root, and the final directory will be `<target-root>/skill-workflow-manager`.
+- Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
+- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1.`
+- To stage it in another directory, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager, and install it to <target-root>.`
+- More precisely, `<target-root>` is the install root, and the staged directory will be `<target-root>/skill-workflow-manager`.
+- A staged install is not automatically discoverable as a Codex skill. To use it as a skill, either install to `$CODEX_HOME/skills` or link `<target-root>/skill-workflow-manager` into `$CODEX_HOME/skills/skill-workflow-manager` or `<project-root>/.agents/skills/skill-workflow-manager`.
 
 ## Start Here
 
