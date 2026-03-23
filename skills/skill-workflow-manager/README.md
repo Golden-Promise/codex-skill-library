@@ -10,6 +10,7 @@ Maintain Codex skills with one canonical source, optional project discovery link
 - importing a downloaded local skill into a managed library
 - attaching, detaching, or syncing project discovery links
 - bootstrapping a managed project layout for skills without leaving a duplicate source folder behind
+- registering a staged skill package into the runtime skills root for direct Codex discovery
 - validating an existing skill package without writing files
 
 ## Best For
@@ -50,6 +51,13 @@ Install with Codex using the `skill-installer` skill:
 - More precisely, `<target-root>` is the install root, and the staged directory will be `<target-root>/skill-workflow-manager`.
 - A staged install is not automatically discoverable as a Codex skill. To use it as a skill, either install to `$CODEX_HOME/skills` or link `<target-root>/skill-workflow-manager` into `$CODEX_HOME/skills/skill-workflow-manager` or `<project-root>/.agents/skills/skill-workflow-manager`.
 
+After a staged install, register it for direct Codex use:
+
+```bash
+python3 <target-root>/skill-workflow-manager/scripts/manage_skill.py \
+  --register-runtime-skill
+```
+
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).
@@ -80,6 +88,12 @@ Validate the current package without writing files:
 
 ```bash
 python3 scripts/manage_skill.py --validate-only
+```
+
+Register the current package into the runtime skills root:
+
+```bash
+python3 scripts/manage_skill.py --register-runtime-skill
 ```
 
 List library skills in machine-readable form:

@@ -15,7 +15,7 @@ Use this skill for skill lifecycle work only.
 - create or update a managed skill
 - inspect or import a downloaded local skill into the library
 - attach, detach, or exact-sync selected skills for a project
-- repair project discovery links or bootstrap a managed project layout
+- repair project discovery links, bootstrap a managed project layout, or register a staged package for direct Codex discovery
 
 Do not use this skill for unrelated coding tasks.
 
@@ -29,7 +29,7 @@ Do not use this skill for unrelated coding tasks.
 
 ## Workflow
 
-1. Classify the request as create/update, inspect/import, project link management, or bootstrap.
+1. Classify the request as create/update, inspect/import, project link management, bootstrap, or runtime registration.
 2. Use `scripts/manage_skill.py` for deterministic filesystem work.
 3. Prefer `--dry-run` or `--inspect-import` before risky changes.
 4. Default to `--import-mode copy`; use `move` only when the shared-library copy should become the sole source.
@@ -68,6 +68,11 @@ python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
 
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
+  --register-runtime-skill
+```
+
+```bash
+python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
   --validate-only
 ```
 
@@ -79,6 +84,8 @@ Key flags:
 - `--project-skills skill-a,skill-b`
 - `--unlink-skills skill-a`
 - `--sync-project-skills skill-a,skill-b`
+- `--register-runtime-skill`
+- `--runtime-skills-root <runtime-skills-root>`
 - `--overwrite-skill-md`
 - `--overwrite-openai`
 - `--validate-only`

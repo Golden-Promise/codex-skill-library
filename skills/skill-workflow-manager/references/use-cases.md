@@ -23,6 +23,7 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 | Inspect a local skill before import | Import inspection | `--inspect-import --import-path <import-path>` |
 | Adopt a downloaded local skill | Import | `--import-path <import-path>` |
 | Turn a standalone package into a managed layout | Bootstrap | `--bootstrap-project-layout` |
+| Register a staged package for direct Codex discovery | Runtime registration | `--register-runtime-skill` |
 | Validate an existing skill without writing files | Validation | `--validate-only` |
 
 ## Shared Placeholders
@@ -33,6 +34,8 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 | `<skill-name>` | The canonical hyphen-case skill name |
 | `<project-root>` | The target project root |
 | `<import-path>` | A downloaded local skill directory outside the library |
+| `<target-root>` | A staging directory that contains `skill-workflow-manager` |
+| `<runtime-skills-root>` | The runtime skills root, usually `$CODEX_HOME/skills` |
 | `<purpose>` | The frontmatter description for the target skill |
 
 ## Working Rules
@@ -42,6 +45,7 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 - Use project-link mode when the skill already exists and the user only wants attachment changes.
 - Use `--inspect-import` before importing an unfamiliar downloaded skill.
 - Use `copy` import mode by default. Use `move` only when the shared-library copy should become the sole source.
+- Use runtime registration when a staged package should become directly discoverable in Codex without moving it into the canonical shared library first.
 
 ## 1. Create Or Refresh A Managed Skill
 
@@ -228,7 +232,34 @@ Notes:
 - This is the bridge from a standalone package to the shared-library workflow.
 - When bootstrap adopts a standalone in-project package, it removes the original source folder after validation so the project does not keep two `skill-workflow-manager` directories.
 
-## 9. Validate An Existing Skill Without Writing Files
+## 9. Register A Staged Package For Direct Codex Discovery
+
+Use when:
+
+- the skill package already exists in another directory
+- you want Codex to discover it under `$CODEX_HOME/skills`
+- you do not want to re-install or re-copy the whole package
+
+Command patterns:
+
+```bash
+python3 <target-root>/skill-workflow-manager/scripts/manage_skill.py \
+  --register-runtime-skill
+```
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  --register-runtime-skill \
+  --runtime-skills-root <runtime-skills-root>
+```
+
+Notes:
+
+- By default, the script registers the package that contains `manage_skill.py`.
+- If the package is already installed directly inside the runtime skills root, registration becomes a no-op.
+- This mode only handles Codex runtime discovery. It does not create `_skill-library`, update project links, or replace project bootstrap.
+
+## 10. Validate An Existing Skill Without Writing Files
 
 Use when:
 

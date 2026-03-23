@@ -100,3 +100,9 @@ $skill-workflow-manager I am already in the target project directory. Import <im
 ```text
 $skill-workflow-manager Turn this standalone downloaded skill package into a managed project. Infer the project root, create _skill-library and .agents/skills, and validate the result at the end.
 ```
+
+### Register A Staged Package For Direct Codex Use
+
+```text
+$skill-workflow-manager Register this staged skill package for direct Codex use by linking it into the runtime skills root.
+```

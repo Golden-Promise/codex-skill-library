@@ -10,6 +10,7 @@
 - 把已下载的本地 skill 导入受管共享库
 - 给项目接入、移除或同步 skill 链接
 - 为项目自举可管理的 skill 目录结构，并避免遗留重复的来源目录
+- 把暂存的 skill 包注册到运行时技能目录，供 Codex 直接发现
 - 在不写入文件的前提下校验现有 skill 包
 
 ## 适合什么场景
@@ -50,6 +51,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - 更准确地说，`<目标根目录>` 会作为安装根，暂存后的目录会是 `<目标根目录>/skill-workflow-manager`。
 - 但这种“安装到其他目录”的方式不会自动让 Codex 发现这个技能。若要把它作为技能使用，请安装到 `$CODEX_HOME/skills`，或者把 `<目标根目录>/skill-workflow-manager` 链接到 `$CODEX_HOME/skills/skill-workflow-manager` 或 `<project-root>/.agents/skills/skill-workflow-manager`。
 
+如果已经暂存到其他目录，想让 Codex 直接发现它，可以继续执行：
+
+```bash
+python3 <目标根目录>/skill-workflow-manager/scripts/manage_skill.py \
+  --register-runtime-skill
+```
+
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
@@ -80,6 +88,12 @@ python3 scripts/manage_skill.py \
 
 ```bash
 python3 scripts/manage_skill.py --validate-only
+```
+
+把当前包注册到运行时技能目录：
+
+```bash
+python3 scripts/manage_skill.py --register-runtime-skill
 ```
 
 以机器可读格式列出共享库中的 skill：
