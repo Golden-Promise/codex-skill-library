@@ -94,6 +94,22 @@ python3 <skill-dir>/scripts/manage_skill.py \
   --workspace-root <workspace-root>
 ```
 
+用本地来源包刷新一个受管 skill：
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  upgrade <import-path> \
+  --library-root <library-root>
+```
+
+把一个 skill 从某个项目里移除，但不删除共享副本：
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  retire <skill-name> \
+  --project-root <project-root>
+```
+
 补齐 `SKILL.md` 缺失章节：
 
 ```bash
@@ -184,5 +200,5 @@ platform_root = ".skill-platform"
 ## 相关文档
 
 - [README.zh-CN.md](../README.zh-CN.md)：概览
-- [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)：可直接复制的请求
-- [prompt-templates.en.md](prompt-templates.en.md)：English copy-ready requests
+- [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)：提示词模板
+- [prompt-templates.en.md](prompt-templates.en.md)：English prompt templates

@@ -34,7 +34,7 @@ If you are starting fresh, begin with project takeover, project setup, or a pre-
 
 To install `skill-governance`, use the standard package path in your Codex workspace, then choose the release or ref that fits your workflow.
 
-For the copy-ready command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
+For command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
 
 ## Common Paths
 
@@ -44,7 +44,7 @@ Start with one of these three actions:
 2. Set up skill governance for a new project.
 3. Check the project before cleanup or release.
 
-If you want the copy-ready prompts for each path, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
+If you want the prompt templates for each path, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
 ## What You Can Do Next
 
@@ -63,6 +63,6 @@ For more detailed examples and direct command patterns, see [references/use-case
 
 - Command reference and advanced usage: [references/use-cases.md](references/use-cases.md)
 - Chinese command reference and usage: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
-- Copy-ready prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
-- Chinese copy-ready prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- Prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - Maintainer publishing notes: [docs/publishing-with-skill-installer.md](docs/publishing-with-skill-installer.md)

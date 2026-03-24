@@ -94,6 +94,22 @@ python3 <skill-dir>/scripts/manage_skill.py \
   --workspace-root <workspace-root>
 ```
 
+Refresh a managed skill from a local source package:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  upgrade <import-path> \
+  --library-root <library-root>
+```
+
+Remove a skill from one project without deleting the shared copy:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  retire <skill-name> \
+  --project-root <project-root>
+```
+
 Refresh missing `SKILL.md` sections:
 
 ```bash
@@ -184,5 +200,5 @@ The older filename `skill-workflow.toml` is still accepted.
 ## Related Documentation
 
 - [README.md](../README.md): overview
-- [prompt-templates.en.md](prompt-templates.en.md): copy-ready requests
-- [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md): Chinese copy-ready requests
+- [prompt-templates.en.md](prompt-templates.en.md): prompt templates
+- [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md): Chinese prompt templates

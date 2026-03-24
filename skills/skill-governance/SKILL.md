@@ -8,7 +8,7 @@ description: Use when the user wants to take over project skill governance, set 
 ## Overview
 
 Project skill governance for taking over, setting up, and maintaining Codex skills in a project.
-Use this skill for project skill work when you want to start from the task instead of the layout.
+Use this skill for task-focused project skill work.
 
 ## Use This Skill When
 
@@ -31,4 +31,4 @@ Use this skill for project skill work when you want to start from the task inste
 ## References
 
 - `references/use-cases.md` and `references/use-cases.zh-CN.md`: command reference and advanced usage
-- `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: copy-ready requests
+- `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: prompt templates

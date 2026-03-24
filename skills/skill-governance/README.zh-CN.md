@@ -34,7 +34,7 @@
 
 安装 `skill-governance` 时，请先使用 Codex 工作区中的标准安装路径，再按需要选择最新发布版本或指定 ref。
 
-关于可直接复制的安装命令和进阶说明，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+关于命令模式和进阶说明，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
 ## 常用路径
 
@@ -44,7 +44,7 @@
 2. 为新项目建立 skill 治理。
 3. 在清理或发布前检查项目。
 
-如果你想查看每条路径对应的可直接复制提示词，请参考 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
+如果你想查看每条路径对应的提示词模板，请参考 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 
 ## 下一步可以做什么
 
@@ -63,6 +63,6 @@
 
 - 中文命令参考与进阶用法: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
 - English command reference and usage: [references/use-cases.md](references/use-cases.md)
-- 中文可直接复制提示词模板: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
-- English copy-ready prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- 中文提示词模板: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - 维护者发布说明: [docs/publishing-with-skill-installer.zh-CN.md](docs/publishing-with-skill-installer.zh-CN.md)
