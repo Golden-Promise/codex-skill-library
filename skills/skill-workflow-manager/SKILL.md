@@ -1,20 +1,21 @@
 ---
 name: skill-workflow-manager
-description: Use this skill when the user wants to create, update, standardize, import, or relink a Codex skill with a shared-library workflow. It treats $CODEX_HOME/skills as the default shared library, manages optional project discovery links, and updates skill metadata consistently.
+description: Use this skill when the user wants to create, update, adopt, check, or relink a Codex skill with a shared-library workflow. It treats $CODEX_HOME/skills as the default shared library, manages optional project discovery links, and updates skill metadata consistently.
 ---
 
 # Skill Workflow Manager
 
 ## Purpose
 
-Manage skills in the default Codex shared library plus optional project discovery links.
+Manage the shared skills in `$CODEX_HOME/skills`, then attach selected skills to projects only when a project needs local discovery.
 Use this skill for skill lifecycle work only.
 
 ## Use This Skill When
 
 - create or update a managed skill
-- inspect or import a downloaded local skill into the library
+- inspect or adopt a downloaded local skill into the shared library
 - attach, detach, or exact-sync selected skills for a project
+- run a health check for one shared skill, adoption candidate, or project link
 - repair project discovery links
 - bootstrap a project-local managed layout when the user explicitly wants project-contained skill management
 
@@ -31,12 +32,13 @@ Do not use this skill for unrelated coding tasks.
 
 ## Workflow
 
-1. Classify the request as create/update, inspect/import, project link management, or project-local bootstrap.
-2. Use `scripts/manage_skill.py` for deterministic filesystem work.
-3. Prefer `--dry-run` or `--inspect-import` before risky changes.
-4. Prefer the global shared-library flow in `$CODEX_HOME/skills`; use project-local bootstrap only when the user explicitly wants vendored project management.
-5. Default to `--import-mode copy`; use `move` only when the shared-library copy should become the sole source.
-6. Report the canonical path, any links changed, and the validation result or remaining manual follow-up.
+1. Classify the request as one of three main paths: create or refresh a shared skill, adopt a downloaded skill, or attach shared skills to a project.
+2. Treat `--doctor` / `--check`, validation, inventory, and project-local bootstrap as advanced or read-only paths.
+3. Use `scripts/manage_skill.py` for deterministic filesystem work.
+4. Prefer `--dry-run` or `--inspect-import` before risky changes.
+5. Prefer the global shared-library flow in `$CODEX_HOME/skills`; use project-local bootstrap only when the user explicitly wants vendored project management.
+6. Default to `--import-mode copy`; use `move` only when the shared-library copy should become the sole source.
+7. Report the canonical path, any links changed, and the validation result or remaining manual follow-up.
 
 ## Rules
 
@@ -57,14 +59,20 @@ python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
 
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
-  --inspect-import \
-  --import-path <downloaded-skill>
+  --adopt <downloaded-skill>
 ```
 
 ```bash
 python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
   --project-root <project-root> \
   --project-skills <skill-name>
+```
+
+```bash
+python3 <path-to-skill-workflow-manager>/scripts/manage_skill.py \
+  <skill-name> \
+  --doctor \
+  --project-root <project-root>
 ```
 
 ```bash
@@ -83,6 +91,8 @@ Key flags:
 - `--list-library-skills`
 - `--list-project-skills --project-root <project-root>`
 - `--format json` for read-only modes
+- `--doctor` / `--check`
+- `--adopt <downloaded-skill>` as the task-first import alias
 - `--project-skills skill-a,skill-b`
 - `--unlink-skills skill-a`
 - `--sync-project-skills skill-a,skill-b`

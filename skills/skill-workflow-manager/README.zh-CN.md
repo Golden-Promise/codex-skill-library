@@ -2,27 +2,20 @@
 
 [English](README.md)
 
-用“全局共享库优先”的方式维护 Codex skill：默认以 `$CODEX_HOME/skills` 为共享库，再按需把 skill 暴露给具体项目。
+用“全局共享库优先”的方式维护 Codex skill：先把 canonical skill 放到 `$CODEX_HOME/skills`，再按需把它暴露给具体项目。
 
-## 这个包可以帮你做什么
+## 3 条主路径
 
-- 在默认 Codex 共享库中创建或刷新 canonical skill 包
-- 把已下载的本地 skill 导入该共享库
-- 给项目接入、移除或同步 skill 链接
-- 仅在你明确需要项目内托管时，为项目自举可管理的本地 skill 结构，并避免遗留重复来源目录
-- 在不写入文件的前提下校验现有 skill 包
+- 在 `$CODEX_HOME/skills` 中创建或刷新一个共享 skill
+- 把已下载的本地 skill 接入这个共享库
+- 通过 `<project-root>/.agents/skills` 给项目接入共享 skill
 
-## 适合什么场景
+## 进阶路径
 
-如果你希望某个 skill 以 `$CODEX_HOME/skills` 作为权威共享来源，同时又希望多个项目按需通过轻量链接发现和使用它，这个包会很合适。
-
-## 推荐模型
-
-建议按两层来使用：
-
-- 默认共享库：把 canonical skill 放在 `$CODEX_HOME/skills`
-- 可选项目链接：通过 `<project-root>/.agents/skills` 暴露给具体项目
-- 项目内自举：只有当你明确希望 skill 随项目一起托管时，才使用 `<project-root>/_skill-library`
+- 想先体检再动手时，用 `--doctor` / `--check`
+- 做发布检查或 CI 校验时，用 `--validate-only`
+- 想先盘点现状时，用 `--list-library-skills` 或 `--list-project-skills`
+- 只有在你明确要项目内托管时，才用 `--bootstrap-project-layout`
 
 ## 安装方式
 
@@ -57,10 +50,17 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 如果你只是把它安装到其他目标目录做手动审阅或脚本执行，Codex 不会把那个目录自动当成运行时技能目录。要在 Codex 里直接使用，仍然建议安装到默认的 `$CODEX_HOME/skills`。
 
+## 可以直接这样对 Codex 说
+
+- `用 $skill-workflow-manager 在共享库里创建或刷新 <skill-name>，并在最后校验。`
+- `用 $skill-workflow-manager 把 <import-path> 接入共享库。`
+- `用 $skill-workflow-manager 把 <skill-name> 接入 <project-root>。`
+- `用 $skill-workflow-manager 在修改前检查 <skill-name>，并同时检查它在 <project-root> 里的项目链接。`
+
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
-2. 默认优先使用 `$CODEX_HOME/skills` 这条全局共享库路径。
+2. 先从上面的 3 条主路径里选最接近的一条。
 3. 如果你只想快速复制提示词，打开 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 4. 只有在你明确希望 skill 跟项目一起托管时，才使用项目内自举。
 
@@ -74,11 +74,11 @@ python3 scripts/manage_skill.py \
   --purpose "Use this skill when the user wants help with demo-skill tasks."
 ```
 
-把一个已下载的本地 skill 导入共享库：
+把一个已下载的本地 skill 接入共享库：
 
 ```bash
 python3 scripts/manage_skill.py \
-  --import-path <import-path>
+  --adopt <import-path>
 ```
 
 把共享库中的现有 skill 接入项目：
@@ -87,6 +87,15 @@ python3 scripts/manage_skill.py \
 python3 scripts/manage_skill.py \
   --project-root <project-root> \
   --project-skills demo-skill
+```
+
+在修改前检查一个 skill 及其项目链接：
+
+```bash
+python3 scripts/manage_skill.py \
+  demo-skill \
+  --project-root <project-root> \
+  --doctor
 ```
 
 无写入地校验当前包：
@@ -117,7 +126,7 @@ python3 scripts/manage_skill.py \
 | --- | --- |
 | `SKILL.md` | Codex 运行时入口 |
 | `agents/openai.yaml` | 元数据和默认 prompt 配置 |
-| `scripts/manage_skill.py` | 创建、导入、链接、自举和校验流程的确定性 CLI |
+| `scripts/manage_skill.py` | 创建、接管、体检、链接、自举和校验流程的确定性 CLI |
 | `references/` | 面向读者的工作流说明和提示词参考 |
 | `docs/` | 面向维护者的发布说明 |
 | `tests/` | 管理脚本的回归测试 |

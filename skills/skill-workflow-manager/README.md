@@ -2,27 +2,20 @@
 
 [简体中文](README.zh-CN.md)
 
-Maintain Codex skills with a global-first shared-library workflow built around `$CODEX_HOME/skills`, plus optional project discovery links when a project needs them.
+Manage Codex skills with a global-first workflow: keep canonical skills in `$CODEX_HOME/skills`, then expose selected ones to projects only when a project needs local discovery.
 
-## What This Package Helps With
+## The 3 Main Paths
 
-- creating or refreshing a canonical skill package in the default Codex shared library
-- importing a downloaded local skill into that shared library
-- attaching, detaching, or syncing project discovery links
-- bootstrapping a project-local managed layout when you intentionally want project-contained skill management
-- validating an existing skill package without writing files
+- Create or refresh one shared skill in `$CODEX_HOME/skills`
+- Adopt a downloaded local skill into that shared library
+- Attach shared skills to a project through `<project-root>/.agents/skills`
 
-## Best For
+## Advanced Paths
 
-This package works best when you treat `$CODEX_HOME/skills` as the natural shared skill library and add project links only when a project needs local discovery.
-
-## Recommended Model
-
-Use this package in two layers:
-
-- Default shared library: keep canonical skills in `$CODEX_HOME/skills`
-- Optional project links: expose selected skills through `<project-root>/.agents/skills`
-- Project-local bootstrap: use `<project-root>/_skill-library` only when you explicitly want a project-contained managed layout
+- Run `--doctor` / `--check` when you want a health check before changing anything
+- Use `--validate-only` for release checks and CI
+- Use `--list-library-skills` or `--list-project-skills` to inventory what already exists
+- Use `--bootstrap-project-layout` only when you explicitly want a project-contained `_skill-library`
 
 ## Install
 
@@ -57,11 +50,18 @@ Install with Codex using the `skill-installer` skill:
 
 If you install it to another target root for manual inspection, Codex will not auto-discover it as a runtime skill. The recommended path for direct use is still the default install into `$CODEX_HOME/skills`.
 
+## Say This To Codex
+
+- `Use $skill-workflow-manager to create or refresh <skill-name> in the shared library and validate it at the end.`
+- `Use $skill-workflow-manager to adopt <import-path> into the shared library.`
+- `Use $skill-workflow-manager to attach <skill-name> to <project-root>.`
+- `Use $skill-workflow-manager to check <skill-name> and its project link in <project-root> before making changes.`
+
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).
-2. Default to the global shared-library flow in `$CODEX_HOME/skills`.
-3. Use [references/prompt-templates.en.md](references/prompt-templates.en.md) when you want copy-ready prompt wording.
+2. Start with one of the 3 main paths above.
+3. Use [references/prompt-templates.en.md](references/prompt-templates.en.md) when you only need copy-ready wording.
 4. Reach for project-local bootstrap only when the skill should live under one project rather than the global shared library.
 
 ## Common Commands
@@ -74,11 +74,11 @@ python3 scripts/manage_skill.py \
   --purpose "Use this skill when the user wants help with demo-skill tasks."
 ```
 
-Import a downloaded local skill into the shared library:
+Adopt a downloaded local skill into the shared library:
 
 ```bash
 python3 scripts/manage_skill.py \
-  --import-path <import-path>
+  --adopt <import-path>
 ```
 
 Attach an existing shared-library skill to a project:
@@ -87,6 +87,15 @@ Attach an existing shared-library skill to a project:
 python3 scripts/manage_skill.py \
   --project-root <project-root> \
   --project-skills demo-skill
+```
+
+Check one skill and its project link before changing anything:
+
+```bash
+python3 scripts/manage_skill.py \
+  demo-skill \
+  --project-root <project-root> \
+  --doctor
 ```
 
 Validate the current package without writing files:
@@ -117,7 +126,7 @@ python3 scripts/manage_skill.py \
 | --- | --- |
 | `SKILL.md` | Runtime entry point for Codex |
 | `agents/openai.yaml` | Metadata and default prompt wiring |
-| `scripts/manage_skill.py` | Deterministic CLI for create, import, link, bootstrap, and validate flows |
+| `scripts/manage_skill.py` | Deterministic CLI for create, adopt, check, link, bootstrap, and validate flows |
 | `references/` | Reader-facing workflow guides and prompt references |
 | `docs/` | Maintainer-oriented notes for publishing this package |
 | `tests/` | Regression coverage for the management script |

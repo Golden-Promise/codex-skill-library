@@ -150,6 +150,65 @@ class ManageSkillTests(unittest.TestCase):
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["errors"], [])
 
+    def test_doctor_supports_json_output_for_current_package(self):
+        result = self.run_script("--doctor", "--format", "json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "doctor")
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["target_location"], "canonical shared-library skill")
+
+    def test_doctor_reports_missing_project_link_without_failing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            skill_dir = library_root / "demo-skill"
+            project_root = Path(tmpdir) / "demo-project"
+            write_skill_dir(skill_dir, skill_name="demo-skill")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            result = self.run_script(
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--doctor",
+                "--format",
+                "json",
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["project_link"]["status"], "missing")
+        self.assertIn("--project-skills demo-skill", payload["recommendations"][0])
+
+    def test_doctor_reports_duplicate_canonical_copy_for_adopt(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            import_path = Path(tmpdir) / "incoming-skill"
+            write_skill_dir(library_root / "incoming-skill", skill_name="incoming-skill")
+            write_skill_dir(import_path, skill_name="incoming-skill")
+
+            result = self.run_script(
+                "--library-root",
+                str(library_root),
+                "--doctor",
+                "--adopt",
+                str(import_path),
+                "--format",
+                "json",
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["duplicate_canonical_copy"])
+        self.assertIn("Canonical copy already exists", payload["issues"][0])
+
+    def test_doctor_rejects_mutating_flags(self):
+        result = self.run_script("--doctor", "--dry-run")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("--doctor is read-only", result.stdout)
+
     def test_list_library_skills_supports_json_output(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             library_root = Path(tmpdir) / "_skill-library"
@@ -218,6 +277,43 @@ class ManageSkillTests(unittest.TestCase):
         self.assertEqual(payload["import_status"], "ready to import")
         self.assertEqual(payload["detected_source_skill_name"], "incoming-skill")
         self.assertTrue(payload["validation"]["ok"])
+
+    def test_adopt_alias_supports_inspect_import(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            adopt_path = Path(tmpdir) / "incoming-skill"
+            write_skill_dir(adopt_path, skill_name="incoming-skill")
+
+            result = self.run_script(
+                "--library-root",
+                str(library_root),
+                "--inspect-import",
+                "--adopt",
+                str(adopt_path),
+                "--format",
+                "json",
+            )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "inspect-import")
+        self.assertEqual(payload["source_path"], str(adopt_path))
+
+    def test_adopt_and_import_path_cannot_be_combined(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adopt_path = Path(tmpdir) / "incoming-skill"
+            write_skill_dir(adopt_path, skill_name="incoming-skill")
+
+            result = self.run_script(
+                "--inspect-import",
+                "--import-path",
+                str(adopt_path),
+                "--adopt",
+                str(adopt_path),
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Use only one of --import-path or --adopt", result.stdout)
 
     def test_json_format_is_rejected_for_mutation_mode(self):
         result = self.run_script("demo-skill", "--format", "json")

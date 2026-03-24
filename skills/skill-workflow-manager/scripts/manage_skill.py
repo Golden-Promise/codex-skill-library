@@ -584,7 +584,7 @@ def ensure_import_target_available(
         f"{target_dir}\n"
         f"Try importing with a different canonical name, for example: {suggestion_text}\n"
         "You can override the imported name by passing it as the positional skill name, "
-        f"for example: manage_skill.py {retry_name} --import-path {source_dir}"
+        f"for example: manage_skill.py {retry_name} --adopt {source_dir}"
     )
 
 
@@ -744,7 +744,7 @@ def inspect_import_source(
         if suggestions:
             print(
                 "[INSPECT] Retry example: "
-                f"manage_skill.py {suggestions[0]} --import-path {source_dir}"
+                f"manage_skill.py {suggestions[0]} --adopt {source_dir}"
             )
 
     print("[INSPECT] Recommended import mode: copy")
@@ -1102,6 +1102,241 @@ def resolve_validate_target(
     return runtime_skill_dir
 
 
+def resolve_effective_skill_name(
+    target_dir: Path,
+    fallback_name: str,
+) -> str:
+    if target_dir.exists() and target_dir.is_dir() and (target_dir / "SKILL.md").exists():
+        detected_name = detect_skill_name_from_source(target_dir)
+        if detected_name:
+            return detected_name
+    if fallback_name:
+        return fallback_name
+    return normalize_skill_name(target_dir.name)
+
+
+def collect_project_link_status(
+    project_root: Path,
+    library_root: Path,
+    skill_name: str,
+) -> dict[str, object]:
+    canonical_path = library_root / skill_name
+    project_link = project_root / ".agents" / "skills" / skill_name
+    payload: dict[str, object] = {
+        "project_root": str(project_root),
+        "path": str(project_link),
+        "exists": project_link.exists() or project_link.is_symlink(),
+    }
+
+    if project_link.is_symlink():
+        target = Path(os.path.realpath(project_link))
+        payload["target"] = str(target)
+        if not target.exists():
+            payload["status"] = "broken symlink"
+        elif target == canonical_path.resolve(strict=False):
+            payload["status"] = "managed library link"
+        elif target.parent == library_root:
+            payload["status"] = "shared-library link to another skill"
+        else:
+            payload["status"] = "external symlink"
+        return payload
+
+    if project_link.exists():
+        if project_link.is_dir():
+            payload["status"] = "local directory (not a symlink)"
+        else:
+            payload["status"] = "non-directory entry"
+        return payload
+
+    payload["status"] = "missing"
+    return payload
+
+
+def collect_doctor_result(ctx: ExecutionContext) -> dict[str, object]:
+    target_dir = resolve_validate_target(
+        ctx.skill_name,
+        ctx.import_path,
+        ctx.library_root,
+        ctx.runtime_skill_dir,
+    )
+    target_exists = target_dir.exists()
+    target_is_dir = target_dir.is_dir() if target_exists else False
+    effective_skill_name = resolve_effective_skill_name(target_dir, ctx.skill_name)
+    canonical_path = ctx.library_root / effective_skill_name if effective_skill_name else None
+    canonical_exists = bool(canonical_path and canonical_path.exists())
+
+    if not target_exists:
+        target_location = "missing target"
+    elif not target_is_dir:
+        target_location = "non-directory target"
+    elif canonical_path and target_dir.resolve() == canonical_path.resolve(strict=False):
+        target_location = "canonical shared-library skill"
+    elif target_dir.resolve() == ctx.runtime_skill_dir.resolve():
+        target_location = "runtime package outside shared library"
+    elif path_is_within(target_dir, ctx.library_root):
+        target_location = "shared-library entry"
+    elif ctx.project_root and path_is_within(target_dir, ctx.project_root):
+        target_location = "project-local skill directory"
+    elif ctx.import_path is not None:
+        target_location = "external import candidate"
+    else:
+        target_location = "external skill directory"
+
+    validation: dict[str, object] | None = None
+    issues: list[str] = []
+    recommendations: list[str] = []
+    duplicate_canonical_copy = False
+
+    if not target_exists:
+        issues.append(f"Target does not exist: {target_dir}")
+        recommendations.append(
+            "Create or import the skill before using it as a managed shared-library package."
+        )
+    elif not target_is_dir:
+        issues.append(f"Target is not a directory: {target_dir}")
+        recommendations.append(
+            "Point doctor at a skill directory instead of a file or other filesystem entry."
+        )
+    else:
+        validation = collect_validation_result(target_dir)
+        validation_errors = validation["errors"]
+        if validation_errors:
+            issues.extend(str(error) for error in validation_errors)
+            recommendations.append(
+                "Fix the structural errors in SKILL.md and agents/openai.yaml before relying on this skill."
+            )
+        if (
+            canonical_path
+            and target_dir.resolve() != canonical_path.resolve(strict=False)
+            and canonical_exists
+        ):
+            duplicate_canonical_copy = True
+            issues.append(f"Canonical copy already exists at {canonical_path}")
+            if ctx.import_path is not None:
+                recommendations.append(
+                    "Import under a different canonical name, or update the existing shared-library copy instead of keeping two copies."
+                )
+            else:
+                recommendations.append(
+                    "Choose which copy should remain canonical, then remove or merge the duplicate."
+                )
+
+    if target_location == "runtime package outside shared library":
+        recommendations.append(
+            "Install or copy this package into $CODEX_HOME/skills when you want Codex to discover it directly as a shared skill."
+        )
+
+    project_link: dict[str, object] | None = None
+    if ctx.project_root and effective_skill_name:
+        project_link = collect_project_link_status(
+            ctx.project_root,
+            ctx.library_root,
+            effective_skill_name,
+        )
+        project_status = str(project_link["status"])
+        if project_status == "missing":
+            recommendations.append(
+                f"Attach {effective_skill_name} to the project with --project-skills {effective_skill_name}."
+            )
+        elif project_status == "broken symlink":
+            issues.append(f"Project link is broken: {project_link['path']}")
+            recommendations.append(
+                f"Rebuild the project link for {effective_skill_name} so it points to the canonical shared-library skill."
+            )
+        elif project_status == "shared-library link to another skill":
+            issues.append(
+                f"Project link points to a different shared-library skill: {project_link.get('target')}"
+            )
+            recommendations.append(
+                f"Relink the project entry so {effective_skill_name} points to its own canonical directory."
+            )
+        elif project_status == "external symlink":
+            issues.append(
+                f"Project link points outside the shared library: {project_link.get('target')}"
+            )
+            recommendations.append(
+                f"Replace the external project symlink with a managed link to {ctx.library_root / effective_skill_name}."
+            )
+        elif project_status in {"local directory (not a symlink)", "non-directory entry"}:
+            issues.append(f"Project link path is blocked by an existing entry: {project_link['path']}")
+            recommendations.append(
+                f"Remove the blocker at {project_link['path']} and recreate the managed project link."
+            )
+
+    return {
+        "mode": "doctor",
+        "ok": not issues,
+        "target": str(target_dir),
+        "skill_name": effective_skill_name or None,
+        "library_root": str(ctx.library_root),
+        "runtime_skill_dir": str(ctx.runtime_skill_dir),
+        "target_exists": target_exists,
+        "target_is_directory": target_is_dir,
+        "target_location": target_location,
+        "canonical_path": str(canonical_path) if canonical_path else None,
+        "canonical_exists": canonical_exists,
+        "duplicate_canonical_copy": duplicate_canonical_copy,
+        "validation": validation,
+        "project_link": project_link,
+        "issues": issues,
+        "recommendations": recommendations,
+    }
+
+
+def report_doctor(ctx: ExecutionContext) -> int:
+    payload = collect_doctor_result(ctx)
+    if ctx.args.format == "json":
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0 if payload["ok"] else 1
+
+    print(f"[DOCTOR] Target: {payload['target']}")
+    print(f"[DOCTOR] Library root: {payload['library_root']}")
+    print(f"[DOCTOR] Runtime skill dir: {payload['runtime_skill_dir']}")
+    if payload["skill_name"]:
+        print(f"[DOCTOR] Skill name: {payload['skill_name']}")
+    print(f"[DOCTOR] Target location: {payload['target_location']}")
+    if payload["canonical_path"]:
+        print(f"[DOCTOR] Canonical path: {payload['canonical_path']}")
+        print(
+            "[DOCTOR] Canonical status: "
+            + ("present" if payload["canonical_exists"] else "missing")
+        )
+
+    validation = payload["validation"]
+    if validation is None:
+        print("[DOCTOR] Validation: skipped because the target is missing or not a directory.")
+    elif validation["ok"]:
+        print("[DOCTOR] Validation: passes structural checks.")
+    else:
+        print("[DOCTOR] Validation: has structural errors.")
+        for error in validation["errors"]:
+            print(f"  - {error}")
+    if validation is not None:
+        for warning in validation["warnings"]:
+            print(f"  - Warning: {warning}")
+
+    project_link = payload["project_link"]
+    if project_link is not None:
+        print(f"[DOCTOR] Project link: {project_link['status']}")
+        print(f"[DOCTOR] Project link path: {project_link['path']}")
+        if project_link.get("target"):
+            print(f"[DOCTOR] Project link target: {project_link['target']}")
+
+    if payload["issues"]:
+        print("[DOCTOR] Issues:")
+        for issue in payload["issues"]:
+            print(f"  - {issue}")
+    else:
+        print("[DOCTOR] No blocking issues found.")
+
+    if payload["recommendations"]:
+        print("[DOCTOR] Recommendations:")
+        for recommendation in payload["recommendations"]:
+            print(f"  - {recommendation}")
+
+    return 0 if payload["ok"] else 1
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -1141,9 +1376,23 @@ def parse_args() -> argparse.Namespace:
         help="Path to an already-downloaded local skill directory to import into the shared library",
     )
     parser.add_argument(
+        "--adopt",
+        help="Path to a downloaded local skill directory to adopt into the shared library. Alias for --import-path.",
+    )
+    parser.add_argument(
         "--inspect-import",
         action="store_true",
         help="Inspect a local skill import candidate without writing any files",
+    )
+    parser.add_argument(
+        "--doctor",
+        "--check",
+        dest="doctor",
+        action="store_true",
+        help=(
+            "Run a read-only health check for the current package, a canonical shared-library "
+            "skill, or a local import candidate."
+        ),
     )
     parser.add_argument(
         "--import-mode",
@@ -1229,7 +1478,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help=(
             "Validate an existing skill directory without writing files. "
-            "Defaults to --import-path, the canonical skill, or this package."
+            "Defaults to --adopt/--import-path, the canonical skill, or this package."
         ),
     )
     parser.add_argument(
@@ -1250,7 +1499,8 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
     root_override_provided = bool(args.library_root or os.environ.get(DEFAULT_LIBRARY_ENV))
     runtime_skill_dir = detect_runtime_skill_dir()
     project_root = Path(args.project_root).expanduser().resolve() if args.project_root else None
-    import_path = Path(args.import_path).expanduser().resolve() if args.import_path else None
+    raw_import_path = args.import_path or args.adopt
+    import_path = Path(raw_import_path).expanduser().resolve() if raw_import_path else None
     auto_bootstrap_import = False
     kept_existing_canonical = False
     project_root_inferred_from_cwd = False
@@ -1279,7 +1529,7 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         if not (runtime_skill_dir / "SKILL.md").exists():
             print(
                 "[ERROR] Could not infer an import source for --bootstrap-project-layout. "
-                "Provide --import-path explicitly."
+                "Provide --adopt or --import-path explicitly."
             )
             return 1
         import_path = runtime_skill_dir
@@ -1405,6 +1655,9 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
 def validate_execution_context(ctx: ExecutionContext) -> None:
     args = ctx.args
 
+    if args.import_path and args.adopt:
+        raise UsageError("[ERROR] Use only one of --import-path or --adopt.")
+
     if (ctx.project_skills or ctx.unlink_skills or ctx.sync_project_skills) and ctx.project_root is None:
         raise UsageError(
             "[ERROR] Project skill add/remove/sync operations require --project-root."
@@ -1422,6 +1675,7 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
         and not args.list_project_skills
         and not args.bootstrap_project_layout
         and not args.validate_only
+        and not args.doctor
     ):
         raise UsageError(
             "[ERROR] Provide a skill name to create/update, or use a project skill operation."
@@ -1429,15 +1683,16 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
 
     if ctx.import_path and (ctx.project_skills or ctx.unlink_skills or ctx.sync_project_skills):
         raise UsageError(
-            "[ERROR] --import-path cannot be combined with project skill add/remove/sync modes."
+            "[ERROR] --import-path/--adopt cannot be combined with project skill add/remove/sync modes."
         )
 
     if args.inspect_import and not ctx.import_path:
-        raise UsageError("[ERROR] --inspect-import requires --import-path.")
+        raise UsageError("[ERROR] --inspect-import requires --import-path or --adopt.")
 
     if args.validate_only:
         if (
-            args.list_library_skills
+            args.doctor
+            or args.list_library_skills
             or args.list_project_skills
             or ctx.project_skills
             or ctx.unlink_skills
@@ -1462,18 +1717,51 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
                 "listing, mutation, inspect, dry-run, compat-link, or metadata flags."
             )
 
+    if args.doctor:
+        if (
+            args.validate_only
+            or args.list_library_skills
+            or args.list_project_skills
+            or ctx.project_skills
+            or ctx.unlink_skills
+            or ctx.sync_project_skills
+            or args.bootstrap_project
+            or args.bootstrap_project_layout
+            or args.dry_run
+            or args.resources
+            or args.purpose
+            or args.display_name
+            or args.short_description
+            or args.default_prompt
+            or args.overwrite_skill_md
+            or args.overwrite_openai
+            or args.skip_validate
+            or args.inspect_import
+            or args.compat_root
+            or args.no_compat_link
+        ):
+            raise UsageError(
+                "[ERROR] --doctor is read-only and cannot be combined with "
+                "listing, mutation, inspect, dry-run, compat-link, or metadata flags."
+            )
+
     if args.format == "json" and not (
-        args.validate_only or args.list_library_skills or args.list_project_skills or args.inspect_import
+        args.validate_only
+        or args.list_library_skills
+        or args.list_project_skills
+        or args.inspect_import
+        or args.doctor
     ):
         raise UsageError(
             "[ERROR] --format json is supported only with --validate-only, "
-            "--list-library-skills, --list-project-skills, or --inspect-import."
+            "--list-library-skills, --list-project-skills, --inspect-import, or --doctor."
         )
 
     if args.list_library_skills or args.list_project_skills:
         if (
             ctx.skill_name
             or ctx.import_path
+            or args.doctor
             or ctx.project_skills
             or ctx.unlink_skills
             or ctx.sync_project_skills
@@ -1544,6 +1832,10 @@ def handle_validate_only_mode(ctx: ExecutionContext) -> int:
     if ctx.args.format == "text":
         print(f"[INFO] Validation target: {validate_target}")
     return report_validation(validate_target, output_format=ctx.args.format)
+
+
+def handle_doctor_mode(ctx: ExecutionContext) -> int:
+    return report_doctor(ctx)
 
 
 def handle_listing_mode(ctx: ExecutionContext) -> int:
@@ -1747,6 +2039,8 @@ def main() -> int:
 
     if args.validate_only:
         return handle_validate_only_mode(ctx)
+    if args.doctor:
+        return handle_doctor_mode(ctx)
     if args.list_library_skills or args.list_project_skills:
         return handle_listing_mode(ctx)
     if args.inspect_import:
