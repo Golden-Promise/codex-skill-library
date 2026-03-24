@@ -27,13 +27,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-workflow-manager
 ```
 
-固定安装已发布的 `v0.1.1` 版本：
+固定安装已发布的 `v0.2.0` 版本：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager \
-  --ref v0.1.1
+  --ref v0.2.0
 ```
 
 也可以直接使用 GitHub tree URL：
@@ -46,9 +46,20 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 如果通过 Codex 中的 `skill-installer` 技能安装，可以直接这样说：
 
 - 如果你希望它能被 Codex 直接当作技能使用，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager。`
-- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.1.1。`
+- 如果要安装已发布版本，可以说：`请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-workflow-manager 安装 skill-workflow-manager，并使用 v0.2.0。`
 
 如果你只是把它安装到其他目标目录做手动审阅或脚本执行，Codex 不会把那个目录自动当成运行时技能目录。要在 Codex 里直接使用，仍然建议安装到默认的 `$CODEX_HOME/skills`。
+
+## 5 分钟上手
+
+1. 先把 `skill-workflow-manager` 安装到默认的 Codex 共享库。
+2. 在 `$CODEX_HOME/skills` 中创建或接管一个共享 skill。
+3. 通过 `.agents/skills` 把这个共享 skill 接入一个项目。
+4. 在清理、重链或发布前先跑一次 `--doctor`。
+
+## 平台提醒
+
+项目接入依赖 symlink。若你在 Windows 或受限文件系统里创建链接失败，请先检查符号链接权限、开发者模式，以及目标文件系统是否支持 symlink。
 
 ## 可以直接这样对 Codex 说
 
@@ -60,7 +71,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 ## 开始阅读
 
 1. 先看主工作流说明 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
-2. 先从上面的 3 条主路径里选最接近的一条。
+2. 如果你是第一次使用，先走上面的“5 分钟上手”。
 3. 如果你只想快速复制提示词，打开 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 4. 只有在你明确希望 skill 跟项目一起托管时，才使用项目内自举。
 

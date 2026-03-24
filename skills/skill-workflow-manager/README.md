@@ -27,13 +27,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-workflow-manager
 ```
 
-Install the published `v0.1.1` release:
+Install the published `v0.2.0` release:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-workflow-manager \
-  --ref v0.1.1
+  --ref v0.2.0
 ```
 
 Install from a GitHub tree URL:
@@ -46,9 +46,20 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 Install with Codex using the `skill-installer` skill:
 
 - Ask Codex: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager.`
-- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.1.1.`
+- For the published release, ask: `Use the skill-installer skill to install skill-workflow-manager from Golden-Promise/codex-skill-library at skills/skill-workflow-manager using ref v0.2.0.`
 
 If you install it to another target root for manual inspection, Codex will not auto-discover it as a runtime skill. The recommended path for direct use is still the default install into `$CODEX_HOME/skills`.
+
+## Quick Start In 5 Minutes
+
+1. Install `skill-workflow-manager` into the default Codex shared library.
+2. Create or adopt one shared skill in `$CODEX_HOME/skills`.
+3. Attach that shared skill to one project through `.agents/skills`.
+4. Run `--doctor` before cleanup, relinking, or release work.
+
+## Platform Note
+
+Project attachment depends on symlinks. On Windows or restricted filesystems, if link creation fails, check symlink permissions, developer mode, and whether the target filesystem supports symbolic links.
 
 ## Say This To Codex
 
@@ -60,7 +71,7 @@ If you install it to another target root for manual inspection, Codex will not a
 ## Start Here
 
 1. Read the main workflow guide in [references/use-cases.md](references/use-cases.md).
-2. Start with one of the 3 main paths above.
+2. If you are new, follow the 5-minute quick start first.
 3. Use [references/prompt-templates.en.md](references/prompt-templates.en.md) when you only need copy-ready wording.
 4. Reach for project-local bootstrap only when the skill should live under one project rather than the global shared library.
 

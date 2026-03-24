@@ -209,6 +209,76 @@ class ManageSkillTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("--doctor is read-only", result.stdout)
 
+    def test_doctor_reports_missing_target_directory(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+
+            result = self.run_script(
+                "missing-skill",
+                "--library-root",
+                str(library_root),
+                "--doctor",
+                "--format",
+                "json",
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertEqual(payload["target_location"], "missing target")
+        self.assertIn("Target does not exist", payload["issues"][0])
+
+    def test_doctor_reports_broken_project_symlink(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            skill_dir = library_root / "demo-skill"
+            project_root = Path(tmpdir) / "demo-project"
+            project_skills_dir = project_root / ".agents" / "skills"
+            write_skill_dir(skill_dir, skill_name="demo-skill")
+            project_skills_dir.mkdir(parents=True, exist_ok=True)
+            (project_skills_dir / "demo-skill").symlink_to(project_root / "missing-target")
+
+            result = self.run_script(
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--doctor",
+                "--format",
+                "json",
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["project_link"]["status"], "broken symlink")
+        self.assertIn("Project link is broken", payload["issues"][0])
+
+    def test_doctor_reports_project_link_blocked_by_directory(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            skill_dir = library_root / "demo-skill"
+            project_root = Path(tmpdir) / "demo-project"
+            project_link = project_root / ".agents" / "skills" / "demo-skill"
+            write_skill_dir(skill_dir, skill_name="demo-skill")
+            project_link.mkdir(parents=True, exist_ok=True)
+
+            result = self.run_script(
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--doctor",
+                "--format",
+                "json",
+            )
+
+        self.assertNotEqual(result.returncode, 0)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["project_link"]["status"], "local directory (not a symlink)")
+        self.assertIn("blocked by an existing entry", payload["issues"][0])
+
     def test_list_library_skills_supports_json_output(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             library_root = Path(tmpdir) / "_skill-library"

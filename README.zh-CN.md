@@ -25,13 +25,13 @@
 
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
-| `skill-workflow-manager` | 用共享库工作流创建、更新、导入和重连 Codex skills | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-workflow-manager` | 以共享库优先的方式管理 skill、接管下载包、做健康检查并接入项目 | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
 
 ## 快速开始
 
 1. 先看 [skills/README.zh-CN.md](skills/README.zh-CN.md) 浏览当前可用 skill。
 2. 进入具体 skill 包的 `README.md` 了解它是否适合你的场景。
-3. 使用 `skill-installer` 进行安装。
+3. 使用 `skill-installer` 进行安装，通常直接安装到默认的 Codex 共享库。
 4. 需要更详细示例时，继续阅读该包下的 `references/`。
 
 ## 安装示例

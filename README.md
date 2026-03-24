@@ -25,13 +25,13 @@ This repository is designed for people who want to:
 
 | Skill | Best For | Docs |
 | --- | --- | --- |
-| `skill-workflow-manager` | Creating, updating, importing, and relinking Codex skills with a shared-library workflow | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-workflow-manager` | Shared-library-first skill management, adoption, health checks, and project links | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
 
 ## Quick Start
 
 1. Open the package list in [skills/README.md](skills/README.md).
 2. Choose a skill and read its package `README.md`.
-3. Install it with `skill-installer`.
+3. Install it with `skill-installer`, usually into the default Codex shared library.
 4. Use the package references for examples, prompts, and deeper guidance.
 
 ## Install Example
