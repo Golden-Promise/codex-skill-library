@@ -40,7 +40,7 @@
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance
 ```
 
@@ -48,7 +48,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
   --ref v0.4.0
 ```
@@ -57,10 +57,8 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
+  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-governance
 ```
-
-把 `<owner>` 替换成你的 GitHub 用户名或组织名即可。
 
 ## 阅读入口
 

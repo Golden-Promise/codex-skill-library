@@ -43,7 +43,7 @@ repo-root/
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance
 ```
 
@@ -92,5 +92,5 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
+  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-governance
 ```

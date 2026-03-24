@@ -22,7 +22,7 @@
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance
 ```
 
@@ -30,7 +30,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
   --ref v0.4.0
 ```
@@ -38,7 +38,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 在 Codex 里也可以直接这样说：
 
 ```text
-请用 skill-installer 从 <owner>/codex-skill-library 的 skills/skill-governance 安装 skill-governance。
+请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance。
 ```
 
 ## 快速上手

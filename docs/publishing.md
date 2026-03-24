@@ -46,7 +46,7 @@ Verify installation from the repository path:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance
 ```
 
@@ -54,7 +54,7 @@ Verify installation from a GitHub tree URL:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
+  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-governance
 ```
 
 ## Maintainer Notes

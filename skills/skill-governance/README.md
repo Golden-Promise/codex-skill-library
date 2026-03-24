@@ -22,7 +22,7 @@ Install the latest package from this repository:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance
 ```
 
@@ -30,7 +30,7 @@ Install the current release:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo <owner>/codex-skill-library \
+  --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
   --ref v0.4.0
 ```
@@ -38,7 +38,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 Natural-language install request inside Codex:
 
 ```text
-Use skill-installer to install skill-governance from <owner>/codex-skill-library at skills/skill-governance.
+Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.
 ```
 
 ## Quick Start
