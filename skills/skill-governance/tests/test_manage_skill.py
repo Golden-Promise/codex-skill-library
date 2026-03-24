@@ -783,6 +783,47 @@ class ManageSkillTests(unittest.TestCase):
             self.assertTrue(project_link.is_symlink())
             self.assertEqual(project_link.resolve(), canonical_dir.resolve())
 
+    def test_setup_task_creates_project_management_skeleton(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = Path(tmpdir) / "demo-project"
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            result = self.run_script("setup", str(project_root))
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((project_root / "_skill-library").exists())
+            self.assertTrue((project_root / ".agents" / "skills").exists())
+            self.assertTrue((project_root / ".skill-platform" / "registry.json").exists())
+            self.assertTrue(
+                (project_root / ".skill-platform" / "dependency-graph.json").exists()
+            )
+            self.assertIn("[NEXT] Task complete: setup", result.stdout)
+
+    def test_manage_task_adopts_local_project_skill_and_builds_structure(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = Path(tmpdir) / "demo-project"
+            source_dir = project_root / "demo-skill"
+            canonical_dir = project_root / "_skill-library" / "demo-skill"
+            exposure_dir = project_root / ".agents" / "skills" / "demo-skill"
+            project_root.mkdir(parents=True, exist_ok=True)
+            write_skill_dir(source_dir, skill_name="demo-skill")
+
+            result = self.run_script(
+                "manage",
+                str(project_root),
+                "--exposure-mode",
+                "copy",
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(canonical_dir.exists())
+            self.assertFalse(source_dir.exists())
+            self.assertTrue(exposure_dir.exists())
+            self.assertTrue((exposure_dir / "SKILL.md").exists())
+            self.assertTrue((project_root / ".skill-platform" / "registry.json").exists())
+            self.assertIn("Discovered local skill packages: 1", result.stdout)
+            self.assertIn("Task complete: manage", result.stdout)
+
     def test_add_task_creates_project_owned_skill(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             project_root = Path(tmpdir) / "demo-project"

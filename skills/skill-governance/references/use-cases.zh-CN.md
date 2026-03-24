@@ -6,6 +6,8 @@ English version: [use-cases.md](use-cases.md)
 
 ## 一句话理解
 
+- `manage`：审查一个项目目录，接管本地 skill，并补齐受管布局
+- `setup`：快速搭建项目级管理骨架
 - `add`：新增或接管一个 skill
 - `enable`：把 skill 启用到一个项目
 - `doctor`：检查健康度和治理状态
@@ -16,6 +18,20 @@ English version: [use-cases.md](use-cases.md)
 - `retire`：移除一个项目暴露
 
 ## 最常用流程
+
+接管一个项目目录的 skill 管理：
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  manage <project-root>
+```
+
+快速搭建项目级管理骨架：
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  setup <project-root>
+```
 
 新增一个可复用共享 skill：
 
@@ -85,6 +101,8 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 ## 工具会自动判断什么
 
+- `manage` 会发现本地 skill 包，并把它们接入项目受管结构。
+- `setup` 会自动创建项目内库、暴露目录和平台状态目录。
 - 不带 `--project`：默认走共享库。
 - 带 `--project`：`add` 默认更偏向项目内托管。
 - `auto` 暴露模式会在 CI 中选 `manifest`，在 Windows 上选 `copy`，在 Linux/macOS 上选 `symlink`。

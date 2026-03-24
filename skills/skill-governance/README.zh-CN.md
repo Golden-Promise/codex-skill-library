@@ -7,6 +7,8 @@
 
 ## 最适合用来做什么
 
+- 接管一个已有项目目录里的 skill 管理
+- 为某个项目快速搭建 skill 管理骨架
 - 新增一个可复用共享 skill
 - 接管一个已下载的本地 skill 包
 - 把某个 skill 启用到一个项目里
@@ -14,7 +16,7 @@
 - 执行安全自动修复
 - 为 CI 或发布准备注册表、生命周期和依赖图
 
-如果你不确定从哪里开始，优先用 `add`、`enable` 和 `doctor`。
+如果你不确定从哪里开始，优先用 `manage`、`setup` 和 `doctor`。
 
 ## 安装
 
@@ -32,7 +34,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.4.1
+  --ref v0.5.0
 ```
 
 在 Codex 里也可以直接这样说：
@@ -43,42 +45,27 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 ## 快速上手
 
-新增一个可复用共享 skill：
+如果你刚通过 `skill-installer` 安装完 `skill-governance`，最推荐直接在 Codex 里这样说：
 
-```bash
-python3 scripts/manage_skill.py \
-  add demo-skill \
-  --purpose "Use this skill when the user wants help with demo-skill tasks."
-```
+- `接管这个目录的 skill 管理，并把本地 skill 整理进受管结构。`
+- `给这个项目搭建 skill 管理骨架。`
 
-把一个已下载的 skill 包接入某个项目：
+这通常就是最省事的起点。
 
-```bash
-python3 scripts/manage_skill.py \
-  add <import-path> \
-  --project <project-root>
-```
+如果你已经知道下一步要做什么，也可以直接说：
 
-把已有 skill 启用到项目：
+- `在我清理或重链 skill 之前，先对这个项目跑一次 doctor。`
+- `把 <skill-name> 启用到这个项目。`
+- `往共享库里新增一个可复用 skill。`
 
-```bash
-python3 scripts/manage_skill.py \
-  enable demo-skill \
-  --project <project-root>
-```
-
-在改动前先做体检：
-
-```bash
-python3 scripts/manage_skill.py \
-  doctor demo-skill \
-  --project <project-root>
-```
+如果你更喜欢直接看命令模式，请继续看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
 ## 主要任务
 
 | 任务 | 作用 |
 | --- | --- |
+| `manage` | 审查一个项目目录，发现本地 skill 包，自动接管到受管结构，并补齐项目管理布局 |
+| `setup` | 只搭建项目级 skill 管理骨架，不接管本地 skill 包 |
 | `add` | 新建 skill，或接管一个本地下载包 |
 | `enable` | 把已有 skill 暴露给一个项目 |
 | `doctor` | 做健康评分、重叠检测、影响分析和修复建议 |
@@ -90,6 +77,8 @@ python3 scripts/manage_skill.py \
 
 ## 工具会自动帮你判断什么
 
+- `manage` 会检查目标目录、发现本地 skill 包，并自动补齐项目受管结构。
+- `setup` 会自动创建项目内库、暴露目录和平台状态目录。
 - 不带 `--project` 时，默认走共享库。
 - 带 `--project` 时，`add` 默认更偏向项目内托管。
 - `auto` 暴露策略当前会自动选择：

@@ -6,6 +6,18 @@ English version: [prompt-templates.en.md](prompt-templates.en.md)
 
 ## 核心模板
 
+### 接管一个项目目录的 skill 管理
+
+```text
+$skill-governance 接管 <project-root> 的 skill 管理，审查目录、发现本地 skill，并整理进受管结构。
+```
+
+### 给项目搭建管理骨架
+
+```text
+$skill-governance 给 <project-root> 搭建 skill 管理骨架。
+```
+
 ### 新增一个共享 skill
 
 ```text

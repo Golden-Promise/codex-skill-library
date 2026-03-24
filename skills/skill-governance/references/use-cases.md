@@ -6,6 +6,8 @@ Use this page when you want quick command patterns for the most common tasks.
 
 ## The Short Version
 
+- `manage`: inspect a project directory, adopt local skills, and build the managed layout
+- `setup`: create the project management skeleton
 - `add`: create or adopt a skill
 - `enable`: expose a skill to one project
 - `doctor`: inspect health and governance state
@@ -16,6 +18,20 @@ Use this page when you want quick command patterns for the most common tasks.
 - `retire`: remove a project exposure
 
 ## Most Common Flows
+
+Take over skill management for a project directory:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  manage <project-root>
+```
+
+Set up a clean project management skeleton:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  setup <project-root>
+```
 
 Add a reusable shared skill:
 
@@ -85,6 +101,8 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 ## Automatic Decisions
 
+- `manage` discovers local skill packages and adopts them into the managed project structure.
+- `setup` creates the project-owned library, exposure root, and platform state directories.
 - No `--project`: default to the shared library.
 - With `--project`: `add` prefers project-owned storage.
 - `auto` exposure mode chooses `manifest` in CI, `copy` on Windows, and `symlink` on Linux/macOS.

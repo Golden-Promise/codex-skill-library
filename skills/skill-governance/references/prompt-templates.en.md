@@ -6,6 +6,18 @@ Use these short prompts when you already know the task.
 
 ## Core Prompts
 
+### Take over skill management for one project
+
+```text
+$skill-governance Take over skill management for <project-root>, inspect the directory, discover local skills, and organize them into the managed project structure.
+```
+
+### Set up a project management skeleton
+
+```text
+$skill-governance Set up skill governance for <project-root> and create the project management skeleton.
+```
+
 ### Add a shared skill
 
 ```text

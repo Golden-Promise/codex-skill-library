@@ -7,6 +7,8 @@ Use it to add, enable, check, repair, audit, document, upgrade, or retire skills
 
 ## What It Is Best For
 
+- taking over skill management for an existing project directory
+- setting up a clean skill governance skeleton for one project
 - adding a new reusable skill
 - adopting a downloaded local skill package
 - enabling a skill inside one project
@@ -14,7 +16,7 @@ Use it to add, enable, check, repair, audit, document, upgrade, or retire skills
 - repairing safe project exposure issues
 - keeping registry, lifecycle, and dependency state ready for CI
 
-If you are unsure where to start, use `add`, `enable`, and `doctor`.
+If you are unsure where to start, use `manage`, `setup`, and `doctor`.
 
 ## Install
 
@@ -32,7 +34,7 @@ Install the current release:
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.4.1
+  --ref v0.5.0
 ```
 
 Natural-language install request inside Codex:
@@ -43,42 +45,27 @@ Use skill-installer to install skill-governance from Golden-Promise/codex-skill-
 
 ## Quick Start
 
-Add a reusable shared skill:
+If you have just installed `skill-governance`, start with one of these two requests inside Codex:
 
-```bash
-python3 scripts/manage_skill.py \
-  add demo-skill \
-  --purpose "Use this skill when the user wants help with demo-skill tasks."
-```
+- `Take over skill management for this directory and organize any local skills into the managed project structure.`
+- `Set up skill governance for this project and create the management skeleton.`
 
-Adopt a downloaded skill into one project:
+That is the fastest path for most users.
 
-```bash
-python3 scripts/manage_skill.py \
-  add <import-path> \
-  --project <project-root>
-```
+If you already know which managed skill you want to work on next, then ask for:
 
-Enable a skill for a project:
+- `Run doctor for this project before I clean up or relink skills.`
+- `Enable <skill-name> for this project.`
+- `Add a new reusable skill to the shared library.`
 
-```bash
-python3 scripts/manage_skill.py \
-  enable demo-skill \
-  --project <project-root>
-```
-
-Check health before you change anything:
-
-```bash
-python3 scripts/manage_skill.py \
-  doctor demo-skill \
-  --project <project-root>
-```
+If you prefer direct command patterns, use [references/use-cases.md](references/use-cases.md).
 
 ## Main Tasks
 
 | Task | What it does |
 | --- | --- |
+| `manage` | Inspect one project directory, discover local skill packages, adopt them into managed storage, and build the project structure |
+| `setup` | Create the project skill governance skeleton without taking over local skill packages |
 | `add` | Create a new skill or adopt a downloaded local package |
 | `enable` | Expose an existing skill to one project |
 | `doctor` | Score health, detect overlap, analyze impact, and produce repair suggestions |
@@ -90,6 +77,8 @@ python3 scripts/manage_skill.py \
 
 ## What The Tool Decides Automatically
 
+- `manage` inspects the target directory, discovers local skill packages, and builds the managed project layout for you.
+- `setup` creates the project-owned library, exposure root, and platform state layout for you.
 - Without `--project`, skills default to the shared library.
 - With `--project`, `add` prefers project-owned storage.
 - Exposure mode `auto` currently chooses:

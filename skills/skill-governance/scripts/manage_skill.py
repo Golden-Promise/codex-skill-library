@@ -197,7 +197,18 @@ def normalize_cli_args(argv: list[str]) -> list[str]:
         return argv
 
     task = argv[0]
-    if task not in {"add", "enable", "doctor", "audit", "document", "upgrade", "retire", "repair"}:
+    if task not in {
+        "add",
+        "enable",
+        "doctor",
+        "audit",
+        "document",
+        "upgrade",
+        "retire",
+        "repair",
+        "setup",
+        "manage",
+    }:
         return argv
 
     rest = list(argv[1:])
@@ -232,6 +243,11 @@ def normalize_cli_args(argv: list[str]) -> list[str]:
         return rewritten + rest
     if task == "audit":
         return rewritten + rest + ["--audit"]
+    if task in {"setup", "manage"}:
+        if rest and not rest[0].startswith("-"):
+            target = rest.pop(0)
+            rewritten.extend(["--project-root", target])
+        return rewritten + rest
     return rewritten + rest + ["--doctor"]
 
 
@@ -4143,8 +4159,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     normalized_argv = normalize_cli_args(list(argv) if argv is not None else sys.argv[1:])
     parser = argparse.ArgumentParser(
         description=(
-            "Manage Codex skills through task-oriented actions such as add, enable, "
-            "doctor, document, audit, repair, upgrade, and retire. Legacy flags remain supported."
+            "Manage Codex skills through task-oriented actions such as setup, manage, "
+            "add, enable, doctor, document, audit, repair, upgrade, and retire. Legacy flags remain supported."
         )
     )
     parser.add_argument("--task-kind", default="legacy", help=argparse.SUPPRESS)
@@ -4397,7 +4413,7 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
 
     if project_root is None:
         infer_without_import = bool(
-            args.task_kind in {"enable", "doctor", "repair", "retire", "upgrade"}
+            args.task_kind in {"enable", "doctor", "repair", "retire", "upgrade", "setup", "manage"}
             or args.list_project_skills
             or args.project_skills
             or args.unlink_skills
@@ -4441,7 +4457,7 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
     skill_name = normalize_skill_name(args.skill_name) if args.skill_name else inferred_import_name
     prefer_project_library = bool(
         project_root
-        and args.task_kind in {"add", "upgrade"}
+        and args.task_kind in {"add", "upgrade", "setup", "manage"}
         and not args.inspect_import
         and not args.list_library_skills
         and not args.list_project_skills
@@ -4465,6 +4481,13 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         project_root,
         library_root,
     )
+    if (
+        args.task_kind in {"setup", "manage"}
+        and project_root is not None
+        and not args.platform_root
+        and config.platform_root is None
+    ):
+        platform_root = (project_root / DEFAULT_PLATFORM_DIRNAME).resolve()
     compat_root = detect_compat_root(
         args.compat_root,
         library_root,
@@ -4614,6 +4637,7 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
         and not args.doctor
         and not document_requested
         and not args.audit
+        and args.task_kind not in {"setup", "manage"}
     ):
         raise UsageError(
             "[ERROR] Provide a skill name to create/update, or use a project skill operation."
@@ -4804,6 +4828,53 @@ def validate_execution_context(ctx: ExecutionContext) -> None:
             "[ERROR] enable needs a project context. Pass --project-root/--project or run it inside the target project."
         )
 
+    if args.task_kind in {"setup", "manage"} and ctx.project_root is None:
+        raise UsageError(
+            "[ERROR] setup/manage need a project context. Pass --project-root/--project or run them inside the target project."
+        )
+
+    if args.task_kind in {"setup", "manage"}:
+        if (
+            args.validate_only
+            or args.doctor
+            or args.document
+            or args.audit
+            or args.list_library_skills
+            or args.list_project_skills
+            or ctx.project_skills
+            or ctx.unlink_skills
+            or ctx.sync_project_skills
+            or args.bootstrap_project
+            or args.bootstrap_project_layout
+            or args.inspect_import
+            or args.compat_root
+            or args.no_compat_link
+            or args.sync_platform_state
+            or args.resources
+            or args.purpose
+            or args.display_name
+            or args.short_description
+            or args.default_prompt
+            or args.overwrite_skill_md
+            or args.overwrite_openai
+            or args.skip_validate
+            or args.skill_name
+            or args.import_path
+            or args.adopt
+            or args.owner
+            or args.reviewer
+            or args.team
+            or args.version
+            or args.lifecycle_status
+            or args.deprecation_policy
+            or args.last_reviewed_at
+        ):
+            raise UsageError(
+                "[ERROR] setup/manage only work with project scope flags such as "
+                "--project-root/--project, --workspace-root, --platform-root, "
+                "--library-root, --exposure-mode, --config, and --dry-run."
+            )
+
     if args.task_kind == "repair":
         if ctx.import_path:
             raise UsageError("[ERROR] repair works with a managed skill name, not --import-path/--adopt.")
@@ -4880,6 +4951,179 @@ def print_execution_context(ctx: ExecutionContext) -> None:
         print(f"[INFO] Compatibility root: {ctx.compat_root}")
     if args.dry_run:
         print("[INFO] Dry-run mode enabled. No files will be modified.")
+
+
+def initialize_project_management_layout(ctx: ExecutionContext) -> dict[str, str]:
+    if ctx.project_root is None:
+        raise FileNotFoundError("Could not determine a project root for setup/manage.")
+    if ctx.exposure_root is None:
+        raise FileNotFoundError("Could not determine a managed project exposure root.")
+
+    return {
+        "project_root": ensure_directory(ctx.project_root, dry_run=ctx.args.dry_run),
+        "library_root": ensure_directory(ctx.library_root, dry_run=ctx.args.dry_run),
+        "exposure_root": ensure_directory(ctx.exposure_root, dry_run=ctx.args.dry_run),
+        "platform_root": ensure_directory(ctx.platform_root, dry_run=ctx.args.dry_run),
+    }
+
+
+def discover_local_project_skill_dirs(
+    project_root: Path,
+    library_root: Path,
+    exposure_root: Path | None,
+    platform_root: Path,
+    runtime_skill_dir: Path,
+    limit: int = 200,
+) -> list[Path]:
+    ignored_names = {
+        ".git",
+        ".agents",
+        ".skill-platform",
+        ".venv",
+        "venv",
+        "node_modules",
+        "__pycache__",
+        library_root.name,
+        platform_root.name,
+    }
+    ignored_roots = [
+        library_root.resolve(strict=False),
+        platform_root.resolve(strict=False),
+        runtime_skill_dir.resolve(strict=False),
+    ]
+    if exposure_root is not None:
+        ignored_roots.append(exposure_root.resolve(strict=False))
+        ignored_roots.append(exposure_root.parent.resolve(strict=False))
+
+    discovered: list[Path] = []
+    for root, dirs, files in os.walk(project_root):
+        root_path = Path(root).resolve()
+        pruned_dirs: list[str] = []
+        for dirname in dirs:
+            candidate = (root_path / dirname).resolve(strict=False)
+            if dirname in ignored_names:
+                continue
+            if any(
+                candidate == ignored_root or path_is_within(candidate, ignored_root)
+                for ignored_root in ignored_roots
+            ):
+                continue
+            pruned_dirs.append(dirname)
+        dirs[:] = pruned_dirs
+
+        if "SKILL.md" not in files:
+            continue
+        if any(
+            root_path == ignored_root or path_is_within(root_path, ignored_root)
+            for ignored_root in ignored_roots
+        ):
+            continue
+        discovered.append(root_path)
+        dirs[:] = []
+        if len(discovered) >= limit:
+            break
+
+    return sorted(discovered)
+
+
+def handle_setup_project_mode(ctx: ExecutionContext) -> int:
+    print_execution_context(ctx)
+    statuses = initialize_project_management_layout(ctx)
+    print(f"[OK] Project root ({statuses['project_root']}): {ctx.project_root}")
+    print(f"[OK] Managed library root ({statuses['library_root']}): {ctx.library_root}")
+    print(f"[OK] Exposure root ({statuses['exposure_root']}): {ctx.exposure_root}")
+    print(f"[OK] Platform root ({statuses['platform_root']}): {ctx.platform_root}")
+    if not ctx.args.dry_run:
+        sync_platform_state_for_changes(ctx)
+    print("[NEXT] Task complete: setup")
+    return 0
+
+
+def handle_manage_project_mode(ctx: ExecutionContext) -> int:
+    print_execution_context(ctx)
+    statuses = initialize_project_management_layout(ctx)
+    print(f"[OK] Project root ({statuses['project_root']}): {ctx.project_root}")
+    print(f"[OK] Managed library root ({statuses['library_root']}): {ctx.library_root}")
+    print(f"[OK] Exposure root ({statuses['exposure_root']}): {ctx.exposure_root}")
+    print(f"[OK] Platform root ({statuses['platform_root']}): {ctx.platform_root}")
+
+    discovered_dirs = discover_local_project_skill_dirs(
+        ctx.project_root,
+        ctx.library_root,
+        ctx.exposure_root,
+        ctx.platform_root,
+        ctx.runtime_skill_dir,
+    )
+    print(f"[INFO] Discovered local skill packages: {len(discovered_dirs)}")
+
+    adopted_count = 0
+    skipped_count = 0
+    for source_dir in discovered_dirs:
+        skill_name = detect_skill_name_from_source(source_dir)
+        if not skill_name:
+            print(f"[WARN] Skipping {source_dir}: could not determine a managed skill name.")
+            skipped_count += 1
+            continue
+
+        validation = collect_validation_result(source_dir)
+        if not validation["ok"]:
+            print(f"[WARN] Skipping {source_dir}: structural validation failed.")
+            for error in validation["errors"]:
+                print(f"  - {error}")
+            skipped_count += 1
+            continue
+
+        canonical_skill_dir = ctx.library_root / skill_name
+        ensure_import_target_available(
+            source_dir,
+            canonical_skill_dir,
+            ctx.library_root,
+            skill_name,
+        )
+        import_status = import_skill_tree(
+            source_dir,
+            canonical_skill_dir,
+            mode=ctx.args.import_mode,
+            dry_run=ctx.args.dry_run,
+        )
+        print(
+            f"[OK] Managed canonical skill ({import_status}): "
+            f"{canonical_skill_dir}"
+        )
+
+        if ctx.exposure_root is None:
+            raise FileNotFoundError("Could not determine a managed project exposure root.")
+        link_status, project_link, registry_status = ensure_project_exposure(
+            ctx.exposure_root,
+            skill_name,
+            canonical_skill_dir,
+            ctx.exposure_mode,
+            dry_run=ctx.args.dry_run,
+        )
+        print(f"[OK] Project exposure ({link_status}): {project_link}")
+        print(
+            f"[OK] Exposure registry ({registry_status}): "
+            f"{managed_exposure_registry_path(ctx.exposure_root)}"
+        )
+
+        if source_dir.resolve() != canonical_skill_dir.resolve(strict=False):
+            cleanup_status = remove_path(source_dir, dry_run=ctx.args.dry_run)
+            print(f"[OK] Source cleanup ({cleanup_status}): {source_dir}")
+
+        if not ctx.args.skip_validate and not ctx.args.dry_run:
+            validation_status = report_validation(canonical_skill_dir)
+            if validation_status != 0:
+                return validation_status
+        adopted_count += 1
+
+    if not ctx.args.dry_run:
+        sync_platform_state_for_changes(ctx)
+
+    print(
+        "[NEXT] Task complete: manage "
+        f"(adopted={adopted_count}, skipped={skipped_count}, discovered={len(discovered_dirs)})"
+    )
+    return 0
 
 
 def handle_validate_only_mode(ctx: ExecutionContext) -> int:
@@ -5265,6 +5509,10 @@ def main() -> int:
         if args.format == "text":
             print_execution_context(ctx)
         return handle_inspect_mode(ctx)
+    if args.task_kind == "setup":
+        return handle_setup_project_mode(ctx)
+    if args.task_kind == "manage":
+        return handle_manage_project_mode(ctx)
     if args.task_kind == "repair":
         return handle_repair_mode(ctx)
     return handle_mutation_mode(ctx)

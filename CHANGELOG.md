@@ -2,6 +2,20 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [0.5.0] - 2026-03-24
+
+### Added
+
+- Add `manage` as a higher-level project take-over task that inspects a project directory, discovers local skill packages, adopts them into managed storage, and builds the project structure.
+- Add `setup` as a quick project bootstrap task for creating the project-owned library, exposure root, and platform state layout.
+- Add regression coverage for the new `manage` and `setup` task flows.
+
+### Changed
+
+- Rewrite package quick-start guidance around natural-language, task-first project onboarding instead of command-first onboarding.
+- Update the skill entry point, task guide, and prompt templates to prioritize `manage` and `setup` for new users.
+- Make `setup` and `manage` default to project-local `.skill-platform` state when no explicit platform root is configured.
+
 ## [0.4.1] - 2026-03-24
 
 ### Fixed
