@@ -2,6 +2,21 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [0.4.0] - 2026-03-24
+
+### Added
+
+- Add a first extracted module layer under `scripts/skill_governance/` for config, constants, registry payloads, version parsing, and audit rules.
+- Add stronger governance metadata checks for `owner`, `reviewer`, `team`, and `version` in `audit`.
+- Add lightweight version governance with normalized `version_info`, prerelease detection, and version regression checks.
+- Add CLI metadata flags such as `--owner`, `--reviewer`, `--team`, `--version`, `--lifecycle-status`, and `--deprecation-policy`.
+
+### Changed
+
+- Persist governance metadata overrides through task flows such as `add`, `enable`, and `upgrade` so the central registry reflects task-time decisions.
+- Include version change summaries in upgrade and retire impact reporting.
+- Expand regression coverage for audit rules, registry version metadata, bootstrap with extracted modules, and read-only command behavior.
+
 ## [0.3.0] - 2026-03-24
 
 ### Changed

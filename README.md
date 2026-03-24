@@ -50,7 +50,7 @@ Install the current release:
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.3.0
+  --ref v0.4.0
 ```
 
 Install from a GitHub tree URL:

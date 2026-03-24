@@ -14,143 +14,59 @@ import re
 import shlex
 import shutil
 import sys
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_LIBRARY_ENV = "CODEX_SKILL_LIBRARY_ROOT"
-DEFAULT_COMPAT_ENV = "CODEX_SKILL_COMPAT_ROOT"
-DEFAULT_LIBRARY_DIRNAME = "_skill-library"
-DEFAULT_PLATFORM_DIRNAME = ".skill-platform"
-EXTERNAL_SOURCE_REGISTRY_DIRNAME = "skill-governance"
-EXTERNAL_SOURCE_REGISTRY_FILENAME = "external-sources.json"
-MANAGED_EXPOSURE_REGISTRY_FILENAME = "managed-exposures.json"
-EXPOSURE_MANIFEST_FILENAME = "skills-manifest.json"
-PLATFORM_REGISTRY_FILENAME = "registry.json"
-PLATFORM_DEPENDENCY_GRAPH_FILENAME = "dependency-graph.json"
-DEFAULT_CONFIG_FILENAMES = (
-    "skill-governance.toml",
-    ".skill-governance.toml",
-    "skill-workflow.toml",
-    ".skill-workflow.toml",
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from skill_governance.audit_rules import build_audit_findings
+from skill_governance.config import (
+    ConfigError,
+    WorkflowConfig,
+    detect_compat_root,
+    detect_exposure_root,
+    detect_library_root,
+    detect_platform_root,
+    detect_workspace_root,
+    discover_workflow_config_path,
+    find_project_config_path,
+    load_workflow_config as shared_load_workflow_config,
+    resolve_exposure_mode,
 )
-ALLOWED_EXPOSURE_MODES = {"auto", "symlink", "copy", "manifest"}
-ALLOWED_LIFECYCLE_STATUSES = {
-    "draft",
-    "review",
-    "active",
-    "deprecated",
-    "archived",
-    "blocked",
-}
-MAX_NAME_LENGTH = 64
-ALLOWED_RESOURCES = {"scripts", "references", "assets"}
-DOCUMENT_SECTION_TITLES = (
-    "Purpose",
-    "Use This Skill When",
-    "Do Not Use This Skill When",
-    "Inputs / Outputs",
-    "Workflow",
-    "Example Requests",
-    "Risks / Boundaries",
+from skill_governance.constants import (
+    ACTIVE_PROJECT_LINK_STATUSES,
+    ALLOWED_EXPOSURE_MODES,
+    ALLOWED_LIFECYCLE_STATUSES,
+    ALLOWED_RESOURCES,
+    DEFAULT_COMPAT_ENV,
+    DEFAULT_CONFIG_FILENAMES,
+    DEFAULT_LIBRARY_DIRNAME,
+    DEFAULT_LIBRARY_ENV,
+    DEFAULT_PLATFORM_DIRNAME,
+    DOCUMENT_SECTION_TITLES,
+    EXPOSURE_MANIFEST_FILENAME,
+    EXTERNAL_SOURCE_REGISTRY_DIRNAME,
+    EXTERNAL_SOURCE_REGISTRY_FILENAME,
+    GOVERNANCE_REVIEW_ACTION_TYPES,
+    MANAGED_EXPOSURE_REGISTRY_FILENAME,
+    MAX_NAME_LENGTH,
+    PLACEHOLDER_DESCRIPTION,
+    PLATFORM_DEPENDENCY_GRAPH_FILENAME,
+    PLATFORM_REGISTRY_FILENAME,
+    SEMANTIC_TOKEN_ALIASES,
+    SKILL_TEXT_STOPWORDS,
 )
-PLACEHOLDER_DESCRIPTION = (
-    "TODO: replace with a precise description of what this skill does and when to use it."
-)
+from skill_governance.registry import build_registry_entry_payload
+from skill_governance.versioning import compare_versions, version_metadata
+
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
 TOKEN_RE = re.compile(r"[a-z0-9]+")
-SKILL_TEXT_STOPWORDS = {
-    "a",
-    "an",
-    "and",
-    "as",
-    "at",
-    "before",
-    "by",
-    "codex",
-    "do",
-    "for",
-    "from",
-    "help",
-    "in",
-    "into",
-    "is",
-    "it",
-    "its",
-    "manage",
-    "of",
-    "on",
-    "or",
-    "project",
-    "skill",
-    "tasks",
-    "task",
-    "that",
-    "the",
-    "this",
-    "to",
-    "use",
-    "user",
-    "wants",
-    "when",
-    "with",
-    "workflow",
-    "workflows",
-}
-SEMANTIC_TOKEN_ALIASES = {
-    "analysis": "analyze",
-    "analyze": "analyze",
-    "assistant": "assistant",
-    "assist": "assistant",
-    "bug": "issue",
-    "bugs": "issue",
-    "check": "diagnose",
-    "checker": "diagnose",
-    "checking": "diagnose",
-    "docs": "documentation",
-    "documentation": "documentation",
-    "document": "documentation",
-    "documents": "documentation",
-    "error": "issue",
-    "errors": "issue",
-    "excel": "spreadsheet",
-    "helper": "assistant",
-    "inspect": "diagnose",
-    "inspection": "diagnose",
-    "issue": "issue",
-    "issues": "issue",
-    "readme": "documentation",
-    "sheet": "spreadsheet",
-    "sheets": "spreadsheet",
-    "spreadsheet": "spreadsheet",
-    "spreadsheets": "spreadsheet",
-    "troubleshoot": "diagnose",
-    "troubleshooting": "diagnose",
-    "workbook": "spreadsheet",
-    "workbooks": "spreadsheet",
-}
-ACTIVE_PROJECT_LINK_STATUSES = {"managed symlink", "managed copy", "managed manifest"}
-GOVERNANCE_REVIEW_ACTION_TYPES = {
-    "resolve-duplicate-canonical",
-    "improve-skill-docs",
-    "review-overlap",
-    "consider-retire-candidate",
-}
 
 
 class UsageError(Exception):
     pass
-
-
-@dataclass
-class WorkflowConfig:
-    path: Path | None
-    shared_root: Path | None
-    project_library_root: Path | None
-    exposure_root: Path | None
-    exposure_mode: str | None
-    workspace_root: Path | None
-    platform_root: Path | None
 
 
 @dataclass
@@ -319,168 +235,42 @@ def normalize_cli_args(argv: list[str]) -> list[str]:
     return rewritten + rest + ["--doctor"]
 
 
-def resolve_configured_path(raw_value: object, config_dir: Path) -> Path | None:
-    if raw_value is None:
-        return None
-    if not isinstance(raw_value, str) or not raw_value.strip():
-        raise UsageError("[ERROR] skill_registry paths in the config file must be non-empty strings.")
-    candidate = Path(raw_value).expanduser()
-    if not candidate.is_absolute():
-        candidate = (config_dir / candidate).resolve()
-    else:
-        candidate = candidate.resolve()
-    return candidate
-
-
-def discover_workflow_config_path(
-    explicit_path: str | None,
-    project_root: Path | None,
-) -> Path | None:
-    if explicit_path:
-        return Path(explicit_path).expanduser().resolve()
-    if project_root is None:
-        return None
-    for filename in DEFAULT_CONFIG_FILENAMES:
-        candidate = project_root / filename
-        if candidate.exists():
-            return candidate.resolve()
-    return None
-
-
 def load_workflow_config(config_path: Path | None) -> WorkflowConfig:
-    if config_path is None:
-        return WorkflowConfig(None, None, None, None, None, None, None)
-    if not config_path.exists():
-        raise UsageError(f"[ERROR] Config file does not exist: {config_path}")
     try:
-        data = tomllib.loads(config_path.read_text())
-    except (OSError, tomllib.TOMLDecodeError) as error:
-        raise UsageError(f"[ERROR] Could not parse config file {config_path}: {error}") from error
-
-    registry = data.get("skill_registry")
-    if registry is None:
-        return WorkflowConfig(config_path, None, None, None, None, None, None)
-    if not isinstance(registry, dict):
-        raise UsageError("[ERROR] [skill_registry] in the config file must be a table.")
-
-    config_dir = config_path.parent
-    exposure_mode = registry.get("exposure_mode")
-    if exposure_mode is not None:
-        if not isinstance(exposure_mode, str) or exposure_mode not in ALLOWED_EXPOSURE_MODES:
-            allowed = ", ".join(sorted(ALLOWED_EXPOSURE_MODES))
-            raise UsageError(
-                f"[ERROR] skill_registry.exposure_mode must be one of: {allowed}."
-            )
-
-    return WorkflowConfig(
-        path=config_path,
-        shared_root=resolve_configured_path(registry.get("shared_root"), config_dir),
-        project_library_root=resolve_configured_path(registry.get("project_root"), config_dir),
-        exposure_root=resolve_configured_path(registry.get("exposure_root"), config_dir),
-        exposure_mode=exposure_mode,
-        workspace_root=resolve_configured_path(registry.get("workspace_root"), config_dir),
-        platform_root=resolve_configured_path(registry.get("platform_root"), config_dir),
-    )
+        return shared_load_workflow_config(config_path)
+    except ConfigError as error:
+        raise UsageError(str(error)) from error
 
 
-def detect_library_root(
-    explicit_root: str | None,
-    config: WorkflowConfig,
-    project_root: Path | None = None,
-    bootstrap_project_layout: bool = False,
-    prefer_project_library: bool = False,
-) -> Path:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    env_root = os.environ.get(DEFAULT_LIBRARY_ENV)
-    if env_root:
-        return Path(env_root).expanduser().resolve()
-    if (bootstrap_project_layout or prefer_project_library) and config.project_library_root:
-        return config.project_library_root
-    if (bootstrap_project_layout or prefer_project_library) and project_root is not None:
-        return (project_root / DEFAULT_LIBRARY_DIRNAME).resolve()
-    if config.shared_root:
-        return config.shared_root
-    return Path(__file__).resolve().parents[2]
+def registry_metadata_overrides_from_args(args: argparse.Namespace) -> dict[str, str]:
+    overrides: dict[str, str] = {}
+    mapping = {
+        "owner": "owner",
+        "reviewer": "reviewer",
+        "team": "team",
+        "version": "version",
+        "lifecycle_status": "lifecycle_status",
+        "deprecation_policy": "deprecation_policy",
+        "last_reviewed_at": "last_reviewed_at",
+    }
+    for arg_name, field_name in mapping.items():
+        value = getattr(args, arg_name, None)
+        if value is None:
+            continue
+        normalized = str(value).strip()
+        overrides[field_name] = normalized
+    return overrides
 
 
-def detect_compat_root(
-    explicit_root: str | None,
-    library_root: Path,
-    allow_default: bool,
-) -> Path | None:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    env_root = os.environ.get(DEFAULT_COMPAT_ENV)
-    if env_root:
-        return Path(env_root).expanduser().resolve()
-    if not allow_default:
+def merge_registry_entry_metadata(
+    existing_entry: dict[str, object] | None,
+    overrides: dict[str, str],
+) -> dict[str, object] | None:
+    if not existing_entry and not overrides:
         return None
-    candidate = library_root.parent
-    if (candidate / ".agents" / "skills").exists():
-        return candidate
-    return None
-
-
-def detect_exposure_root(
-    explicit_root: str | None,
-    config: WorkflowConfig,
-    project_root: Path | None,
-) -> Path | None:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    if config.exposure_root:
-        return config.exposure_root
-    if project_root is None:
-        return None
-    return (project_root / ".agents" / "skills").resolve()
-
-
-def resolve_exposure_mode(
-    requested_mode: str | None,
-    config: WorkflowConfig,
-) -> str:
-    mode = requested_mode or config.exposure_mode or "auto"
-    if mode not in ALLOWED_EXPOSURE_MODES:
-        allowed = ", ".join(sorted(ALLOWED_EXPOSURE_MODES))
-        raise UsageError(f"[ERROR] Exposure mode must be one of: {allowed}.")
-    if mode != "auto":
-        return mode
-    if os.environ.get("CI") or os.name == "nt":
-        return "manifest" if os.environ.get("CI") else "copy"
-    return "symlink"
-
-
-def detect_workspace_root(
-    explicit_root: str | None,
-    config: WorkflowConfig,
-    project_root: Path | None,
-) -> Path | None:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    if config.workspace_root:
-        return config.workspace_root
-    if project_root is not None:
-        return project_root.parent.resolve()
-    return None
-
-
-def detect_platform_root(
-    explicit_root: str | None,
-    config: WorkflowConfig,
-    workspace_root: Path | None,
-    project_root: Path | None,
-    library_root: Path,
-) -> Path:
-    if explicit_root:
-        return Path(explicit_root).expanduser().resolve()
-    if config.platform_root:
-        return config.platform_root
-    if workspace_root is not None:
-        return (workspace_root / DEFAULT_PLATFORM_DIRNAME).resolve()
-    if project_root is not None:
-        return (project_root / DEFAULT_PLATFORM_DIRNAME).resolve()
-    return (library_root.parent / DEFAULT_PLATFORM_DIRNAME).resolve()
+    merged = dict(existing_entry or {})
+    merged.update(overrides)
+    return merged
 
 
 def infer_project_root_for_bootstrap(
@@ -1832,15 +1622,6 @@ def build_governance_profile(
         "suggestions": suggestions,
     }
 
-
-def find_project_config_path(project_root: Path) -> Path | None:
-    for filename in DEFAULT_CONFIG_FILENAMES:
-        candidate = project_root / filename
-        if candidate.exists():
-            return candidate
-    return None
-
-
 def safe_load_project_config(project_root: Path) -> tuple[WorkflowConfig, str | None]:
     config_path = find_project_config_path(project_root)
     try:
@@ -2186,41 +1967,6 @@ def collect_dependency_graph(
     }
 
 
-def normalize_string_list(value: object) -> list[str]:
-    if not isinstance(value, list):
-        return []
-    result = []
-    seen: set[str] = set()
-    for item in value:
-        if not isinstance(item, str):
-            continue
-        normalized = item.strip()
-        if not normalized or normalized in seen:
-            continue
-        result.append(normalized)
-        seen.add(normalized)
-    return result
-
-
-def derive_registry_exposure_mode(skill_graph: dict[str, object]) -> str:
-    counts = skill_graph["counts"]
-    has_symlink = int(counts["managed_symlink"]) > 0
-    has_copy = int(counts["managed_copy"]) > 0
-    has_manifest = int(counts["managed_manifest"]) > 0
-    active_modes = sum(1 for present in (has_symlink, has_copy, has_manifest) if present)
-    if active_modes > 1:
-        return "mixed"
-    if has_symlink:
-        return "symlink"
-    if has_copy:
-        return "copy"
-    if has_manifest:
-        return "manifest"
-    if int(skill_graph["projects_total"]) > 0:
-        return "indirect"
-    return "unexposed"
-
-
 def build_registry_entry(
     skill_name: str,
     skill_dir: Path,
@@ -2255,47 +2001,15 @@ def build_registry_entry(
             "active_projects": [],
         },
     )
-    existing = existing_entry or {}
-    lifecycle_status = str(existing.get("lifecycle_status", "active") or "active")
-    version = str(existing.get("version", "") or "")
-    owner = str(existing.get("owner", "") or "")
-    reviewer = str(existing.get("reviewer", "") or "")
-    team = str(existing.get("team", "") or "")
-    deprecation_policy = str(existing.get("deprecation_policy", "") or "")
-    last_reviewed_at = str(existing.get("last_reviewed_at", "") or "")
-
-    usage_stats = {
-        "projects_total": int(skill_graph["projects_total"]),
-        "active_projects_total": int(skill_graph["active_projects_total"]),
-        "managed_symlink": int(skill_graph["counts"]["managed_symlink"]),
-        "managed_copy": int(skill_graph["counts"]["managed_copy"]),
-        "managed_manifest": int(skill_graph["counts"]["managed_manifest"]),
-        "broken": int(skill_graph["counts"]["broken"]),
-        "blocked": int(skill_graph["counts"]["blocked"]),
-        "external": int(skill_graph["counts"]["external"]),
-    }
-
-    return {
-        "skill_id": skill_name,
-        "display_name": str(target_summary.get("display_name", title_case_skill_name(skill_name))),
-        "owner": owner,
-        "reviewer": reviewer,
-        "team": team,
-        "version": version,
-        "lifecycle_status": lifecycle_status,
-        "canonical_location": str(skill_dir.resolve()),
-        "description": str(target_summary.get("description", "") or ""),
-        "short_description": str(target_summary.get("short_description", "") or ""),
-        "default_prompt": str(target_summary.get("default_prompt", "") or ""),
-        "exposure_mode": derive_registry_exposure_mode(skill_graph),
-        "dependencies": normalize_string_list(existing.get("dependencies")),
-        "dependents": list(skill_graph["active_projects"]),
-        "quality_score": int(governance["health_score"]),
-        "quality_band": str(governance["health_band"]),
-        "usage_stats": usage_stats,
-        "deprecation_policy": deprecation_policy,
-        "last_reviewed_at": last_reviewed_at,
-    }
+    return build_registry_entry_payload(
+        skill_name=skill_name,
+        canonical_location=str(skill_dir.resolve()),
+        target_summary=target_summary,
+        governance=governance,
+        skill_graph=skill_graph,
+        existing_entry=existing_entry,
+        title_case_skill_name=title_case_skill_name,
+    )
 
 
 def collect_platform_state(ctx: ExecutionContext) -> tuple[dict[str, object], dict[str, object]]:
@@ -2314,16 +2028,26 @@ def collect_platform_state(ctx: ExecutionContext) -> tuple[dict[str, object], di
         else {}
     )
     registry_skills: dict[str, dict[str, object]] = {}
+    registry_overrides = registry_metadata_overrides_from_args(ctx.args)
+    override_skill_name = primary_task_skill_name(ctx)
     for skill_name, node in dependency_graph["skills"].items():
         skill_dir = Path(str(node["canonical_location"]))
         if not skill_dir.exists():
             continue
+        existing_entry = (
+            existing_skills.get(skill_name) if isinstance(existing_skills, dict) else None
+        )
+        if skill_name == override_skill_name and registry_overrides:
+            existing_entry = merge_registry_entry_metadata(
+                existing_entry if isinstance(existing_entry, dict) else None,
+                registry_overrides,
+            )
         registry_skills[skill_name] = build_registry_entry(
             skill_name,
             skill_dir,
             ctx.library_root,
             dependency_graph,
-            existing_skills.get(skill_name) if isinstance(existing_skills, dict) else None,
+            existing_entry if isinstance(existing_entry, dict) else None,
         )
 
     registry_payload = {
@@ -2361,11 +2085,27 @@ def write_platform_state(
     }
 
 
+def load_platform_registry_skill_entry(
+    platform_root: Path,
+    skill_name: str,
+) -> dict[str, object] | None:
+    payload, _error = load_json_state(platform_registry_path(platform_root))
+    if not isinstance(payload, dict):
+        return None
+    skills = payload.get("skills", {})
+    if not isinstance(skills, dict):
+        return None
+    entry = skills.get(skill_name)
+    return entry if isinstance(entry, dict) else None
+
+
 def collect_task_impact_summary(
     ctx: ExecutionContext,
     action: str,
     skill_name: str,
     canonical_skill_dir: Path | None = None,
+    previous_registry_entry: dict[str, object] | None = None,
+    current_registry_entry: dict[str, object] | None = None,
 ) -> dict[str, object] | None:
     impact_analysis = collect_impact_analysis(
         skill_name,
@@ -2418,13 +2158,52 @@ def collect_task_impact_summary(
                 follow_up.append(f"No active project exposures remain for {skill_name}.")
             follow_up.append(f"The canonical skill remains at {canonical_path}.")
 
-    return {
+    version_summary: dict[str, object] | None = None
+    previous_version = (
+        str(previous_registry_entry.get("version", "") or "")
+        if isinstance(previous_registry_entry, dict)
+        else ""
+    )
+    current_version = (
+        str(current_registry_entry.get("version", "") or "")
+        if isinstance(current_registry_entry, dict)
+        else ""
+    )
+    if previous_version or current_version:
+        comparison = compare_versions(current_version, previous_version)
+        changed = bool(previous_version != current_version)
+        if changed and action == "upgrade":
+            if comparison == 1:
+                follow_up.append(
+                    f"Registry version advanced from {previous_version or '(unset)'} to {current_version or '(unset)'}."
+                )
+            elif comparison == -1:
+                follow_up.append(
+                    f"Registry version moved backward from {previous_version or '(unset)'} to {current_version or '(unset)'}."
+                )
+            else:
+                follow_up.append(
+                    f"Registry version changed from {previous_version or '(unset)'} to {current_version or '(unset)'}. Review compatibility notes before rollout."
+                )
+        version_summary = {
+            "previous": previous_version,
+            "current": current_version,
+            "changed": changed,
+            "comparison": comparison,
+            "previous_info": version_metadata(previous_version),
+            "current_info": version_metadata(current_version),
+        }
+
+    summary = {
         "action": action,
         "skill_name": skill_name,
         "canonical_path": str(canonical_path),
         "impact_analysis": impact_analysis,
         "follow_up": follow_up,
     }
+    if version_summary is not None:
+        summary["version_summary"] = version_summary
+    return summary
 
 
 def sort_action_suggestions(actions: list[dict[str, object]]) -> list[dict[str, object]]:
@@ -2944,6 +2723,7 @@ def report_task_impact_summary(summary: dict[str, object]) -> None:
     counts = impact_analysis["counts"]
     reference_graph = impact_analysis["reference_graph"]
     preview = bool(summary.get("preview"))
+    version_summary = summary.get("version_summary")
 
     if action == "upgrade":
         print(
@@ -2958,6 +2738,15 @@ def report_task_impact_summary(summary: dict[str, object]) -> None:
             else reference_graph["active_projects_total"]
         )
         print(f"[IMPACT] {label} for {skill_name}: {value}")
+
+    if isinstance(version_summary, dict):
+        previous_version = str(version_summary.get("previous", "") or "")
+        current_version = str(version_summary.get("current", "") or "")
+        if previous_version or current_version:
+            print(
+                "[IMPACT] Registry version: "
+                f"{previous_version or '(unset)'} -> {current_version or '(unset)'}"
+            )
 
     print(
         "[IMPACT] Exposure modes: "
@@ -4157,119 +3946,6 @@ def diff_named_object_map(
     }
 
 
-def build_audit_findings(
-    registry_payload: dict[str, object],
-) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    issues: list[dict[str, object]] = []
-    recommendations: list[dict[str, object]] = []
-    skills = registry_payload.get("skills", {})
-    if not isinstance(skills, dict):
-        return issues, recommendations
-
-    for skill_name, entry in sorted(skills.items()):
-        if not isinstance(entry, dict):
-            continue
-        lifecycle_status = str(entry.get("lifecycle_status", "") or "")
-        usage_stats = entry.get("usage_stats", {})
-        if not isinstance(usage_stats, dict):
-            usage_stats = {}
-        active_projects_total = int(usage_stats.get("active_projects_total", 0) or 0)
-        owner = str(entry.get("owner", "") or "")
-        team = str(entry.get("team", "") or "")
-        version = str(entry.get("version", "") or "")
-        deprecation_policy = str(entry.get("deprecation_policy", "") or "")
-
-        if lifecycle_status not in ALLOWED_LIFECYCLE_STATUSES:
-            issues.append(
-                {
-                    "type": "invalid-lifecycle-status",
-                    "skill_name": skill_name,
-                    "priority": "high",
-                    "summary": (
-                        f"{skill_name} uses an invalid lifecycle_status '{lifecycle_status}'."
-                    ),
-                    "next_step": (
-                        "Use one of: "
-                        + ", ".join(sorted(ALLOWED_LIFECYCLE_STATUSES))
-                        + "."
-                    ),
-                }
-            )
-            continue
-
-        if lifecycle_status == "draft" and active_projects_total > 0:
-            issues.append(
-                {
-                    "type": "draft-skill-has-dependents",
-                    "skill_name": skill_name,
-                    "priority": "high",
-                    "summary": (
-                        f"{skill_name} is marked draft but still has {active_projects_total} active project dependent(s)."
-                    ),
-                    "next_step": "Promote the skill lifecycle or remove the active project exposures.",
-                }
-            )
-
-        if lifecycle_status == "deprecated" and active_projects_total > 0 and not deprecation_policy:
-            issues.append(
-                {
-                    "type": "deprecated-skill-missing-policy",
-                    "skill_name": skill_name,
-                    "priority": "high",
-                    "summary": (
-                        f"{skill_name} is deprecated, still has active dependents, and has no deprecation_policy."
-                    ),
-                    "next_step": "Add a deprecation policy or migrate the remaining dependents first.",
-                }
-            )
-
-        if lifecycle_status in {"archived", "blocked"} and active_projects_total > 0:
-            issues.append(
-                {
-                    "type": "inactive-lifecycle-has-dependents",
-                    "skill_name": skill_name,
-                    "priority": "high",
-                    "summary": (
-                        f"{skill_name} is {lifecycle_status} but still has {active_projects_total} active project dependent(s)."
-                    ),
-                    "next_step": "Remove or migrate the remaining dependents before keeping this lifecycle status.",
-                }
-            )
-
-        if not owner:
-            recommendations.append(
-                {
-                    "type": "missing-owner",
-                    "skill_name": skill_name,
-                    "priority": "medium",
-                    "summary": f"{skill_name} has no owner in the central registry.",
-                    "next_step": "Set the owner field so the skill has a clear maintainer.",
-                }
-            )
-        if not team:
-            recommendations.append(
-                {
-                    "type": "missing-team",
-                    "skill_name": skill_name,
-                    "priority": "medium",
-                    "summary": f"{skill_name} has no team in the central registry.",
-                    "next_step": "Set the team field to clarify responsibility.",
-                }
-            )
-        if lifecycle_status in {"active", "review", "deprecated", "blocked"} and not version:
-            recommendations.append(
-                {
-                    "type": "missing-version",
-                    "skill_name": skill_name,
-                    "priority": "low",
-                    "summary": f"{skill_name} has no version recorded in the central registry.",
-                    "next_step": "Add a version value so upgrades and lifecycle changes are easier to track.",
-                }
-            )
-
-    return issues, recommendations
-
-
 def collect_audit_result(ctx: ExecutionContext) -> dict[str, object]:
     registry_payload, dependency_graph = collect_platform_state(ctx)
     write_statuses: dict[str, str] | None = None
@@ -4333,7 +4009,10 @@ def collect_audit_result(ctx: ExecutionContext) -> dict[str, object]:
             "Dependency graph is out of date. Run audit with --sync-platform-state before pushing."
         )
 
-    audit_findings, audit_recommendations = build_audit_findings(registry_payload)
+    audit_findings, audit_recommendations = build_audit_findings(
+        registry_payload,
+        persisted_registry if isinstance(persisted_registry, dict) else None,
+    )
     for finding in audit_findings:
         issues.append(str(finding["summary"]))
 
@@ -4634,6 +4313,35 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Default prompt for agents/openai.yaml",
     )
     parser.add_argument(
+        "--owner",
+        help="Owner recorded in the central registry for CI and governance routing.",
+    )
+    parser.add_argument(
+        "--reviewer",
+        help="Reviewer recorded in the central registry. Required for review lifecycle skills.",
+    )
+    parser.add_argument(
+        "--team",
+        help="Owning team recorded in the central registry.",
+    )
+    parser.add_argument(
+        "--version",
+        help="Semver-like version for the central registry, for example 1.2.3 or 2.0.0-beta.",
+    )
+    parser.add_argument(
+        "--lifecycle-status",
+        choices=sorted(ALLOWED_LIFECYCLE_STATUSES),
+        help="Lifecycle status recorded in the central registry.",
+    )
+    parser.add_argument(
+        "--deprecation-policy",
+        help="Short deprecation or replacement note kept in the central registry.",
+    )
+    parser.add_argument(
+        "--last-reviewed-at",
+        help="Optional review timestamp or date string kept in the central registry.",
+    )
+    parser.add_argument(
         "--resources",
         help="Optional comma-separated resource dirs to create, e.g. scripts,references",
     )
@@ -4748,6 +4456,7 @@ def resolve_execution_context(args: argparse.Namespace) -> ExecutionContext:
         project_root=project_root,
         bootstrap_project_layout=effective_bootstrap_project_layout,
         prefer_project_library=prefer_project_library,
+        current_script=Path(__file__).resolve(),
     )
     platform_root = detect_platform_root(
         args.platform_root,
@@ -5431,6 +5140,11 @@ def run_project_skill_operations(ctx: ExecutionContext) -> None:
 
 def finalize_mutation_mode(ctx: ExecutionContext, canonical_skill_dir: Path | None) -> int:
     task_skill_name = primary_task_skill_name(ctx)
+    previous_registry_entry = (
+        load_platform_registry_skill_entry(ctx.platform_root, task_skill_name)
+        if task_skill_name
+        else None
+    )
     sync_platform_state_for_changes(ctx)
     if canonical_skill_dir and not ctx.args.skip_validate:
         if ctx.args.dry_run:
@@ -5451,6 +5165,11 @@ def finalize_mutation_mode(ctx: ExecutionContext, canonical_skill_dir: Path | No
             "upgrade",
             task_skill_name,
             canonical_skill_dir=canonical_skill_dir,
+            previous_registry_entry=previous_registry_entry,
+            current_registry_entry=load_platform_registry_skill_entry(
+                ctx.platform_root,
+                task_skill_name,
+            ),
         )
     elif task_skill_name and ctx.args.task_kind == "retire":
         impact_summary = collect_task_impact_summary(
@@ -5458,6 +5177,11 @@ def finalize_mutation_mode(ctx: ExecutionContext, canonical_skill_dir: Path | No
             "retire",
             task_skill_name,
             canonical_skill_dir=(ctx.library_root / task_skill_name),
+            previous_registry_entry=previous_registry_entry,
+            current_registry_entry=load_platform_registry_skill_entry(
+                ctx.platform_root,
+                task_skill_name,
+            ),
         )
         if impact_summary is not None:
             impact_summary["preview"] = bool(ctx.args.dry_run)

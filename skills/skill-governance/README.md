@@ -32,7 +32,7 @@ Install the current release:
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.3.0
+  --ref v0.4.0
 ```
 
 Natural-language install request inside Codex:
@@ -115,6 +115,24 @@ python3 scripts/manage_skill.py \
 
 - `.skill-platform/registry.json`
 - `.skill-platform/dependency-graph.json`
+
+`audit` also acts as a CI gate for governance metadata:
+
+- `active`, `review`, `deprecated`, and `blocked` skills should carry an `owner`
+- `active`, `review`, `deprecated`, and `blocked` skills should carry a semver-like `version`
+- `review` skills should also carry a `reviewer`
+- `active` and `review` skills should usually carry a `team`
+
+You can set these fields during task flows such as `add`, `enable`, or `upgrade`:
+
+```bash
+python3 scripts/manage_skill.py \
+  add demo-skill \
+  --purpose "Use this skill when the user wants help with demo skill tasks." \
+  --owner "platform@example.com" \
+  --team "core-platform" \
+  --version "1.2.0"
+```
 
 ## Optional Repo Config
 

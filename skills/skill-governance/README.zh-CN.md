@@ -32,7 +32,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.3.0
+  --ref v0.4.0
 ```
 
 在 Codex 里也可以直接这样说：
@@ -115,6 +115,24 @@ python3 scripts/manage_skill.py \
 
 - `.skill-platform/registry.json`
 - `.skill-platform/dependency-graph.json`
+
+`audit` 现在也会把治理元数据当作 CI / 发布门禁：
+
+- `active`、`review`、`deprecated`、`blocked` 状态的 skill 应该有 `owner`
+- `active`、`review`、`deprecated`、`blocked` 状态的 skill 应该有 semver 风格的 `version`
+- `review` 状态的 skill 还应该有 `reviewer`
+- `active` 和 `review` 状态的 skill 通常也应该有 `team`
+
+这些字段可以在 `add`、`enable`、`upgrade` 这类任务里顺手写入：
+
+```bash
+python3 scripts/manage_skill.py \
+  add demo-skill \
+  --purpose "Use this skill when the user wants help with demo skill tasks." \
+  --owner "platform@example.com" \
+  --team "core-platform" \
+  --version "1.2.0"
+```
 
 ## 可选仓库配置
 

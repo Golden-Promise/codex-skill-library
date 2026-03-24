@@ -734,6 +734,7 @@ class ManageSkillTests(unittest.TestCase):
             scripts_dir.mkdir(parents=True, exist_ok=True)
             script_copy = scripts_dir / "manage_skill.py"
             shutil.copy2(SCRIPT_PATH, script_copy)
+            shutil.copytree(ROOT_DIR / "scripts" / "skill_governance", scripts_dir / "skill_governance")
             project_root.mkdir(parents=True, exist_ok=True)
 
             result = self.run_script_from_path(
@@ -763,6 +764,7 @@ class ManageSkillTests(unittest.TestCase):
             scripts_dir.mkdir(parents=True, exist_ok=True)
             script_copy = scripts_dir / "manage_skill.py"
             shutil.copy2(SCRIPT_PATH, script_copy)
+            shutil.copytree(ROOT_DIR / "scripts" / "skill_governance", scripts_dir / "skill_governance")
             project_root.mkdir(parents=True, exist_ok=True)
 
             result = self.run_script_from_path(
@@ -1233,6 +1235,12 @@ class ManageSkillTests(unittest.TestCase):
                 str(project_root),
                 "--platform-root",
                 str(platform_root),
+                "--owner",
+                "platform@example.com",
+                "--team",
+                "core-platform",
+                "--version",
+                "1.2.0",
             )
             self.assertEqual(enable_result.returncode, 0, enable_result.stderr)
 
@@ -1261,9 +1269,53 @@ class ManageSkillTests(unittest.TestCase):
             self.assertTrue(payload["drift"]["dependency_graph_matches"])
             self.assertIn("demo-skill", payload["registry"]["skills"])
             self.assertEqual(
+                payload["registry"]["skills"]["demo-skill"]["version_info"]["normalized"],
+                "1.2.0",
+            )
+            self.assertEqual(
                 payload["dependency_graph"]["skills"]["demo-skill"]["active_projects_total"],
                 1,
             )
+
+    def test_audit_reports_missing_owner_and_version_for_active_skill(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace_root = Path(tmpdir)
+            library_root = workspace_root / "_skill-library"
+            platform_root = workspace_root / ".skill-platform"
+            project_root = workspace_root / "demo-project"
+            canonical_dir = library_root / "demo-skill"
+            write_skill_dir(canonical_dir, skill_name="demo-skill")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            enable_result = self.run_script(
+                "enable",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--platform-root",
+                str(platform_root),
+            )
+            self.assertEqual(enable_result.returncode, 0, enable_result.stderr)
+
+            audit_result = self.run_script(
+                "audit",
+                "--library-root",
+                str(library_root),
+                "--workspace-root",
+                str(workspace_root),
+                "--platform-root",
+                str(platform_root),
+                "--format",
+                "json",
+            )
+
+            self.assertNotEqual(audit_result.returncode, 0)
+            payload = json.loads(audit_result.stdout)
+            finding_types = {finding["type"] for finding in payload["audit_findings"]}
+            self.assertIn("missing-owner", finding_types)
+            self.assertIn("missing-version", finding_types)
 
     def test_audit_detects_stale_dependency_graph(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1357,6 +1409,140 @@ class ManageSkillTests(unittest.TestCase):
                 any(
                     finding["type"] == "inactive-lifecycle-has-dependents"
                     for finding in payload["audit_findings"]
+                )
+            )
+
+    def test_audit_reports_review_skill_missing_reviewer(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace_root = Path(tmpdir)
+            library_root = workspace_root / "_skill-library"
+            platform_root = workspace_root / ".skill-platform"
+            project_root = workspace_root / "demo-project"
+            canonical_dir = library_root / "demo-skill"
+            write_skill_dir(canonical_dir, skill_name="demo-skill")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            enable_result = self.run_script(
+                "enable",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--platform-root",
+                str(platform_root),
+                "--owner",
+                "owner@example.com",
+                "--team",
+                "core-platform",
+                "--version",
+                "1.2.0",
+                "--lifecycle-status",
+                "review",
+            )
+            self.assertEqual(enable_result.returncode, 0, enable_result.stderr)
+
+            audit_result = self.run_script(
+                "audit",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--workspace-root",
+                str(workspace_root),
+                "--platform-root",
+                str(platform_root),
+                "--format",
+                "json",
+            )
+
+            self.assertNotEqual(audit_result.returncode, 0)
+            payload = json.loads(audit_result.stdout)
+            self.assertTrue(
+                any(
+                    finding["type"] == "review-missing-reviewer"
+                    for finding in payload["audit_findings"]
+                )
+            )
+
+    def test_audit_reports_invalid_version_and_version_regression(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            workspace_root = Path(tmpdir)
+            library_root = workspace_root / "_skill-library"
+            platform_root = workspace_root / ".skill-platform"
+            project_root = workspace_root / "demo-project"
+            canonical_dir = library_root / "demo-skill"
+            write_skill_dir(canonical_dir, skill_name="demo-skill")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            enable_result = self.run_script(
+                "enable",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--project-root",
+                str(project_root),
+                "--platform-root",
+                str(platform_root),
+                "--owner",
+                "owner@example.com",
+                "--team",
+                "core-platform",
+                "--version",
+                "1.2.0",
+            )
+            self.assertEqual(enable_result.returncode, 0, enable_result.stderr)
+
+            invalid_version_result = self.run_script(
+                "audit",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--workspace-root",
+                str(workspace_root),
+                "--platform-root",
+                str(platform_root),
+                "--owner",
+                "owner@example.com",
+                "--team",
+                "core-platform",
+                "--version",
+                "not-a-version",
+                "--format",
+                "json",
+            )
+            self.assertNotEqual(invalid_version_result.returncode, 0)
+            invalid_payload = json.loads(invalid_version_result.stdout)
+            self.assertTrue(
+                any(
+                    finding["type"] == "invalid-version"
+                    for finding in invalid_payload["audit_findings"]
+                )
+            )
+
+            regression_result = self.run_script(
+                "audit",
+                "demo-skill",
+                "--library-root",
+                str(library_root),
+                "--workspace-root",
+                str(workspace_root),
+                "--platform-root",
+                str(platform_root),
+                "--owner",
+                "owner@example.com",
+                "--team",
+                "core-platform",
+                "--version",
+                "1.1.0",
+                "--format",
+                "json",
+            )
+            self.assertNotEqual(regression_result.returncode, 0)
+            regression_payload = json.loads(regression_result.stdout)
+            self.assertTrue(
+                any(
+                    finding["type"] == "version-regression"
+                    for finding in regression_payload["audit_findings"]
                 )
             )
 
