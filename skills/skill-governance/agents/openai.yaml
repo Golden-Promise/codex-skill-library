@@ -1,5 +1,4 @@
 interface:
   display_name: "Skill Governance"
-  short_description: "Govern Codex skills and project exposure"
-  default_prompt: "Use $skill-governance to add, enable, inspect, repair, audit, document, upgrade, or retire Codex skills without making the user choose storage or exposure details first."
-
+  short_description: "Set up, check, and govern Codex skills"
+  default_prompt: "Use $skill-governance to take over skill management for this project, set up a clean skill-management skeleton, or check and repair Codex skills."
