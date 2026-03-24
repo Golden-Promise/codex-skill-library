@@ -1,6 +1,6 @@
 ---
 name: skill-governance
-description: Use when the user wants to take over skill management for a project, set up skill management for a project, or check, repair, audit, document, upgrade, or retire Codex skills.
+description: Use when the user wants to take over or set up project skill management, add a reusable skill, bring a local skill into a project, make a skill available in a project, or check, repair, audit, document, upgrade, or retire Codex skills.
 ---
 
 # Skill Governance
@@ -8,26 +8,25 @@ description: Use when the user wants to take over skill management for a project
 ## Overview
 
 Manage Codex skills through task-first requests.
-Use this skill when the user wants project skill onboarding, quick health checks, or governance actions without having to sort out the underlying layout manually.
+Use this skill for first-run setup, ongoing skill upkeep, and quick governance checks without asking the user to sort out the project shape first.
 
 ## Use This Skill When
 
-- taking over skill management for an existing project directory
-- setting up a skill management skeleton for one project
-- adding or adopting a skill
-- enabling a skill for one project
-- checking health before cleanup, relinking, upgrade, or release
-- repairing safe exposure problems
-- auditing registry, lifecycle, or dependency state
-- filling missing `SKILL.md` sections for an existing package
+- taking over project skill management
+- setting up project skill management
+- adding a reusable skill
+- bringing a local skill into a project
+- making a skill available in a project
+- checking, repairing, or auditing skills
+- documenting, upgrading, or retiring skills
 
 ## Core Rules
 
-1. For project onboarding, start with `manage` or `setup`.
+1. Start with the user’s task, not the underlying layout.
 2. Prefer `doctor` before cleanup, relinking, upgrade, or release.
 3. Prefer `audit` for CI or release checks.
 4. Use `document` to fill missing `SKILL.md` sections; use `--overwrite-skill-md` only for a full rewrite.
-5. Keep command details in the reference guides and keep the main interaction task-first.
+5. Keep the main interaction short and task-first.
 
 ## References
 

@@ -2,52 +2,56 @@
 
 [简体中文](README.zh-CN.md)
 
-`skill-governance` is a task-first governance tool for Codex skills.
-Use it to add, enable, check, repair, audit, document, upgrade, or retire skills without manually managing storage paths, project exposure, or platform state.
+## What It Is
 
-## What It Is Best For
+`skill-governance` helps you manage Codex skills with less guesswork.
+Use it when you want to take over an existing project, set up a clean skill workflow, add or enable a skill, or check everything is safe before cleanup or release.
 
-- taking over skill management for an existing project directory
-- setting up a clean skill governance skeleton for one project
-- adding a new reusable skill
-- adopting a downloaded local skill package
-- enabling a skill inside one project
-- checking skill health before cleanup, relinking, upgrade, or release
-- repairing safe project exposure issues
-- keeping registry, lifecycle, and dependency state ready for CI
+## Best For
 
-If you are unsure where to start, use `manage`, `setup`, and `doctor`.
+It is especially useful when you are:
+
+- stepping into a project that already has local skills
+- setting up skill governance for a new project
+- adding a reusable skill you want to keep and reuse later
+- enabling one skill for one project without touching everything else
+- checking health before cleanup, relinking, upgrade, or release
+- preparing skill metadata for CI or release checks
+
+If you are new to the tool, start with `manage`, `setup`, and `doctor`.
 
 ## Install
 
-Inside Codex, the easiest install request is:
+In Codex, the simplest way to ask is just:
 
-```text
-Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.
-```
+“Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.”
 
-If you want the current tagged release, say:
+If you want a specific release, add the version you want:
 
-```text
-Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.5.0.
-```
+“Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.5.0.”
+
+If you prefer exact command patterns, use [references/use-cases.md](references/use-cases.md).
 
 ## Quick Start
 
-If you have just installed `skill-governance`, start with one of these two requests inside Codex:
+Your first three moves are usually:
 
-- `Take over skill management for this directory and organize any local skills for me.`
-- `Set up skill governance for this project.`
+1. Take over an existing project directory: `Take over skill management for this directory and organize any local skills for me.`
+2. Set up a project from scratch: `Set up skill governance for this project.`
+3. Check before cleanup or release: `Check this project before I clean up or relink skills.`
 
-That is the fastest path for most users.
+## What You Can Ask Next
 
-If you already know which managed skill you want to work on next, then ask for:
+Once the basics are in place, you can ask `skill-governance` to help with:
 
-- `Check this project before I clean up or relink skills.`
-- `Make <skill-name> available in this project.`
-- `Add a new reusable skill.`
+- adding a new skill
+- enabling a skill in one project
+- repairing safe issues
+- auditing registry or dependency state
+- documenting an existing skill
+- upgrading or retiring a skill
 
-If you prefer direct command patterns, use [references/use-cases.md](references/use-cases.md).
+If you want direct command patterns and more detailed examples, use [references/use-cases.md](references/use-cases.md).
 
 ## Main Tasks
 
@@ -64,10 +68,10 @@ If you prefer direct command patterns, use [references/use-cases.md](references/
 | `upgrade` | Refresh a managed skill from a local source package |
 | `retire` | Remove a skill from one project without deleting the shared copy |
 
-## What The Tool Decides Automatically
+## What the Tool Decides Automatically
 
 - `manage` inspects the target directory, discovers local skill packages, and organizes them into the project's managed layout for you.
-- `setup` creates the project skill folders and platform state folders for you.
+- `setup` creates the project skill folders and governance state folders for you.
 - Without `--project`, new skills default to the shared library.
 - With `--project`, `add` prefers to keep the skill with that project.
 - Exposure mode `auto` currently chooses:
@@ -112,7 +116,7 @@ python3 scripts/manage_skill.py \
   --version "1.2.0"
 ```
 
-## Optional Repo Config
+## Advanced Setup
 
 Use `skill-governance.toml` in the project root when you want custom paths:
 

@@ -2,52 +2,56 @@
 
 [English](README.md)
 
-`skill-governance` 是一个面向任务的 Codex skill 资产治理工具。
-它用来完成新增、启用、体检、修复、审计、补文档、升级和退役这些动作，并尽量把存放路径、项目暴露和平台状态这些底层细节藏起来。
+## 它是什么
 
-## 最适合用来做什么
+`skill-governance` 帮你更轻松地管理 Codex skill。
+当你想接手已有项目、搭建干净的 skill 工作流、添加或启用 skill，或者在清理和发布前确认一切安全时，它都很适合。
 
-- 接管一个已有项目目录里的 skill 管理
-- 为某个项目快速搭建 skill 管理骨架
-- 新增一个可复用共享 skill
-- 接管一个已下载的本地 skill 包
-- 把某个 skill 启用到一个项目里
-- 在清理、重链、升级或发布前先做体检
-- 执行安全自动修复
-- 为 CI 或发布准备注册表、生命周期和依赖图
+## 最适合哪些场景
 
-如果你不确定从哪里开始，优先用 `manage`、`setup` 和 `doctor`。
+它特别适合这些场景：
+
+- 接手一个已经有本地 skill 的项目
+- 为新项目搭建 skill 治理流程
+- 新增一个想长期复用的 skill
+- 只在某个项目里启用一个 skill，而不是改动全部
+- 在清理、重链、升级或发布前做一次检查
+- 为 CI 或发布准备 skill 元数据
+
+如果你刚开始用，先看 `manage`、`setup` 和 `doctor`。
 
 ## 安装
 
-在 Codex 里，最简单的安装说法是：
+在 Codex 里，最自然的说法是直接请求：
 
-```text
-请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance。
-```
+“请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance。”
 
-如果你想固定到当前发布版本，可以直接这样说：
+如果你想固定到某个版本，也可以直接补一句版本号：
 
-```text
-请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance，并使用 v0.5.0。
-```
+“请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance，并使用 v0.5.0。”
+
+如果你想看更精确的命令模式，请看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
 ## 快速上手
 
-如果你刚通过 `skill-installer` 安装完 `skill-governance`，最推荐直接在 Codex 里这样说：
+通常先做这三步：
 
-- `接管这个目录的 skill 管理，并把本地 skill 帮我整理好。`
-- `给这个项目搭建 skill 管理骨架。`
+1. 接管已有项目目录：`接管这个目录的 skill 管理，并把本地 skill 帮我整理好。`
+2. 从零搭建项目：`给这个项目搭建 skill 管理骨架。`
+3. 在清理或发布前检查：`在我清理或重链 skill 之前，先检查一下这个项目。`
 
-这通常就是最省事的起点。
+## 接下来可以问什么
 
-如果你已经知道下一步要做什么，也可以直接说：
+当基础流程准备好后，你可以继续让 `skill-governance` 帮你：
 
-- `在我清理或重链 skill 之前，先检查一下这个项目。`
-- `让 <skill-name> 在这个项目里可用。`
-- `新增一个可复用 skill。`
+- 新增一个 skill
+- 在某个项目里启用一个 skill
+- 修复安全问题
+- 审计注册表或依赖状态
+- 为已有 skill 补文档
+- 升级或退役一个 skill
 
-如果你更喜欢直接看命令模式，请继续看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如果你想看直接的命令模式和更多示例，请看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
 ## 主要任务
 
@@ -67,7 +71,7 @@
 ## 工具会自动帮你判断什么
 
 - `manage` 会检查目标目录、发现本地 skill 包，并自动整理成项目内的受管结构。
-- `setup` 会自动创建项目 skill 目录和平台状态目录。
+- `setup` 会自动创建项目 skill 目录和治理状态目录。
 - 不带 `--project` 时，新 skill 默认进入共享库。
 - 带 `--project` 时，`add` 默认更偏向跟着项目走。
 - `auto` 暴露策略当前会自动选择：
@@ -112,7 +116,7 @@ python3 scripts/manage_skill.py \
   --version "1.2.0"
 ```
 
-## 可选仓库配置
+## 高级设置
 
 如果你想自定义共享库、项目库或暴露路径，可以在项目根目录放一份 `skill-governance.toml`：
 
