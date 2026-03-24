@@ -25,7 +25,7 @@ This repository is designed for people who want to:
 
 | Skill | Best For | Docs |
 | --- | --- | --- |
-| `skill-workflow-manager` | Shared-library-first skill management, adoption, health checks, and project links | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-workflow-manager` | Managing both shared and project-managed Codex skills, including adoption, diagnostics, and project links | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
 
 ## Quick Start
 

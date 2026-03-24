@@ -3,38 +3,32 @@
 Chinese version: [use-cases.zh-CN.md](use-cases.zh-CN.md)
 
 This is the main reader guide for `skill-workflow-manager`.
-Use it to understand the workflow, choose the right mode, and find the matching CLI pattern.
+Use it to choose a mode first, then choose the right operation inside that mode.
 
 ## Start Here
 
-- This skill is easiest to learn through 3 main paths: create or refresh a shared skill, adopt a downloaded skill, or attach shared skills to a project.
+- `skill-workflow-manager` supports two explicit modes: shared skills and project-managed skills.
 - If you already know the workflow and only need copy-ready wording, open [prompt-templates.en.md](prompt-templates.en.md).
-- Treat `$CODEX_HOME/skills` as the default shared library unless the user explicitly wants a project-local managed layout.
-- If you need to choose the correct operation, start with the decision map below.
+- If you are unsure which mode to use, start with the mode selector below.
 - Read-only modes can add `--format json` when you need machine-readable output for CI or automation.
 
-## Three Main Paths
+## Mode Selector
 
-| Task | Best first move | Typical command |
+| Mode | Choose it when | Canonical location | Typical follow-up |
+| --- | --- | --- | --- |
+| Shared skill | The skill should be reused across projects | `$CODEX_HOME/skills/<skill-name>` | Optionally link it into one or more projects |
+| Project-managed skill | The skill is private, pinned, or should evolve with one repository | `<project-root>/_skill-library/<skill-name>` | Link it inside the same project |
+
+## Most Common Paths
+
+| Goal | Best first move | Typical command |
 | --- | --- | --- |
-| Create or refresh one shared skill | Create or update | `<skill-name> --purpose "<purpose>"` |
-| Adopt a downloaded local skill | Adopt | `--adopt <import-path>` |
-| Attach one or more shared skills to a project | Project link | `--project-skills ... --project-root <project-root>` |
-
-## Decision Map
-
-| Goal | Use this mode | Core flags |
-| --- | --- | --- |
-| Create or refresh one shared-library skill | Create or update | `<skill-name> --purpose "<purpose>"` |
-| Preview risky changes first | Dry run | `--dry-run` |
-| See what already exists | Inventory | `--list-library-skills` or `--list-project-skills` |
-| Attach or repair project links | Project link | `--project-skills ...` or `<skill-name> --project-root ...` |
-| Remove or exact-sync project links | Project cleanup | `--unlink-skills ...` or `--sync-project-skills ...` |
-| Inspect a local skill before adoption | Import inspection | `--inspect-import --adopt <import-path>` |
-| Adopt a downloaded local skill | Adopt | `--adopt <import-path>` |
-| Check one skill before changing it | Health check | `--doctor` |
-| Turn a standalone package into a managed layout | Bootstrap | `--bootstrap-project-layout` |
-| Validate an existing skill without writing files | Validation | `--validate-only` |
+| Create a reusable shared skill | Shared create | `<skill-name> --purpose "<purpose>"` |
+| Create a project-specific skill | Project-managed create | `<skill-name> --library-root <project-root>/_skill-library --project-root <project-root>` |
+| Adopt a downloaded skill into the shared library | Shared adopt | `--adopt <import-path>` |
+| Adopt a downloaded skill into a project-managed library | Project-managed adopt | `--adopt <import-path> --library-root <project-root>/_skill-library --project-root <project-root>` |
+| Expose an existing shared skill to one project | Project link | `--project-skills ... --project-root <project-root>` |
+| Diagnose a skill or project link before changing anything | Doctor | `--doctor` |
 
 ## Shared Placeholders
 
@@ -42,29 +36,26 @@ Use it to understand the workflow, choose the right mode, and find the matching 
 | --- | --- |
 | `<skill-dir>` | The directory that contains this skill package |
 | `<skill-name>` | The canonical hyphen-case skill name |
-| `<library-root>` | The canonical shared-library root, usually `$CODEX_HOME/skills` |
+| `<library-root>` | The chosen canonical library root |
 | `<project-root>` | The target project root |
-| `<import-path>` | A downloaded local skill directory outside the library |
+| `<import-path>` | A downloaded local skill directory outside the chosen library |
 | `<purpose>` | The frontmatter description for the target skill |
 
 ## Working Rules
 
-- Use create or update mode when the user wants to edit one canonical skill.
-- Use the 3 main paths first: create or refresh, adopt, or attach.
-- Use inventory mode when the user wants to list library skills or project links.
-- Use project-link mode when the skill already exists and the user only wants attachment changes.
-- Use `--inspect-import` before adopting an unfamiliar downloaded skill.
-- Use `--doctor` / `--check` when the user wants a read-only health check before making changes.
-- Treat `$CODEX_HOME/skills` as the default canonical library and add project links only when needed.
-- Use project-local bootstrap only when the user explicitly wants a skill to live inside one project.
-- Use `copy` import mode by default. Use `move` only when the shared-library copy should become the sole source.
+- Choose the mode first. Do not blur shared and project-managed flows together.
+- Prefer the shared mode when the skill should survive beyond one repository.
+- Prefer the project-managed mode when the skill should stay private or versioned with one project.
+- Use `--inspect-import`, `--doctor`, or `--dry-run` before risky changes.
+- Use `copy` import mode by default. Use `move` only when the adopted copy should become the sole source.
+- Treat project links as exposure paths, not as the canonical source of truth.
 
-## 1. Create Or Refresh A Managed Skill
+## 1. Create Or Refresh A Shared Skill
 
 Use when:
 
-- the user wants a new canonical skill scaffold
-- the user wants to update metadata or regenerate one of the default files
+- the skill should live in `$CODEX_HOME/skills`
+- the user wants one canonical copy reused across projects
 
 Command pattern:
 
@@ -76,60 +67,103 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 Notes:
 
-- This is the default path for skills that should live in the shared Codex library.
-- Add `--overwrite-skill-md` only when the user explicitly wants to rewrite the main template.
-- Add `--overwrite-openai` only when `agents/openai.yaml` should be regenerated.
+- This is the default mode for reusable skills.
 - Add `--project-root` only when the same request should also ensure a project link.
-- For copy-ready request wording, see [prompt-templates.en.md](prompt-templates.en.md).
+- Add `--overwrite-skill-md` or `--overwrite-openai` only when the user explicitly wants template regeneration.
 
-## 2. Preview Risky Changes
+## 2. Create Or Refresh A Project-Managed Skill
 
 Use when:
 
-- the task involves deletes, sync operations, relinking, or imports
-- the user wants a preview before writing files
+- the skill should stay inside one repository
+- the project should own the canonical copy
 
 Command pattern:
 
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
   <skill-name> \
+  --library-root <project-root>/_skill-library \
   --project-root <project-root> \
-  --purpose "<purpose>" \
-  --dry-run
+  --purpose "<purpose>"
 ```
 
 Notes:
 
-- Use `--dry-run` before bulk project cleanup or unfamiliar imports.
-- For copy-ready request wording, see [prompt-templates.en.md](prompt-templates.en.md).
+- This creates the canonical copy inside the project rather than in `$CODEX_HOME/skills`.
+- The project link is still maintained through `.agents/skills`.
+- Use this mode for private, pinned, or repository-specific skills.
 
-## 3. List Library Skills Or Project Links
+## 3. Adopt A Downloaded Skill Into The Shared Library
 
 Use when:
 
-- the user wants to see which canonical skills already exist
-- the user wants to audit one project's current links
+- the user already has a local skill directory outside the shared library
+- the shared library should become the canonical source
+
+Command pattern:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  --adopt <import-path>
+```
+
+Notes:
+
+- This is the default adoption path for a downloaded skill that should become reusable across projects.
+- `--import-path <import-path>` remains available as the explicit equivalent of `--adopt <import-path>`.
+- Add `--project-root <project-root>` only when the same request should also attach the adopted skill to one project.
+
+## 4. Adopt A Downloaded Skill Into A Project-Managed Library
+
+Use when:
+
+- the user already has a local skill directory outside the target project
+- that project should own the canonical copy
+
+Command pattern:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  --adopt <import-path> \
+  --library-root <project-root>/_skill-library \
+  --project-root <project-root>
+```
+
+Notes:
+
+- This is the project-managed equivalent of the shared adopt flow.
+- Use this when the project should vendor the skill instead of reusing a global copy.
+- If the import name conflicts, retry with an explicit positional `<skill-name>`.
+
+## 5. Inspect A Downloaded Skill Before Adoption
+
+Use when:
+
+- the user wants to check structure, metadata, and name conflicts before adopting
+- the user is unsure whether the target should be shared or project-managed
 
 Command patterns:
 
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
-  --list-library-skills
+  --inspect-import \
+  --adopt <import-path>
 ```
 
 ```bash
 python3 <skill-dir>/scripts/manage_skill.py \
-  --project-root <project-root> \
-  --list-project-skills
+  --inspect-import \
+  --adopt <import-path> \
+  --project-root <project-root>
 ```
 
 Notes:
 
-- Use the library listing before onboarding a project to existing skills.
-- Use the project listing before cleanup, repair, or exact sync work.
+- This is the safest first step for an unfamiliar downloaded skill.
+- The inspection tells you whether the structure is valid and whether the canonical name conflicts.
 
-## 4. Attach Or Repair Selected Project Links
+## 6. Attach Or Repair Project Links
 
 Use when:
 
@@ -155,8 +189,9 @@ Notes:
 
 - Use `--project-skills` when attaching multiple existing skills.
 - Use `<skill-name> --project-root ...` when the main need is to refresh one canonical skill and ensure its project link.
+- This operation works with both shared skills and project-managed skills, as long as the chosen canonical library root is correct.
 
-## 5. Remove Or Exact-Sync Project Links
+## 7. Remove Or Exact-Sync Project Links
 
 Use when:
 
@@ -182,57 +217,12 @@ Notes:
 - `--unlink-skills` removes selected project links without deleting the canonical skill.
 - `--sync-project-skills` is stronger: it makes the project match the exact chosen set.
 
-## 6. Inspect A Downloaded Skill Before Adoption
-
-Use when:
-
-- the user wants to check structure, metadata, and conflict status first
-- the user is unsure whether the import should use `copy` or `move`
-
-Command pattern:
-
-```bash
-python3 <skill-dir>/scripts/manage_skill.py \
-  --inspect-import \
-  --adopt <import-path> \
-  --project-root <project-root>
-```
-
-Notes:
-
-- This is the safest first step for an unfamiliar downloaded skill.
-- `--import-path <import-path>` remains available as the explicit equivalent of `--adopt <import-path>`.
-- If the source name conflicts, the script will suggest alternative canonical names.
-
-## 7. Adopt A Downloaded Skill Into The Shared Library
-
-Use when:
-
-- the user already has a local skill directory outside the library
-- the shared library should become the canonical source
-
-Command pattern:
-
-```bash
-python3 <skill-dir>/scripts/manage_skill.py \
-  --adopt <import-path>
-```
-
-Notes:
-
-- This is the default adoption path for a downloaded skill that should become part of the shared Codex library.
-- `--import-path <import-path>` is still supported when you want the more explicit flag name.
-- Use `--import-mode move` only when the original download directory should stop being the source of truth.
-- If the imported name conflicts, retry with an explicit positional `<skill-name>`.
-- Add `--project-root <project-root>` only when the same request should also attach the imported skill to one project.
-- When the import source lives outside the project root, the script records it in `.agents/skill-workflow-manager/external-sources.json`.
-
 ## 8. Check A Skill Before Changing It
 
 Use when:
 
-- the user wants to know whether one skill is structurally healthy before editing, importing, or linking it
-- the user wants to check whether a project link is missing, broken, or pointing to the wrong place
+- the user wants to know whether one skill is structurally healthy before editing, adopting, or linking it
+- the user wants to check whether a project link is missing, broken, blocked, or pointing to the wrong place
 
 Command patterns:
 
@@ -260,12 +250,12 @@ Notes:
 - It supports `--format json` for automation.
 - It exits non-zero when it finds blocking issues.
 
-## 9. Bootstrap A Standalone Download Into A Managed Project Layout
+## 9. Bootstrap A Standalone Package Into A Project-Managed Layout
 
 Use when:
 
 - the current directory contains a standalone downloaded skill package
-- the project still needs `_skill-library` and `.agents/skills`
+- the end state should be a project-managed layout
 
 Command pattern:
 
@@ -277,17 +267,41 @@ python3 <skill-dir>/scripts/manage_skill.py \
 
 Notes:
 
-- This is not the default way to manage globally shared skills.
-- If the script can infer the project root safely, `--project-root` may be omitted.
-- This is the bridge from a standalone package to a project-local managed layout.
-- When bootstrap adopts a standalone in-project package, it removes the original source folder after validation so the project does not keep two `skill-workflow-manager` directories.
+- This is not the default way to create shared skills.
+- This is the bridge from a standalone package to a project-managed layout.
+- When bootstrap adopts a standalone in-project package, it removes the original source folder after validation so the project does not keep two copies.
 
-## 10. Validate An Existing Skill Without Writing Files
+## 10. Inventory Existing Skills
+
+Use when:
+
+- the user wants to see which canonical skills already exist
+- the user wants to audit one project's current links before cleanup or repair
+
+Command patterns:
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  --list-library-skills
+```
+
+```bash
+python3 <skill-dir>/scripts/manage_skill.py \
+  --project-root <project-root> \
+  --list-project-skills
+```
+
+Notes:
+
+- Use the library listing before onboarding a project to existing skills.
+- Use the project listing before cleanup, repair, or exact sync work.
+
+## 11. Validate Without Writing Files
 
 Use when:
 
 - you want a release check or CI-friendly validation pass
-- you want to validate the current package, a canonical skill, or an import candidate without modifying anything
+- you want to validate the current package, a canonical skill, or an adoption candidate without modifying anything
 
 Command patterns:
 

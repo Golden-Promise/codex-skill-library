@@ -25,7 +25,7 @@
 
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
-| `skill-workflow-manager` | 以共享库优先的方式管理 skill、接管下载包、做健康检查并接入项目 | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-workflow-manager` | 同时管理共享 skill 和项目托管 skill，包括接管下载包、体检诊断与项目链接 | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
 
 ## 快速开始
 

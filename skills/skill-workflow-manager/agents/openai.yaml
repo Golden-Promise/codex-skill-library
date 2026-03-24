@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Workflow Manager"
-  short_description: "Manage shared skills, checks, and project links"
-  default_prompt: "Use $skill-workflow-manager to manage shared skills in $CODEX_HOME/skills, adopt downloaded skills, run health checks, and attach skills to projects when needed."
+  short_description: "Manage shared and project-managed Codex skills"
+  default_prompt: "Use $skill-workflow-manager to create, adopt, diagnose, attach, or bootstrap shared skills in $CODEX_HOME/skills and project-managed skills in a project's _skill-library."
