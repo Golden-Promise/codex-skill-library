@@ -2,9 +2,9 @@
 
 Chinese version: [use-cases.zh-CN.md](use-cases.zh-CN.md)
 
-This page is the command reference for `skill-governance`. It collects install commands, task entry points, command patterns, automatic behavior, governance checks, and repository configuration.
+This page is the command reference for `skill-governance`. It documents install commands, subcommands, command patterns, automatic behavior, governance checks, and repository configuration.
 
-If you are new to the package, start with [../README.md](../README.md) and [prompt-templates.en.md](prompt-templates.en.md). The README stays natural-language-first, so the install commands live here.
+The README provides the overview; this page documents install commands and operational reference material.
 
 ## Install Commands
 
@@ -25,7 +25,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --ref v0.5.0
 ```
 
-## Task Entry Points
+## Commands
 
 - `manage`: inspect a project directory, discover local skills, and adopt them into `skill-governance`
 - `setup`: create the project folders used for governance
@@ -183,6 +183,6 @@ The older filename `skill-workflow.toml` is still accepted.
 
 ## Related Documentation
 
-- [README.md](../README.md): start here if you are new
+- [README.md](../README.md): overview
 - [prompt-templates.en.md](prompt-templates.en.md): copy-ready requests
 - [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md): Chinese copy-ready requests

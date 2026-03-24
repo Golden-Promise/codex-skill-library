@@ -2,9 +2,9 @@
 
 English version: [use-cases.md](use-cases.md)
 
-这一页是 `skill-governance` 的命令参考。这里汇总了安装命令、任务入口、命令模式、自动决策、治理校验和仓库配置。
+这一页是 `skill-governance` 的命令参考。这里记录安装命令、子命令、命令模式、自动决策、治理校验和仓库配置。
 
-如果你刚开始用这个包，先看 [../README.zh-CN.md](../README.zh-CN.md) 和 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。README 保持自然语言优先，所以安装命令放在这里。
+README 提供概览；这一页记录安装命令和操作参考内容。
 
 ## 安装命令
 
@@ -25,7 +25,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --ref v0.5.0
 ```
 
-## 任务入口命令
+## 命令总览
 
 - `manage`：检查项目目录，发现本地 skill，并纳入 `skill-governance`
 - `setup`：创建治理所需的项目目录
@@ -183,6 +183,6 @@ platform_root = ".skill-platform"
 
 ## 相关文档
 
-- [README.zh-CN.md](../README.zh-CN.md)：如果你刚开始用，先看这里
+- [README.zh-CN.md](../README.zh-CN.md)：概览
 - [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)：可直接复制的请求
 - [prompt-templates.en.md](prompt-templates.en.md)：English copy-ready requests
