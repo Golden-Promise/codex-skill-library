@@ -47,13 +47,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-governance
 ```
 
-如果要固定安装最新补丁版本，可使用：
+如果要固定安装当前发布版本，可使用：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.4.1
+  --ref v0.5.0
 ```
 
 ## 当前仓库中的根文件
