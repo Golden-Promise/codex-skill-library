@@ -55,7 +55,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 1. 先把 `skill-workflow-manager` 安装到默认的 Codex 共享库。
 2. 在 `$CODEX_HOME/skills` 中创建或接管一个共享 skill。
 3. 通过 `.agents/skills` 把这个共享 skill 接入一个项目。
-4. 在清理、重链或发布前先跑一次 `--doctor`。
+4. 在清理、重链或发布前先跑一次 `--doctor`，确认当前 skill 状态正常。
 
 ## 平台提醒
 
