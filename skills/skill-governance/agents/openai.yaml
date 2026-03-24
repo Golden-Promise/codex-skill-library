@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Governance"
-  short_description: "Take over, set up, and keep project skills healthy"
-  default_prompt: "Use $skill-governance to take over project skill management, set it up from scratch, add a reusable skill, bring a local skill into the project, make a skill available here, or check, repair, audit, document, upgrade, or retire Codex skills."
+  short_description: "Project skill governance for Codex skills"
+  default_prompt: "Use $skill-governance to take over a project, set up project skill governance, add or enable a skill, check, repair, or audit skills, and document, upgrade, or retire skills."

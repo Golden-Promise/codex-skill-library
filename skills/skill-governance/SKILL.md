@@ -7,8 +7,8 @@ description: Use when the user wants to take over or set up project skill manage
 
 ## Overview
 
-Manage Codex skills through task-first requests.
-Use this skill for first-run setup, ongoing skill upkeep, and quick governance checks without asking the user to sort out the project shape first.
+Project skill governance for taking over, setting up, and maintaining Codex skills.
+Use this skill for task-first project skill work without having to sort out the project shape first.
 
 ## Use This Skill When
 
@@ -31,4 +31,4 @@ Use this skill for first-run setup, ongoing skill upkeep, and quick governance c
 ## References
 
 - `references/use-cases.md` and `references/use-cases.zh-CN.md`: command reference and advanced usage
-- `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: copy-ready prompts
+- `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: copy-ready requests
