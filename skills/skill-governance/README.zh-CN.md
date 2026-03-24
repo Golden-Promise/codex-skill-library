@@ -20,43 +20,32 @@
 
 ## 安装
 
-从当前仓库安装最新版：
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance
-```
-
-固定安装当前发布版本：
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance \
-  --ref v0.5.0
-```
-
-在 Codex 里也可以直接这样说：
+在 Codex 里，最简单的安装说法是：
 
 ```text
 请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance。
+```
+
+如果你想固定到当前发布版本，可以直接这样说：
+
+```text
+请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance，并使用 v0.5.0。
 ```
 
 ## 快速上手
 
 如果你刚通过 `skill-installer` 安装完 `skill-governance`，最推荐直接在 Codex 里这样说：
 
-- `接管这个目录的 skill 管理，并把本地 skill 整理进受管结构。`
+- `接管这个目录的 skill 管理，并把本地 skill 帮我整理好。`
 - `给这个项目搭建 skill 管理骨架。`
 
 这通常就是最省事的起点。
 
 如果你已经知道下一步要做什么，也可以直接说：
 
-- `在我清理或重链 skill 之前，先对这个项目跑一次 doctor。`
-- `把 <skill-name> 启用到这个项目。`
-- `往共享库里新增一个可复用 skill。`
+- `在我清理或重链 skill 之前，先检查一下这个项目。`
+- `让 <skill-name> 在这个项目里可用。`
+- `新增一个可复用 skill。`
 
 如果你更喜欢直接看命令模式，请继续看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
@@ -64,23 +53,23 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 | 任务 | 作用 |
 | --- | --- |
-| `manage` | 审查一个项目目录，发现本地 skill 包，自动接管到受管结构，并补齐项目管理布局 |
-| `setup` | 只搭建项目级 skill 管理骨架，不接管本地 skill 包 |
-| `add` | 新建 skill，或接管一个本地下载包 |
-| `enable` | 把已有 skill 暴露给一个项目 |
+| `manage` | 审查一个项目目录，发现本地 skill 包，并把它们纳入受管的 skill 管理 |
+| `setup` | 为一个项目搭建干净的 skill 管理骨架 |
+| `add` | 新建 skill，或把一个本地下载包纳入管理 |
+| `enable` | 让一个受管 skill 在某个项目里可用 |
 | `doctor` | 做健康评分、重叠检测、影响分析和修复建议 |
 | `repair` | 只执行当前 `safe_auto_fix` 队列 |
 | `audit` | 为 CI 或发布落盘并校验注册表、生命周期和依赖图 |
 | `document` | 默认补齐 `SKILL.md` 缺失章节；如需整篇重写，使用 `--overwrite-skill-md` |
 | `upgrade` | 用本地来源包刷新一个受管 skill |
-| `retire` | 移除一个项目暴露，但不删除 canonical skill |
+| `retire` | 把一个 skill 从某个项目里移除，但不删除共享副本 |
 
 ## 工具会自动帮你判断什么
 
-- `manage` 会检查目标目录、发现本地 skill 包，并自动补齐项目受管结构。
-- `setup` 会自动创建项目内库、暴露目录和平台状态目录。
-- 不带 `--project` 时，默认走共享库。
-- 带 `--project` 时，`add` 默认更偏向项目内托管。
+- `manage` 会检查目标目录、发现本地 skill 包，并自动整理成项目内的受管结构。
+- `setup` 会自动创建项目 skill 目录和平台状态目录。
+- 不带 `--project` 时，新 skill 默认进入共享库。
+- 带 `--project` 时，`add` 默认更偏向跟着项目走。
 - `auto` 暴露策略当前会自动选择：
   - CI 中优先 `manifest`
   - Windows 上优先 `copy`
@@ -95,7 +84,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - 健康分和质量维度
 - 相似或重叠的 skill
 - 受影响项目和 workspace 引用图
-- 治理建议和动作建议
+- 治理建议和下一步动作
 - `repair_plan`、`work_queue`、`batch_repair_preview`
 
 `repair` 只会执行 `safe_auto_fix`，不会自动处理人工清理或治理评审项。

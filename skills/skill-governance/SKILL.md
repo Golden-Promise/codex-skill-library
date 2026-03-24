@@ -1,13 +1,14 @@
 ---
 name: skill-governance
-description: Use this skill when the user wants to set up skill management for a project, take over an existing project directory, or add, enable, inspect, repair, audit, document, upgrade, or retire Codex skills. It chooses storage paths from context, manages project exposure, and keeps governance state consistent.
+description: Use when the user wants to take over skill management for a project, set up skill management for a project, or check, repair, audit, document, upgrade, or retire Codex skills.
 ---
 
 # Skill Governance
 
-## Purpose
+## Overview
 
-Manage Codex skills as governed assets through task-style commands.
+Manage Codex skills through task-first requests.
+Use this skill when the user wants project skill onboarding, quick health checks, or governance actions without having to sort out the underlying layout manually.
 
 ## Use This Skill When
 
@@ -22,26 +23,11 @@ Manage Codex skills as governed assets through task-style commands.
 
 ## Core Rules
 
-1. Prefer task verbs: `manage`, `setup`, `add`, `enable`, `doctor`, `repair`, `audit`, `document`, `upgrade`, `retire`.
-2. Let the tool choose shared versus project-owned storage from context and config.
-3. When the user points at a project directory and wants a quick start, prefer `manage` or `setup` instead of lower-level commands.
-4. Prefer `doctor` before risky changes.
-5. Prefer `audit` for CI or release checks.
-6. `document` fills missing sections by default; use `--overwrite-skill-md` only when you want a full rewrite.
-
-## Core Commands
-
-```bash
-python3 <path-to-skill-governance>/scripts/manage_skill.py manage <project-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py setup <project-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py add <skill-name> --purpose "<purpose>"
-python3 <path-to-skill-governance>/scripts/manage_skill.py add <import-path> --project <project-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py enable <skill-name> --project <project-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py doctor <skill-name> --project <project-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py repair <skill-name> --workspace-root <workspace-root>
-python3 <path-to-skill-governance>/scripts/manage_skill.py audit --workspace-root <workspace-root> --sync-platform-state
-python3 <path-to-skill-governance>/scripts/manage_skill.py document <skill-name> --library-root <library-root>
-```
+1. For project onboarding, start with `manage` or `setup`.
+2. Prefer `doctor` before cleanup, relinking, upgrade, or release.
+3. Prefer `audit` for CI or release checks.
+4. Use `document` to fill missing `SKILL.md` sections; use `--overwrite-skill-md` only for a full rewrite.
+5. Keep command details in the reference guides and keep the main interaction task-first.
 
 ## References
 

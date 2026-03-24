@@ -20,43 +20,32 @@ If you are unsure where to start, use `manage`, `setup`, and `doctor`.
 
 ## Install
 
-Install the latest package from this repository:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance
-```
-
-Install the current release:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance \
-  --ref v0.5.0
-```
-
-Natural-language install request inside Codex:
+Inside Codex, the easiest install request is:
 
 ```text
 Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.
+```
+
+If you want the current tagged release, say:
+
+```text
+Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.5.0.
 ```
 
 ## Quick Start
 
 If you have just installed `skill-governance`, start with one of these two requests inside Codex:
 
-- `Take over skill management for this directory and organize any local skills into the managed project structure.`
-- `Set up skill governance for this project and create the management skeleton.`
+- `Take over skill management for this directory and organize any local skills for me.`
+- `Set up skill governance for this project.`
 
 That is the fastest path for most users.
 
 If you already know which managed skill you want to work on next, then ask for:
 
-- `Run doctor for this project before I clean up or relink skills.`
-- `Enable <skill-name> for this project.`
-- `Add a new reusable skill to the shared library.`
+- `Check this project before I clean up or relink skills.`
+- `Make <skill-name> available in this project.`
+- `Add a new reusable skill.`
 
 If you prefer direct command patterns, use [references/use-cases.md](references/use-cases.md).
 
@@ -64,23 +53,23 @@ If you prefer direct command patterns, use [references/use-cases.md](references/
 
 | Task | What it does |
 | --- | --- |
-| `manage` | Inspect one project directory, discover local skill packages, adopt them into managed storage, and build the project structure |
-| `setup` | Create the project skill governance skeleton without taking over local skill packages |
-| `add` | Create a new skill or adopt a downloaded local package |
-| `enable` | Expose an existing skill to one project |
+| `manage` | Review a project directory, find local skill packages, and bring them under managed skill governance |
+| `setup` | Create a clean skill-management skeleton for one project |
+| `add` | Create a new skill or bring an existing local package into management |
+| `enable` | Make one managed skill available to one project |
 | `doctor` | Score health, detect overlap, analyze impact, and produce repair suggestions |
 | `repair` | Apply only the current `safe_auto_fix` queue |
 | `audit` | Persist or verify registry, lifecycle, and dependency state for CI or release checks |
 | `document` | Fill missing `SKILL.md` sections by default; use `--overwrite-skill-md` for a full rewrite |
 | `upgrade` | Refresh a managed skill from a local source package |
-| `retire` | Remove a managed project exposure without deleting the canonical skill |
+| `retire` | Remove a skill from one project without deleting the shared copy |
 
 ## What The Tool Decides Automatically
 
-- `manage` inspects the target directory, discovers local skill packages, and builds the managed project layout for you.
-- `setup` creates the project-owned library, exposure root, and platform state layout for you.
-- Without `--project`, skills default to the shared library.
-- With `--project`, `add` prefers project-owned storage.
+- `manage` inspects the target directory, discovers local skill packages, and organizes them into the project's managed layout for you.
+- `setup` creates the project skill folders and platform state folders for you.
+- Without `--project`, new skills default to the shared library.
+- With `--project`, `add` prefers to keep the skill with that project.
 - Exposure mode `auto` currently chooses:
   - `manifest` in CI
   - `copy` on Windows
@@ -95,7 +84,7 @@ If you prefer direct command patterns, use [references/use-cases.md](references/
 - health score and quality dimensions
 - similar or overlapping skills
 - impacted projects and workspace reference graph
-- governance suggestions and action suggestions
+- governance suggestions and next actions
 - `repair_plan`, `work_queue`, and `batch_repair_preview`
 
 `repair` only applies `safe_auto_fix`. It does not auto-run manual cleanup or governance review actions.

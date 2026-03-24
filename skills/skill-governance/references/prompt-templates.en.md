@@ -9,43 +9,43 @@ Use these short prompts when you already know the task.
 ### Take over skill management for one project
 
 ```text
-$skill-governance Take over skill management for <project-root>, inspect the directory, discover local skills, and organize them into the managed project structure.
+$skill-governance Take over skill management for <project-root>, review the directory, find any local skills, and organize them for me.
 ```
 
 ### Set up a project management skeleton
 
 ```text
-$skill-governance Set up skill governance for <project-root> and create the project management skeleton.
+$skill-governance Set up skill governance for <project-root>.
 ```
 
 ### Add a shared skill
 
 ```text
-$skill-governance Add <skill-name> as a reusable shared skill. Use it for <purpose>.
+$skill-governance Add <skill-name> as a reusable skill. Use it for <purpose>.
 ```
 
-### Adopt a local package into one project
+### Bring a local package into one project
 
 ```text
-$skill-governance Add <import-path> for <project-root> and choose the right storage and exposure automatically.
+$skill-governance Bring <import-path> into <project-root> and organize it as part of this project's skill management.
 ```
 
 ### Enable a skill for a project
 
 ```text
-$skill-governance Enable <skill-name> for <project-root>.
+$skill-governance Make <skill-name> available in <project-root>.
 ```
 
-### Run health checks before changes
+### Check a project before changes
 
 ```text
-$skill-governance Run doctor for <skill-name> in <project-root> before I clean up, relink, or release it.
+$skill-governance Check <skill-name> in <project-root> before I clean up, relink, or release skills.
 ```
 
-### Repair safe issues
+### Repair safe issues across a workspace
 
 ```text
-$skill-governance Repair <skill-name> across <workspace-root>, but only run safe automatic fixes.
+$skill-governance Fix the safe skill issues for <skill-name> across <workspace-root>.
 ```
 
 ### Refresh missing SKILL.md sections
@@ -57,11 +57,11 @@ $skill-governance Document <skill-name> and fill the missing SKILL.md sections w
 ### Audit platform state
 
 ```text
-$skill-governance Audit the skill platform state for <workspace-root> and sync the registry and dependency graph first.
+$skill-governance Run a skill governance audit for <workspace-root> and sync the registry and dependency graph first.
 ```
 
-### Retire a project exposure
+### Remove a skill from one project
 
 ```text
-$skill-governance Retire <skill-name> from <project-root> without deleting the canonical skill.
+$skill-governance Remove <skill-name> from <project-root> without deleting the shared copy.
 ```
