@@ -2,9 +2,9 @@
 
 Chinese version: [use-cases.zh-CN.md](use-cases.zh-CN.md)
 
-This page is the command reference for `skill-governance`. It documents install commands, subcommands, command patterns, automatic behavior, governance checks, and repository configuration.
+This page is the command and advanced-usage reference for `skill-governance`. It documents install commands, subcommands, command patterns, automatic behavior, governance checks, and repository configuration.
 
-The README provides the overview; this page documents install commands and operational reference material.
+The README provides the landing-page overview.
 
 ## Install Commands
 

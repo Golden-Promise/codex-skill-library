@@ -4,18 +4,18 @@
 
 ## Overview
 
-`skill-governance` is the project skill governance tool for taking over an existing codebase and bringing its skills under clear, repeatable control.
-It helps you organize local skills, decide what should stay enabled, and keep a project ready for cleanup, release, or ongoing maintenance.
+`skill-governance` is the project skill governance tool for organizing local skills, deciding what stays enabled, and keeping a project release-ready.
+It helps you bring project skills under clear, repeatable control for cleanup, release, or ongoing maintenance.
 
 ## Core Capabilities
 
 `skill-governance` focuses on the practical work that comes with owning project skills:
 
-- take over an existing project and organize the skills already present
-- establish a clean governance flow for a new project
-- add, enable, or document a skill with project-specific context
-- check for safe cleanup, relinking, upgrade, or release readiness
-- prepare skill metadata for CI and publishing workflows
+- project takeover and organization for existing skills
+- governance setup for a new project
+- skill context, enablement, and documentation
+- safe cleanup, relinking, upgrade, and release checks
+- metadata for CI and publishing workflows
 
 ## Best For
 
@@ -28,7 +28,7 @@ It is a strong fit when you are:
 - checking health before cleanup, relinking, upgrade, or release
 - preparing skill metadata for CI or release checks
 
-If you are new to the tool, start with project takeover, project setup, or a pre-release health check.
+If you are starting fresh, begin with project takeover, project setup, or a pre-release health check.
 
 ## Install
 
@@ -36,9 +36,9 @@ To install `skill-governance`, use the standard package path in your Codex works
 
 For the copy-ready command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
 
-## Quick Start
+## Common Paths
 
-Most people start with one of these three actions:
+Start with one of these three actions:
 
 1. Take over an existing project directory.
 2. Set up skill governance for a new project.

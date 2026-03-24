@@ -2,9 +2,9 @@
 
 English version: [use-cases.md](use-cases.md)
 
-这一页是 `skill-governance` 的命令参考。这里记录安装命令、子命令、命令模式、自动决策、治理校验和仓库配置。
+这一页是 `skill-governance` 的命令与进阶用法参考。这里记录安装命令、子命令、命令模式、自动决策、治理校验和仓库配置。
 
-README 提供概览；这一页记录安装命令和操作参考内容。
+README 提供落地页概览。
 
 ## 安装命令
 

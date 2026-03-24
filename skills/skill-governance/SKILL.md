@@ -1,6 +1,6 @@
 ---
 name: skill-governance
-description: Use when the user wants to take over project skill governance, set it up, add or enable a skill, check or repair it, or document, upgrade, or retire Codex skills.
+description: Use when the user wants to take over project skill governance, set it up, add or enable a skill, check, audit, or repair it, or document, upgrade, or retire Codex skills.
 ---
 
 # Skill Governance
@@ -8,7 +8,7 @@ description: Use when the user wants to take over project skill governance, set 
 ## Overview
 
 Project skill governance for taking over, setting up, and maintaining Codex skills in a project.
-Use this skill for task-first project skill work without having to sort out the project layout first.
+Use this skill for project skill work when you want to start from the task instead of the layout.
 
 ## Use This Skill When
 
@@ -17,7 +17,7 @@ Use this skill for task-first project skill work without having to sort out the 
 - adding a reusable skill
 - bringing a local skill into a project
 - making a skill available in a project
-- checking, repairing, or auditing skills
+- checking, auditing, or repairing skills
 - documenting, upgrading, or retiring skills
 
 ## Core Rules
