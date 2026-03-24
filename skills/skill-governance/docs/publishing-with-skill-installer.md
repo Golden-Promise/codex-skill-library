@@ -2,12 +2,12 @@
 
 Chinese version: [publishing-with-skill-installer.zh-CN.md](publishing-with-skill-installer.zh-CN.md)
 
-This document is for maintainers publishing the `skill-workflow-manager` package itself.
+This document is for maintainers publishing the `skill-governance` package itself.
 It is intentionally kept outside `references/` so it does not look like a runtime skill guide.
 
 ## Who This Is For
 
-Use this guide if you are packaging or releasing `skill-workflow-manager` as a public skill package.
+Use this guide if you are packaging or releasing `skill-governance` as a public skill package.
 
 ## Goal
 
@@ -29,7 +29,7 @@ repo-root/
   CHANGELOG.md
   skills/
     README.md
-    skill-workflow-manager/
+    skill-governance/
       README.md
       SKILL.md
       docs/
@@ -44,7 +44,7 @@ Install it with:
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
-  --path skills/skill-workflow-manager
+  --path skills/skill-governance
 ```
 
 ## Repository Files In This Repo
@@ -64,7 +64,7 @@ For public distribution, version the repository itself:
 
 - use Git tags such as `v0.1.0`, `v0.2.0`, `v1.0.0`
 - record user-visible changes in `CHANGELOG.md`
-- keep the install path stable, for example `skills/skill-workflow-manager`
+- keep the install path stable, for example `skills/skill-governance`
 - publish GitHub Releases when you want a clear downloadable milestone
 
 Recommended release rhythm:
@@ -92,5 +92,5 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
+  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
 ```

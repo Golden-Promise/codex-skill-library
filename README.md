@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md)
 
-A curated multi-skill repository for installable Codex skills and reusable workflow packages.
+A curated repository of installable Codex skills.
 
 ## What This Repo Is For
 
@@ -25,7 +25,7 @@ This repository is designed for people who want to:
 
 | Skill | Best For | Docs |
 | --- | --- | --- |
-| `skill-workflow-manager` | Managing both shared and project-managed Codex skills, including adoption, diagnostics, and project links | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-governance` | Governing skill assets with task-first add, enable, doctor, repair, audit, and document flows | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
 
 ## Quick Start
 
@@ -36,19 +36,28 @@ This repository is designed for people who want to:
 
 ## Install Example
 
-Install `skill-workflow-manager` from this repository:
+Install `skill-governance` from this repository:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
-  --path skills/skill-workflow-manager
+  --path skills/skill-governance
+```
+
+Install the current release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo <owner>/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.3.0
 ```
 
 Install from a GitHub tree URL:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
+  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
 ```
 
 Replace `<owner>` with your GitHub account or organization name.
@@ -57,7 +66,7 @@ Replace `<owner>` with your GitHub account or organization name.
 
 - English skill index: [skills/README.md](skills/README.md)
 - 中文技能索引: [skills/README.zh-CN.md](skills/README.zh-CN.md)
-- `skill-workflow-manager` package: [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md)
+- `skill-governance` package: [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md)
 - Repository publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
 
@@ -72,7 +81,7 @@ codex-skill-library/
   skills/
     README.md
     README.zh-CN.md
-    skill-workflow-manager/
+    skill-governance/
 ```
 
 ## For Maintainers

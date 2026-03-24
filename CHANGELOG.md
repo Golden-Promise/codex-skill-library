@@ -2,6 +2,15 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [0.3.0] - 2026-03-24
+
+### Changed
+
+- Rename `skill-workflow-manager` to `skill-governance`.
+- Rewrite package READMEs and reader guides around task-first skill asset governance.
+- Update install paths, package indexes, and publishing guides to the new package name.
+- Support `skill-governance.toml` as the preferred repo config filename while keeping `skill-workflow.toml` compatible.
+
 ## [0.2.0] - 2026-03-24
 
 Usability release for `skill-workflow-manager`.

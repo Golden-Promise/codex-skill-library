@@ -28,7 +28,7 @@
 当前包的校验方式：
 
 ```bash
-cd skills/skill-workflow-manager
+cd skills/skill-governance
 python3 scripts/manage_skill.py --validate-only
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
@@ -38,7 +38,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 - 使用仓库级 tag，例如 `v0.1.0`、`v0.2.0`、`v1.0.0`
 - 向后兼容的增强提升次版本
 - 如果包结构或工作流有破坏性变化，则提升主版本
-- 对外安装路径尽量保持稳定，例如 `skills/skill-workflow-manager`
+- 对外安装路径尽量保持稳定，例如 `skills/skill-governance`
 
 ## 安装验证
 
@@ -47,14 +47,14 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
-  --path skills/skill-workflow-manager
+  --path skills/skill-governance
 ```
 
 通过 GitHub tree URL 验证安装：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
+  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
 ```
 
 ## 维护说明

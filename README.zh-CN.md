@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-一个面向公开分享的多-skill 仓库，用于集中发布可安装的 Codex skills 和可复用工作流包。
+一个用于集中发布可安装 Codex skills 的仓库。
 
 ## 这个仓库适合谁
 
@@ -25,7 +25,7 @@
 
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
-| `skill-workflow-manager` | 同时管理共享 skill 和项目托管 skill，包括接管下载包、体检诊断与项目链接 | [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md) |
+| `skill-governance` | 用任务式入口治理 skill 资产，包括新增、启用、体检、修复、审计和补文档 | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
 
 ## 快速开始
 
@@ -36,19 +36,28 @@
 
 ## 安装示例
 
-从当前仓库安装 `skill-workflow-manager`：
+从当前仓库安装 `skill-governance`：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
-  --path skills/skill-workflow-manager
+  --path skills/skill-governance
+```
+
+固定安装当前发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo <owner>/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.3.0
 ```
 
 也可以直接使用 GitHub tree URL：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
+  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
 ```
 
 把 `<owner>` 替换成你的 GitHub 用户名或组织名即可。
@@ -57,7 +66,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - English skill index: [skills/README.md](skills/README.md)
 - 中文技能索引: [skills/README.zh-CN.md](skills/README.zh-CN.md)
-- `skill-workflow-manager` 包说明: [EN](skills/skill-workflow-manager/README.md) / [中文](skills/skill-workflow-manager/README.zh-CN.md)
+- `skill-governance` 包说明: [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md)
 - English publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
 
@@ -72,7 +81,7 @@ codex-skill-library/
   skills/
     README.md
     README.zh-CN.md
-    skill-workflow-manager/
+    skill-governance/
 ```
 
 ## 给维护者

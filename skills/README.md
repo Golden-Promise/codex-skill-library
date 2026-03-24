@@ -14,7 +14,7 @@ This directory contains the installable skill packages published by `codex-skill
 
 | Skill | Best For | Docs |
 | --- | --- | --- |
-| `skill-workflow-manager` | Managing a canonical skill library, project discovery links, imports, and validation | [EN](skill-workflow-manager/README.md) / [中文](skill-workflow-manager/README.zh-CN.md) |
+| `skill-governance` | Governing Codex skill assets with add, enable, doctor, repair, audit, and document tasks | [EN](skill-governance/README.md) / [中文](skill-governance/README.zh-CN.md) |
 
 ## Package Conventions
 

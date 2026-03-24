@@ -2,12 +2,12 @@
 
 English version: [publishing-with-skill-installer.md](publishing-with-skill-installer.md)
 
-这份文档面向发布 `skill-workflow-manager` 当前包的维护者。
-它刻意放在仓库级 `docs/` 下，而不是 `references/`，避免和运行时技能说明混在一起。
+这份文档面向发布 `skill-governance` 当前包的维护者。
+它刻意放在包内 `docs/` 下，而不是 `references/`，避免和运行时技能说明混在一起。
 
 ## 适用对象
 
-如果你要把 `skill-workflow-manager` 作为一个公开 skill 包来发布，可以从这份文档开始。
+如果你要把 `skill-governance` 作为一个公开 skill 包来发布，可以从这份文档开始。
 
 ## 目标
 
@@ -29,7 +29,7 @@ repo-root/
   CHANGELOG.md
   skills/
     README.md
-    skill-workflow-manager/
+    skill-governance/
       README.md
       SKILL.md
       docs/
@@ -44,7 +44,7 @@ repo-root/
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo <owner>/codex-skill-library \
-  --path skills/skill-workflow-manager
+  --path skills/skill-governance
 ```
 
 ## 当前仓库中的根文件
@@ -64,7 +64,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - 使用 Git tag，例如 `v0.1.0`、`v0.2.0`、`v1.0.0`
 - 在 `CHANGELOG.md` 里记录对读者可见的改动
-- 保持安装路径稳定，例如 `skills/skill-workflow-manager`
+- 保持安装路径稳定，例如 `skills/skill-governance`
 - 如果需要明确的下载节点，可以同步发布 GitHub Releases
 
 推荐的节奏：
@@ -92,5 +92,5 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-workflow-manager
+  --url https://github.com/<owner>/codex-skill-library/tree/main/skills/skill-governance
 ```

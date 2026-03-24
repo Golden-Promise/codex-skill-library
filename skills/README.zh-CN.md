@@ -14,7 +14,7 @@
 
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
-| `skill-workflow-manager` | 管理 canonical skill 共享库、项目链接、导入和校验流程 | [EN](skill-workflow-manager/README.md) / [中文](skill-workflow-manager/README.zh-CN.md) |
+| `skill-governance` | 用任务式入口治理 skill 资产，包括新增、启用、体检、修复、审计和补文档 | [EN](skill-governance/README.md) / [中文](skill-governance/README.zh-CN.md) |
 
 ## 包结构约定
 
