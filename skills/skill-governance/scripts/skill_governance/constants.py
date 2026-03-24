@@ -39,7 +39,7 @@ DOCUMENT_SECTION_TITLES = (
     "Risks / Boundaries",
 )
 PLACEHOLDER_DESCRIPTION = (
-    "TODO: replace with a precise description of what this skill does and when to use it."
+    "Describe what this skill does, when to use it, and what outcome it helps produce."
 )
 SKILL_TEXT_STOPWORDS = {
     "a",
@@ -118,4 +118,3 @@ GOVERNANCE_REVIEW_ACTION_TYPES = {
     "review-overlap",
     "consider-retire-candidate",
 }
-

@@ -47,6 +47,15 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-governance
 ```
 
+如果要固定安装最新补丁版本，可使用：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.4.1
+```
+
 ## 当前仓库中的根文件
 
 这个仓库已经包含公开发布所需的根目录文件：

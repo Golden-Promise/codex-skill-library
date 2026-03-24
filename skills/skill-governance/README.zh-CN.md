@@ -32,7 +32,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.4.0
+  --ref v0.4.1
 ```
 
 在 Codex 里也可以直接这样说：

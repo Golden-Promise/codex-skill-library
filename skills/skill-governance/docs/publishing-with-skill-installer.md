@@ -47,6 +47,15 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-governance
 ```
 
+If you are publishing the latest patch release, use:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.4.1
+```
+
 ## Repository Files In This Repo
 
 This repository already includes the root files needed for public distribution:

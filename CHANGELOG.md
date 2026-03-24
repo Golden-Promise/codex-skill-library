@@ -2,6 +2,14 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [0.4.1] - 2026-03-24
+
+### Fixed
+
+- Replace published repository placeholders with the real GitHub location `Golden-Promise/codex-skill-library` in repository docs, package docs, and publishing guides.
+- Update fixed-version install examples from `v0.4.0` to `v0.4.1` for the next patch release.
+- Remove the `TODO: replace ...` style placeholder from generated skill description guidance so new packages start from a cleaner default.
+
 ## [0.4.0] - 2026-03-24
 
 ### Added
