@@ -2,12 +2,12 @@
 
 [English](README.md)
 
-## Overview
+## 概述
 
 `skill-governance` 是用于接手已有代码库并将项目 skill 统一纳入治理的工具。
 它帮助你整理本地 skill、明确哪些内容应继续启用，并让项目始终适合清理、发布和持续维护。
 
-## Core Capabilities
+## 核心能力
 
 `skill-governance` 关注的是项目 skill 管理中的核心动作：
 
@@ -17,7 +17,7 @@
 - 在清理、重链、升级或发布前进行安全检查
 - 为 CI 和发布流程准备 skill 元数据
 
-## Best For
+## 适用场景
 
 它尤其适合以下场景：
 
@@ -34,9 +34,9 @@
 
 安装说明与项目中的其他文档保持一致：先确定标准安装路径，再决定是使用最新发布版本，还是固定到某个具体 ref。
 
-关于可直接复制的命令格式和更完整的安装说明，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+关于可直接复制的命令格式和更完整的安装说明，请查看 [references/use-cases.md](references/use-cases.md)。
 
-## Quick Start
+## 快速上手
 
 通常可以从下面三个动作开始：
 
@@ -44,9 +44,9 @@
 2. 为新项目建立 skill 治理。
 3. 在清理或发布前检查项目。
 
-如果你想查看每条路径对应的精确提示词，请参考 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如果你想查看每条路径对应的精确提示词，请参考 [references/use-cases.md](references/use-cases.md)。
 
-## What You Can Do Next
+## 下一步可以做什么
 
 基础流程建立之后，`skill-governance` 还可以继续帮你完成：
 
@@ -57,9 +57,9 @@
 - 为已有 skill 补文档
 - 升级或退役一个 skill
 
-如需更多示例和直接的命令模式，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如需更多示例和直接的命令模式，请查看 [references/use-cases.md](references/use-cases.md)。
 
-## Documentation
+## 文档
 
 - 命令参考与进阶用法: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
 - English task guide: [references/use-cases.md](references/use-cases.md)
