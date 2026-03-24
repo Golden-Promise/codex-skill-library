@@ -2,7 +2,9 @@
 
 Chinese version: [use-cases.zh-CN.md](use-cases.zh-CN.md)
 
-Use this page for command syntax and advanced usage. If you are new, start with [../README.md](../README.md) and [prompt-templates.en.md](prompt-templates.en.md).
+This page is the command reference for `skill-governance`. It collects install commands, task entry points, command patterns, automatic behavior, governance checks, and repository configuration.
+
+If you are new to the package, start with [../README.md](../README.md) and [prompt-templates.en.md](prompt-templates.en.md). The README stays natural-language-first, so the install commands live here.
 
 ## Install Commands
 
@@ -23,16 +25,16 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --ref v0.5.0
 ```
 
-## Common Commands
+## Task Entry Points
 
-- `manage`: inspect a project directory, find local skills, and bring them under `skill-governance`
-- `setup`: create the project folders needed for skill governance
-- `add`: create a new skill or bring in a local package
-- `enable`: make a managed skill available in one project
+- `manage`: inspect a project directory, discover local skills, and adopt them into `skill-governance`
+- `setup`: create the project folders used for governance
+- `add`: create a new skill or import a local package
+- `enable`: expose a managed skill in one project
 - `doctor`: check health and overlap before cleanup, relinking, upgrade, or release
 - `repair`: apply only safe automatic fixes
-- `audit`: write or verify registry and dependency graph for CI or release checks
-- `document`: fill missing `SKILL.md` sections; use `--overwrite-skill-md` to rewrite the whole file
+- `audit`: write or verify the registry and dependency graph for CI or release checks
+- `document`: fill missing `SKILL.md` sections; use `--overwrite-skill-md` to rewrite the file
 - `upgrade`: refresh a managed skill from a local source package
 - `retire`: remove a skill from one project without deleting the shared copy
 
@@ -118,17 +120,17 @@ python3 <skill-dir>/scripts/manage_skill.py \
   --sync-platform-state
 ```
 
-## What The Command Decides For You
+## Automatic Decisions
 
-- `manage` finds local skill packages and organizes them for you.
+- `manage` finds local skill packages and organizes them.
 - `setup` creates the project skill folders and governance state folders.
 - Without `--project`, `add` uses the shared library.
 - With `--project`, `add` keeps the skill with that project.
-- `auto` mode chooses `manifest` in CI, `copy` on Windows, and `symlink` on Linux/macOS.
+- `auto` mode chooses `manifest` in CI, `copy` on Windows, and `symlink` on Linux or macOS.
 - `enable`, `doctor`, `repair`, and `retire` can infer the project root from the current working directory.
 - `document` preserves existing sections unless you explicitly ask for `--overwrite-skill-md`.
 
-## Governance Outputs
+## Governance Outputs and Checks
 
 `doctor` reports:
 
@@ -163,7 +165,7 @@ python3 scripts/manage_skill.py \
   --version "1.2.0"
 ```
 
-## Optional Repo Config
+## Repository Configuration
 
 Use `skill-governance.toml` when you want custom paths:
 
@@ -179,7 +181,7 @@ platform_root = ".skill-platform"
 
 The older filename `skill-workflow.toml` is still accepted.
 
-## Related Files
+## Related Documentation
 
 - [README.md](../README.md): start here if you are new
 - [prompt-templates.en.md](prompt-templates.en.md): copy-ready requests

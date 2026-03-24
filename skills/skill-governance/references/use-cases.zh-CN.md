@@ -2,7 +2,9 @@
 
 English version: [use-cases.md](use-cases.md)
 
-如果你要看命令语法和进阶用法，就读这一页。若你刚开始用，先看 [../README.zh-CN.md](../README.zh-CN.md) 和 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。
+这一页是 `skill-governance` 的命令参考。这里汇总了安装命令、任务入口、命令模式、自动决策、治理校验和仓库配置。
+
+如果你刚开始用这个包，先看 [../README.zh-CN.md](../README.zh-CN.md) 和 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。README 保持自然语言优先，所以安装命令放在这里。
 
 ## 安装命令
 
@@ -23,11 +25,11 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --ref v0.5.0
 ```
 
-## 常用命令
+## 任务入口命令
 
-- `manage`：检查项目目录，找到本地 skill，并交给 `skill-governance` 处理
-- `setup`：创建 skill governance 需要的项目目录
-- `add`：新建一个 skill，或接入一个本地包
+- `manage`：检查项目目录，发现本地 skill，并纳入 `skill-governance`
+- `setup`：创建治理所需的项目目录
+- `add`：新建一个 skill，或导入一个本地包
 - `enable`：让一个受管 skill 在某个项目里可用
 - `doctor`：在清理、重链、升级或发布前检查健康度和重叠情况
 - `repair`：只执行安全自动修复
@@ -118,17 +120,17 @@ python3 <skill-dir>/scripts/manage_skill.py \
   --sync-platform-state
 ```
 
-## 工具会自动决定什么
+## 自动决策
 
 - `manage` 会找到本地 skill 包，并自动整理好。
 - `setup` 会创建项目 skill 目录和治理状态目录。
 - 不带 `--project` 时，`add` 默认使用共享库。
 - 带 `--project` 时，`add` 会把 skill 留在这个项目里。
-- `auto` 模式会在 CI 中选 `manifest`，在 Windows 上选 `copy`，在 Linux/macOS 上选 `symlink`。
+- `auto` 模式会在 CI 中选 `manifest`，在 Windows 上选 `copy`，在 Linux 或 macOS 上选 `symlink`。
 - `enable`、`doctor`、`repair`、`retire` 可以从当前工作目录推断项目根目录。
 - `document` 会保留已有章节，除非你显式要求 `--overwrite-skill-md`。
 
-## 治理输出
+## 治理输出与校验
 
 `doctor` 会输出：
 
@@ -163,7 +165,7 @@ python3 scripts/manage_skill.py \
   --version "1.2.0"
 ```
 
-## 可选仓库配置
+## 仓库配置
 
 如果你想自定义路径，可以使用 `skill-governance.toml`：
 
@@ -179,7 +181,7 @@ platform_root = ".skill-platform"
 
 旧文件名 `skill-workflow.toml` 仍然兼容。
 
-## 相关文件
+## 相关文档
 
 - [README.zh-CN.md](../README.zh-CN.md)：如果你刚开始用，先看这里
 - [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)：可直接复制的请求
