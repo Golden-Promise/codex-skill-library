@@ -57,12 +57,12 @@
 - 为已有 skill 补文档
 - 升级或退役一个 skill
 
-如需更多示例和直接的命令模式，请查看 [references/use-cases.md](references/use-cases.md)。
+如需更多示例和直接的命令模式，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
 ## 文档
 
-- 命令参考与进阶用法: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
-- English task guide: [references/use-cases.md](references/use-cases.md)
-- 提示词模板: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
-- English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- 中文命令参考与进阶用法: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
+- English command reference and usage: [references/use-cases.md](references/use-cases.md)
+- 中文可直接复制提示词模板: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- English copy-ready prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - 维护者发布说明: [docs/publishing-with-skill-installer.zh-CN.md](docs/publishing-with-skill-installer.zh-CN.md)

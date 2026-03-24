@@ -62,7 +62,7 @@ For more detailed examples and direct command patterns, see [references/use-case
 ## Documentation
 
 - Command reference and advanced usage: [references/use-cases.md](references/use-cases.md)
-- 中文任务说明: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
-- Copy-ready prompts: [references/prompt-templates.en.md](references/prompt-templates.en.md)
-- 中文提示词模板: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- Chinese command reference and usage: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
+- Copy-ready prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- Chinese copy-ready prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - Maintainer publishing notes: [docs/publishing-with-skill-installer.md](docs/publishing-with-skill-installer.md)
