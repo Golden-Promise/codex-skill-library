@@ -4,6 +4,25 @@ Chinese version: [use-cases.zh-CN.md](use-cases.zh-CN.md)
 
 Use this page for command syntax and advanced usage. If you are new, start with [../README.md](../README.md) and [prompt-templates.en.md](prompt-templates.en.md).
 
+## Install Commands
+
+Install the latest package from this repository:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance
+```
+
+Install a specific tagged release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.5.0
+```
+
 ## Common Commands
 
 - `manage`: inspect a project directory, find local skills, and bring them under `skill-governance`
@@ -102,12 +121,47 @@ python3 <skill-dir>/scripts/manage_skill.py \
 ## What The Command Decides For You
 
 - `manage` finds local skill packages and organizes them for you.
-- `setup` creates the project skill folders and platform state folders.
+- `setup` creates the project skill folders and governance state folders.
 - Without `--project`, `add` uses the shared library.
 - With `--project`, `add` keeps the skill with that project.
 - `auto` mode chooses `manifest` in CI, `copy` on Windows, and `symlink` on Linux/macOS.
 - `enable`, `doctor`, `repair`, and `retire` can infer the project root from the current working directory.
 - `document` preserves existing sections unless you explicitly ask for `--overwrite-skill-md`.
+
+## Governance Outputs
+
+`doctor` reports:
+
+- health score and quality dimensions
+- similar or overlapping skills
+- impacted projects and workspace reference graph
+- governance suggestions and next actions
+- `repair_plan`, `work_queue`, and `batch_repair_preview`
+
+`repair` applies only `safe_auto_fix`.
+
+`audit` writes or checks:
+
+- `.skill-platform/registry.json`
+- `.skill-platform/dependency-graph.json`
+
+`audit` also enforces governance metadata for CI and release checks:
+
+- `active`, `review`, `deprecated`, and `blocked` skills should carry an `owner`
+- `active`, `review`, `deprecated`, and `blocked` skills should carry a semver-like `version`
+- `review` skills should also carry a `reviewer`
+- `active` and `review` skills should usually carry a `team`
+
+Example:
+
+```bash
+python3 scripts/manage_skill.py \
+  add demo-skill \
+  --purpose "Use this skill when the user wants help with demo skill tasks." \
+  --owner "platform@example.com" \
+  --team "core-platform" \
+  --version "1.2.0"
+```
 
 ## Optional Repo Config
 

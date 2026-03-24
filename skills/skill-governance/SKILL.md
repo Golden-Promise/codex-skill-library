@@ -30,5 +30,5 @@ Use this skill for first-run setup, ongoing skill upkeep, and quick governance c
 
 ## References
 
-- `references/use-cases.md` and `references/use-cases.zh-CN.md`: quick task guide
+- `references/use-cases.md` and `references/use-cases.zh-CN.md`: command reference and advanced usage
 - `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: copy-ready prompts

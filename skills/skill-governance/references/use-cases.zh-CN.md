@@ -4,6 +4,25 @@ English version: [use-cases.md](use-cases.md)
 
 如果你要看命令语法和进阶用法，就读这一页。若你刚开始用，先看 [../README.zh-CN.md](../README.zh-CN.md) 和 [prompt-templates.zh-CN.md](prompt-templates.zh-CN.md)。
 
+## 安装命令
+
+安装当前仓库里的最新版：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance
+```
+
+安装指定发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-governance \
+  --ref v0.5.0
+```
+
 ## 常用命令
 
 - `manage`：检查项目目录，找到本地 skill，并交给 `skill-governance` 处理
@@ -102,12 +121,47 @@ python3 <skill-dir>/scripts/manage_skill.py \
 ## 工具会自动决定什么
 
 - `manage` 会找到本地 skill 包，并自动整理好。
-- `setup` 会创建项目 skill 目录和平台状态目录。
+- `setup` 会创建项目 skill 目录和治理状态目录。
 - 不带 `--project` 时，`add` 默认使用共享库。
 - 带 `--project` 时，`add` 会把 skill 留在这个项目里。
 - `auto` 模式会在 CI 中选 `manifest`，在 Windows 上选 `copy`，在 Linux/macOS 上选 `symlink`。
 - `enable`、`doctor`、`repair`、`retire` 可以从当前工作目录推断项目根目录。
 - `document` 会保留已有章节，除非你显式要求 `--overwrite-skill-md`。
+
+## 治理输出
+
+`doctor` 会输出：
+
+- 健康分和质量维度
+- 相似或重叠的 skill
+- 受影响项目和 workspace 引用图
+- 治理建议和下一步动作
+- `repair_plan`、`work_queue`、`batch_repair_preview`
+
+`repair` 只会执行 `safe_auto_fix`。
+
+`audit` 会写入或校验：
+
+- `.skill-platform/registry.json`
+- `.skill-platform/dependency-graph.json`
+
+`audit` 也会把治理元数据当作 CI 和发布门禁：
+
+- `active`、`review`、`deprecated`、`blocked` 状态的 skill 应该有 `owner`
+- `active`、`review`、`deprecated`、`blocked` 状态的 skill 应该有 semver 风格的 `version`
+- `review` 状态的 skill 还应该有 `reviewer`
+- `active` 和 `review` 状态的 skill 通常也应该有 `team`
+
+示例：
+
+```bash
+python3 scripts/manage_skill.py \
+  add demo-skill \
+  --purpose "Use this skill when the user wants help with demo skill tasks." \
+  --owner "platform@example.com" \
+  --team "core-platform" \
+  --version "1.2.0"
+```
 
 ## 可选仓库配置
 
