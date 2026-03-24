@@ -32,7 +32,7 @@ If you are new to the tool, start with project takeover, project setup, or a pre
 
 ## Install
 
-Installation is documented in the style of the rest of the package: start with the standard project path, then choose whether you want the latest published release or a specific ref.
+To install `skill-governance`, use the standard package path in your Codex workspace, then choose the release or ref that fits your workflow.
 
 For the copy-ready command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
 
@@ -44,7 +44,7 @@ Most people start with one of these three actions:
 2. Set up skill governance for a new project.
 3. Check the project before cleanup or release.
 
-If you want the exact prompts for each path, use [references/use-cases.md](references/use-cases.md).
+If you want the copy-ready prompts for each path, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
 ## What You Can Do Next
 
@@ -52,7 +52,7 @@ Once the basics are in place, `skill-governance` can also help with:
 
 - adding a new skill
 - enabling a skill in one project
-- repairing safe issues
+- applying safe fixes
 - auditing registry or dependency state
 - documenting an existing skill
 - upgrading or retiring a skill
