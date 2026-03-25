@@ -2,26 +2,37 @@
 
 [English](README.md)
 
-## Overview
+## 概述
 
 `skill-phase-gate` 用于在有分量的编码工作前后加入紧凑的 preflight / postflight 检查点。
 它帮助高风险执行保持清晰，但不会接管长期任务状态、泛化规划或最终交接。
 
-## Best For
+## 核心能力
+
+`skill-phase-gate` 聚焦的是把高价值检查点做得清楚、可重复。
+
+- 围绕目标、约束、范围和验证计划定义 preflight 检查点
+- 围绕实际改动、实际验证和剩余风险记录 postflight 检查点
+- 只在有分量的改动中显式使用检查点，而不是给每个小动作都加门
+- 把长期状态交给 `skill-context-keeper`，把交接交给 `skill-handoff-summary`
+
+## 适用场景
 
 - 在重构、迁移或多文件改动前做 preflight
 - 在完成一次有分量的修改后做 postflight，核对实际改动和验证结果
 - 对高风险编辑先明确预期修改范围、明确不改动的范围以及验证计划
 - 在提交前增加一次有意义的检查点
 
-## Meaningful Checkpoint Bar
+如果价值主要来自“先停下来确认范围和验证方式”，这个包就是更合适的入口。
+
+## 检查点门槛
 
 只有当“加一道检查点”本身有价值时才适合使用：
 
 - 适合：重构、多文件修改、高风险编辑、提交前检查点
 - 不适合：typo 修复、极小的一行改动、纯说明类请求、泛化规划
 
-## What It Is Not For
+## 不适用场景
 
 - 不适合琐碎的一行改动
 - 不适合纯解释或纯讲解任务
@@ -31,44 +42,34 @@
 - 持有本应由 `skill-context-keeper` 维护的长期状态
 - 统筹整套长任务连续性套件
 
-## Install
+## 安装
 
-可通过本仓库中的标准发布路径安装 `skill-phase-gate`。
+安装 `skill-phase-gate` 时，请使用本仓库中的标准发布路径，并按你的工作流选择 release 或 ref。
 
 你也可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate。`
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用我指定的 release 或 ref。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用 ref v0.6.0。`
 
-如果你想直接运行 `skill-installer`，可使用：
+关于触发示例和提示词措辞，可查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-phase-gate
-```
+## 常用路径
 
-固定到本次连续性套件计划发布版本：
+可以先从下面三条路径开始：
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-phase-gate \
-  --ref v0.6.0
-```
+1. 在重构、迁移或高风险多文件改动前做 preflight。
+2. 在完成有分量的实现后做 postflight。
+3. 在提交前为重要改动增加一次有意识的检查点。
 
-## How To Use
+如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 
-在实现前后的关键检查点调用这个包。
-如果是 preflight，请说明当前目标、关键约束、预期会改动的文件、明确不改动的文件，以及验证计划；如果是 postflight，请让它记录实际改动、实际验证、剩余风险，以及是否建议交接。
+## 文档
 
-如果你还需要跨长线程保存持续状态，请继续使用 `skill-context-keeper`；这个包只负责当前这一道检查点。
-
-## References
-
-- `SKILL.md`：触发路由与包边界
-- [references/README.zh-CN.md](references/README.zh-CN.md)：面向读者的参考索引
-- [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)：适用与不适用示例
-- [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)：可直接粘贴的提示词模板
-- [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)：preflight 清单
-- [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)：postflight 清单
+- 触发路由与包边界：`SKILL.md`
+- 参考索引：[references/README.zh-CN.md](references/README.zh-CN.md)
+- 使用场景与触发示例：[references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
+- English use cases: [references/use-cases.md](references/use-cases.md)
+- 中文提示词模板：[references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- preflight 清单：[assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
+- postflight 清单：[assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)

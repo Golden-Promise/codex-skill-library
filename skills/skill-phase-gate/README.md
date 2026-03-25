@@ -7,6 +7,15 @@
 `skill-phase-gate` adds compact preflight and postflight checkpoints around meaningful coding work.
 It keeps risky execution intentional without taking over long-term task state, generic planning, or final handoffs.
 
+## Core Capabilities
+
+`skill-phase-gate` focuses on making high-value checkpoints crisp and repeatable.
+
+- define a preflight checkpoint around goal, constraints, scope, and verification
+- capture a postflight checkpoint around actual changes, validations, and remaining risks
+- make checkpoint use explicit for meaningful edits instead of every small action
+- leave long-term state to `skill-context-keeper` and handoffs to `skill-handoff-summary`
+
 ## Best For
 
 - preflight before a refactor, migration, or other multi-file change
@@ -14,7 +23,9 @@ It keeps risky execution intentional without taking over long-term task state, g
 - risky edits where expected files, explicit non-goals, and a verification plan should be clear
 - pre-commit checkpoints when the work deserves one more deliberate pass
 
-## Meaningful Checkpoint Bar
+If the value comes from pausing to confirm scope and validation, this package is the right fit.
+
+## Checkpoint Bar
 
 Use this package when the checkpoint itself is valuable:
 
@@ -33,42 +44,32 @@ Use this package when the checkpoint itself is valuable:
 
 ## Install
 
-Install `skill-phase-gate` from this repository with the standard package path for published Codex skills.
+To install `skill-phase-gate`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate.`
-- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using the release or ref I specify.`
+- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref v0.6.0.`
 
-Or run `skill-installer` directly:
+For direct trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-phase-gate
-```
+## Common Paths
 
-Pin the planned continuity-suite release:
+Start with one of these three paths:
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-phase-gate \
-  --ref v0.6.0
-```
+1. Run a preflight before a refactor, migration, or risky multi-file change.
+2. Run a postflight after meaningful implementation work.
+3. Add a deliberate pre-commit checkpoint when the change deserves one.
 
-## How To Use
+If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
-Use this package at a meaningful checkpoint before or after implementation work.
-Describe the current goal, the key constraints, the expected files, the files you are explicitly not changing, and the verification plan for a preflight gate, or ask for a postflight gate that records actual changes, validations, remaining risks, and whether handoff is recommended.
+## Documentation
 
-If you also need current task state to persist across a long-running thread, keep that state in `skill-context-keeper`; this package only frames the immediate checkpoint.
-
-## References
-
-- `SKILL.md` for trigger routing and package boundaries
-- [references/README.md](references/README.md) for the reader-facing reference index
-- [references/use-cases.md](references/use-cases.md) for positive and negative trigger examples
-- [references/prompt-templates.en.md](references/prompt-templates.en.md) for ready-to-paste prompts
-- [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md) for the preflight checklist
-- [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md) for the postflight checklist
+- Trigger routing and package boundary: `SKILL.md`
+- Reference index: [references/README.md](references/README.md)
+- Use cases and trigger examples: [references/use-cases.md](references/use-cases.md)
+- Chinese use cases: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
+- Prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- Preflight checklist: [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
+- Postflight checklist: [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)

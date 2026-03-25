@@ -4,10 +4,17 @@
 
 ## Overview
 
-`skill-context-keeper` is the narrow package for recovering and refreshing structured task state during a long coding thread.
-It helps the next turn start from the best known picture of the work without expanding into phase control or end-of-task handoff writing.
-This package maintains structured long-task state only.
-It assumes downstream state files can live at paths such as `.agent-state/TASK_STATE.md`, but it does not own workflow gating and it does not own final handoffs.
+`skill-context-keeper` is the focused package for recovering and refreshing structured task state during long-running coding work.
+It helps the next turn start from the best verified picture of the task without expanding into checkpoints, workflow control, or final handoff writing.
+
+## Core Capabilities
+
+`skill-context-keeper` is designed for one job: keeping ongoing task state trustworthy and resumable.
+
+- rebuild the current task picture from verified repository facts
+- keep facts, assumptions, decisions, risks, and next actions clearly separated
+- refresh compact downstream state files such as `.agent-state/TASK_STATE.md`
+- preserve just enough continuity for the next turn without turning into a full workflow package
 
 ## Best For
 
@@ -16,6 +23,8 @@ It assumes downstream state files can live at paths such as `.agent-state/TASK_S
 - refreshing open TODOs, assumptions, and recent changes in one place
 - reconciling what the thread believes with what the repository now shows
 
+If you are picking an entry point, start here when the main problem is stale or scattered task context.
+
 ## What It Is Not For
 
 - breaking a task into staged execution phases
@@ -23,56 +32,32 @@ It assumes downstream state files can live at paths such as `.agent-state/TASK_S
 - writing a final pause or transfer handoff for another agent
 - bootstrapping the full long-task continuity suite
 
-## Package Boundary
-
-Use this package when the task needs a current-state refresh.
-It is responsible for reconstructing verified codebase facts, preserving open issues, and updating a compact task-state artifact for downstream work.
-
-Keep the boundary narrow:
-
-- maintain structured state for an ongoing task
-- refresh or rewrite artifacts such as `.agent-state/TASK_STATE.md`
-- separate facts, assumptions, and decisions clearly
-
-This package does not run phase gates, does not own workflow gating, and does not own final handoffs.
-
 ## Install
 
-Install `skill-context-keeper` from this repository with the standard package path for published Codex skills.
+To install `skill-context-keeper`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper.`
-- `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper using the release or ref I specify.`
+- `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper using ref v0.6.0.`
 
-Or run `skill-installer` directly:
+For trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-context-keeper
-```
+## Common Paths
 
-Pin the planned continuity-suite release:
+Start with one of these three paths:
 
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-context-keeper \
-  --ref v0.6.0
-```
+1. Resume a paused task after the working picture has drifted.
+2. Refresh task state before more implementation work.
+3. Reconcile facts, open issues, and the next action in `.agent-state/TASK_STATE.md`.
 
-## How To Use
+If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
-Start when the task needs a reliable state refresh before execution continues.
-Describe what looks stale or missing, then ask the skill to reconstruct the current task picture, carry forward unresolved work, and keep the summary narrow to ongoing state.
-If you want a concrete downstream artifact, say so explicitly, for example: `Refresh the current task state and update .agent-state/TASK_STATE.md.`
+## Documentation
 
-## References
-
-- `SKILL.md` for trigger routing and package boundaries
-- [references/use-cases.md](references/use-cases.md) for positive and negative trigger examples
-- [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md) for Chinese trigger examples
-- [references/prompt-templates.en.md](references/prompt-templates.en.md) for reusable refresh prompts
-- [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md) for Chinese refresh prompts
-- [assets/TASK_STATE.template.md](assets/TASK_STATE.template.md) for the compact task-state artifact template
+- Trigger routing and package boundary: `SKILL.md`
+- Use cases and trigger examples: [references/use-cases.md](references/use-cases.md)
+- Chinese use cases: [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)
+- Prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
+- Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
+- Task-state template: [assets/TASK_STATE.template.md](assets/TASK_STATE.template.md)

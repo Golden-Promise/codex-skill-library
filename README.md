@@ -35,37 +35,9 @@ This repository is designed for people who want to:
 
 1. Open the package list in [skills/README.md](skills/README.md).
 2. Choose a skill and read its package `README.md`.
-3. Install the package you want with `skill-installer`, using either `main` or a tagged release.
+3. Follow the installation guidance in that package README.
 4. For the continuity workflow, start with `skill-task-continuity` when you need suite bootstrap or composition guidance, or install the narrower atomic package directly.
 5. Use the package reference pages for boundary notes now, and later for examples, prompts, and deeper guidance.
-
-## Install Examples
-
-Install the suite entry package from the repository default branch:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-task-continuity
-```
-
-Pin the upcoming continuity-suite release:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-task-continuity \
-  --ref v0.6.0
-```
-
-Install from a GitHub tree URL when you want the public package page directly:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-task-continuity
-```
-
-For maintainer smoke-test commands covering all four continuity packages, use [docs/publishing.md](docs/publishing.md).
 
 ## Reading Guide
 
@@ -103,4 +75,5 @@ codex-skill-library/
 
 Repository versioning, release flow, and validation steps are documented in [docs/publishing.md](docs/publishing.md).
 The continuity-suite release checklist lives in [docs/release-checklist-long-task-suite.md](docs/release-checklist-long-task-suite.md).
+Package-level install guidance stays in each package README.
 If you are publishing this repository for the first time, start with those maintainer docs instead of the package runtime docs.

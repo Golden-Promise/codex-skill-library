@@ -8,12 +8,21 @@
 It explains how the continuity packages fit together and ships a bootstrap helper that copies downstream templates into a consumer repository.
 It does not replace the atomic skills.
 
-## Package Role
+## Core Capabilities
 
-- explain the composition of `skill-context-keeper`, `skill-phase-gate`, and `skill-handoff-summary`
+`skill-task-continuity` focuses on composition and downstream setup.
+
+- explain how `skill-context-keeper`, `skill-phase-gate`, and `skill-handoff-summary` fit together
 - bootstrap downstream files such as `AGENTS.md` and `.agent-state/*.md`
 - route suite-shaped requests to the atomic package that owns the next action
-- keep the package boundary explicit: templates are for downstream consumers only
+- keep the public-package boundary explicit so templates remain downstream assets, not live repo-root runtime files
+
+## Best For
+
+- adopting the continuity workflow in a downstream repository for the first time
+- setting up downstream templates before long-running work starts
+- deciding which atomic package should own the next action
+- teaching maintainers or downstream users how the suite composes without blurring package boundaries
 
 ## What It Is Not For
 
@@ -24,46 +33,14 @@ It does not replace the atomic skills.
 
 ## Install
 
-Install `skill-task-continuity` from this repository with the standard package path for published Codex skills.
+To install `skill-task-continuity`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity.`
-- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using the release or ref I specify.`
+- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using ref v0.6.0.`
 
-Or run `skill-installer` directly:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-task-continuity
-```
-
-Pin the planned continuity-suite release:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-task-continuity \
-  --ref v0.6.0
-```
-
-## Bootstrap A Downstream Repo
-
-Preview the downstream file operations first:
-
-```bash
-python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run
-```
-
-Then copy the templates for real:
-
-```bash
-python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo
-```
-
-Use `--force` only when you intentionally want to overwrite an existing downstream file.
-The script requires an explicit `--target` and refuses to bootstrap inside this public skill library checkout.
+For downstream bootstrap walkthroughs and prompt wording, see [references/install-playbook.md](references/install-playbook.md).
 
 ## Recommended Downstream Layout
 
@@ -78,6 +55,17 @@ AGENTS.md
 
 `TASK_STATE.md` and `HANDOFF.md` are duplicated copies of the atomic package templates for downstream convenience.
 The atomic packages remain the source of truth for their behavior and wording.
+
+## Common Paths
+
+Start with one of these three paths:
+
+1. Bootstrap a downstream repository with `AGENTS.md` and `.agent-state/` templates.
+2. Read the composition guide and decide which atomic package owns the next action.
+3. Add thin repo-local wrappers only when a downstream repository truly needs them.
+
+The bootstrap helper requires an explicit target and refuses to bootstrap inside this public skill library checkout.
+Use `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` to preview changes, then rerun without `--dry-run` to apply them.
 
 ## How The Suite Composes
 
@@ -97,9 +85,11 @@ The recommended long-task loop is:
 Repo-local `.agents/skills/` wrappers or examples are optional.
 If you add them, keep them thin and point back to the atomic skills instead of replacing them.
 
-## References
+## Documentation
 
-- `SKILL.md` for trigger routing and package boundaries
-- [references/composition-guide.md](references/composition-guide.md) for suite composition and explicit invocation wording
-- [references/install-playbook.md](references/install-playbook.md) for a downstream bootstrap walkthrough
-- `assets/` for downstream-only templates copied by the bootstrap helper
+- Trigger routing and package boundary: `SKILL.md`
+- Composition guide: [references/composition-guide.md](references/composition-guide.md)
+- Chinese composition guide: [references/composition-guide.zh-CN.md](references/composition-guide.zh-CN.md)
+- Install playbook: [references/install-playbook.md](references/install-playbook.md)
+- Chinese install playbook: [references/install-playbook.zh-CN.md](references/install-playbook.zh-CN.md)
+- Downstream templates copied by the bootstrap helper: `assets/`
