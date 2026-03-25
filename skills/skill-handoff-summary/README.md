@@ -56,6 +56,13 @@ Start with one of these three paths:
 
 If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
+## Direct Codex Usage
+
+If you want to tell Codex exactly what to do, say:
+
+- `Use skill-handoff-summary to write a compact continuation-oriented handoff before we pause.`
+- `Use skill-handoff-summary to write .agent-state/HANDOFF.md with the exact next action and a reusable resume prompt.`
+
 ## Documentation
 
 - Trigger routing and package boundary: `SKILL.md`

@@ -63,6 +63,13 @@
 
 如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 
+## 直接告诉 Codex 怎么做
+
+如果你想直接用自然语言告诉 Codex，可以这样说：
+
+- `请用 skill-phase-gate 在这次高风险多文件修改前生成一个 preflight gate。`
+- `请用 skill-phase-gate 在我提交前为这次有分量的改动生成一个 postflight gate。`
+
 ## 文档
 
 - 触发路由与包边界：`SKILL.md`

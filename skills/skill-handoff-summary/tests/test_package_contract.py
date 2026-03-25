@@ -43,6 +43,14 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
         self.assertIn("not whole-project documentation", text)
         self.assertIn(".agent-state/handoff.md", text)
 
+    def test_readme_includes_direct_natural_language_usage(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+        self.assertIn("if you want to tell codex exactly what to do", text)
+        self.assertIn(
+            "use skill-handoff-summary to write a compact continuation-oriented handoff",
+            text,
+        )
+
     def test_bilingual_references_include_positive_and_negative_examples(self):
         english = (ROOT / "references" / "use-cases.md").read_text(encoding="utf-8")
         chinese = (ROOT / "references" / "use-cases.zh-CN.md").read_text(encoding="utf-8")

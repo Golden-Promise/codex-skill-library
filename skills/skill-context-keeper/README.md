@@ -59,6 +59,13 @@ Start with one of these three paths:
 
 If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
+## Direct Codex Usage
+
+If you want to tell Codex exactly what to do, say:
+
+- `Use skill-context-keeper to refresh the current task state from the repository before we continue.`
+- `Use skill-context-keeper to rebuild the last known task state and rewrite .agent-state/TASK_STATE.md.`
+
 ## Documentation
 
 - Trigger routing and package boundary: `SKILL.md`

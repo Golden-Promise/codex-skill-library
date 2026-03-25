@@ -49,6 +49,11 @@ class SkillPhaseGatePackageTests(unittest.TestCase):
         self.assertIn("not for trivial one-line edits", text)
         self.assertIn("not for pure explanation tasks", text)
 
+    def test_readme_includes_direct_natural_language_usage(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+        self.assertIn("if you want to tell codex exactly what to do", text)
+        self.assertIn("use skill-phase-gate to create a preflight gate", text)
+
 
 if __name__ == "__main__":
     unittest.main()

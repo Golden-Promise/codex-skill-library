@@ -53,6 +53,13 @@
 
 如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 
+## 直接告诉 Codex 怎么做
+
+如果你想直接用自然语言告诉 Codex，可以这样说：
+
+- `请用 skill-context-keeper 根据仓库现状刷新当前任务状态。`
+- `请用 skill-context-keeper 重建最近一次可信任务状态，并重写 .agent-state/TASK_STATE.md。`
+
 ## 文档
 
 - 触发路由与包边界：`SKILL.md`

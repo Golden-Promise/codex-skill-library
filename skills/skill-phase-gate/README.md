@@ -63,6 +63,13 @@ Start with one of these three paths:
 
 If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
 
+## Direct Codex Usage
+
+If you want to tell Codex exactly what to do, say:
+
+- `Use skill-phase-gate to create a preflight gate before this risky multi-file change.`
+- `Use skill-phase-gate to create a postflight gate for this meaningful edit before I commit.`
+
 ## Documentation
 
 - Trigger routing and package boundary: `SKILL.md`

@@ -55,6 +55,13 @@
 
 如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
 
+## 直接告诉 Codex 怎么做
+
+如果你想直接用自然语言告诉 Codex，可以这样说：
+
+- `请用 skill-handoff-summary 在暂停前写一个紧凑、面向续做的交接摘要。`
+- `请用 skill-handoff-summary 把交接写到 .agent-state/HANDOFF.md，并附上下一次会话可复用的 resume prompt。`
+
 ## 文档
 
 - 触发路由与包边界：`SKILL.md`

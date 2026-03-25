@@ -48,6 +48,11 @@ class ContextKeeperPackageTests(unittest.TestCase):
         self.assertIn("does not own workflow gating", text)
         self.assertIn("does not own final handoffs", text)
 
+    def test_readme_includes_direct_natural_language_usage(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+        self.assertIn("if you want to tell codex exactly what to do", text)
+        self.assertIn("use skill-context-keeper to refresh the current task state", text)
+
     def test_reference_indexes_point_to_published_files(self):
         english = (ROOT / "references" / "README.md").read_text(encoding="utf-8")
         chinese = (ROOT / "references" / "README.zh-CN.md").read_text(encoding="utf-8")
