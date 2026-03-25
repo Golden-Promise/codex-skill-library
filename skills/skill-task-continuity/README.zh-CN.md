@@ -33,12 +33,33 @@
 
 ## 安装
 
-安装 `skill-task-continuity` 时，请使用本仓库中的标准发布路径，并按你的工作流选择 release 或 ref。
+安装时可以走下面两条路径之一：
+
+- 只安装 `skill-task-continuity`，适合先获得套件入口说明和下游 bootstrap 能力
+- 用一条命令安装整套工具链，适合一开始就把 4 个连续性包全部装好
+
+安装 `skill-task-continuity` 本身不会自动把另外三个原子包一起装上。
+如果你想一次拿到 4 个包，应该显式使用“整套安装”的命令，而不是分别跑 4 次安装器。
 
 你也可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity，并使用 ref v0.6.1。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 一次安装整套长任务连续性工具链，包括 skills/skill-context-keeper、skills/skill-phase-gate、skills/skill-handoff-summary 和 skills/skill-task-continuity。`
+
+如果你想直接执行命令，可以用一条命令安装整套工具链：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path \
+    skills/skill-context-keeper \
+    skills/skill-phase-gate \
+    skills/skill-handoff-summary \
+    skills/skill-task-continuity
+```
+
+如果你要固定到当前发布版本，再补上 `--ref v0.6.1` 即可。
 
 关于下游启动流程和提示词措辞，可查看 [references/install-playbook.zh-CN.md](references/install-playbook.zh-CN.md)。
 
@@ -65,7 +86,12 @@ AGENTS.md
 3. 只有在下游仓库确实需要时，才补充轻量的 repo-local wrapper。
 
 启动脚本要求显式传入目标路径，并且会拒绝在这个公共技能库工作区内执行。
-你可以先运行 `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` 预览变更，再去掉 `--dry-run` 正式应用。
+
+如果你想直接用自然语言让 Codex 帮你完成初始化，可以这样说：
+
+- `请用 skill-task-continuity 把长任务连续性启动文件引导到 /path/to/downstream-repo。先预览文件操作，确认无误后再正式写入；除非我明确要求，否则不要覆盖已有文件。`
+
+如果你想自己精确执行命令，则可以先运行 `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` 预览变更，再去掉 `--dry-run` 正式应用。
 
 ## 套件如何组合
 

@@ -33,12 +33,33 @@ It does not replace the atomic skills.
 
 ## Install
 
-To install `skill-task-continuity`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
+Choose one of these install paths:
+
+- install only `skill-task-continuity` when you want the suite entry docs and downstream bootstrap helper first
+- install the full suite in one command when you want all four continuity packages available immediately
+
+Installing `skill-task-continuity` does not auto-install the three atomic packages.
+Use the full-suite install command when you want all four packages together without running four separate installer commands.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity.`
 - `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using ref v0.6.1.`
+- `Use skill-installer to install the full long-task continuity suite from Golden-Promise/codex-skill-library at skills/skill-context-keeper, skills/skill-phase-gate, skills/skill-handoff-summary, and skills/skill-task-continuity.`
+
+If you want the direct command for the full suite, install all four packages in one command:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path \
+    skills/skill-context-keeper \
+    skills/skill-phase-gate \
+    skills/skill-handoff-summary \
+    skills/skill-task-continuity
+```
+
+Add `--ref v0.6.1` when you want to pin the current published release.
 
 For downstream bootstrap walkthroughs and prompt wording, see [references/install-playbook.md](references/install-playbook.md).
 
@@ -65,7 +86,12 @@ Start with one of these three paths:
 3. Add thin repo-local wrappers only when a downstream repository truly needs them.
 
 The bootstrap helper requires an explicit target and refuses to bootstrap inside this public skill library checkout.
-Use `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` to preview changes, then rerun without `--dry-run` to apply them.
+
+If you want Codex to handle bootstrap in natural language, say:
+
+- `Use skill-task-continuity to bootstrap the long-task continuity starter files into /path/to/downstream-repo. Preview the file operations first, then apply them if the preview looks correct. Do not overwrite existing files unless I explicitly ask.`
+
+If you want exact CLI control instead, use `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` to preview changes, then rerun without `--dry-run` to apply them.
 
 ## How The Suite Composes
 

@@ -18,21 +18,47 @@ The bootstrap helper copies these templates into the downstream repo:
 
 ## Bootstrap Walkthrough
 
-1. Install or vendor this package into your tooling environment.
+1. Install either:
+   - just `skill-task-continuity` if you only need the suite entry point first
+   - the full long-task continuity suite if you want all four packages available immediately
 2. Pick the downstream repository root you want to prepare.
-3. Preview the file operations:
+3. Ask Codex directly when you want a natural-language bootstrap flow:
+
+```text
+Use skill-task-continuity to bootstrap the long-task continuity starter files into /path/to/downstream-repo.
+Preview the file operations first, then apply them if the preview looks correct.
+Do not overwrite existing files unless I explicitly ask.
+```
+
+4. If you want exact CLI control, preview the file operations:
 
 ```bash
 python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run
 ```
 
-4. Run the real bootstrap when the preview looks correct:
+5. Run the real bootstrap when the preview looks correct:
 
 ```bash
 python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo
 ```
 
-5. Re-run with `--force` only when you intentionally want to overwrite an existing downstream file.
+6. Re-run with `--force` only when you intentionally want to overwrite an existing downstream file.
+
+## Full-Suite Install In One Command
+
+If you want all four continuity packages in one command, use the existing multi-path support in `skill-installer`:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path \
+    skills/skill-context-keeper \
+    skills/skill-phase-gate \
+    skills/skill-handoff-summary \
+    skills/skill-task-continuity
+```
+
+Add `--ref v0.6.1` when you want the pinned release.
 
 ## Expected Downstream Layout
 

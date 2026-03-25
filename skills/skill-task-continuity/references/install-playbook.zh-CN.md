@@ -18,21 +18,47 @@
 
 ## 启动流程
 
-1. 先在你的工具环境中安装或引入这个组合包。
+1. 先决定安装方式：
+   - 只安装 `skill-task-continuity`，先拿到套件入口和 bootstrap 能力
+   - 一次安装整套连续性工具链，直接把 4 个包都装好
 2. 选定需要初始化的下游仓库根目录。
-3. 先用 dry run 预览文件操作：
+3. 如果你希望通过自然语言让 Codex 帮你完成初始化，可以直接这样对 Codex 说：
+
+```text
+请用 skill-task-continuity 把长任务连续性启动文件引导到 /path/to/downstream-repo。
+先预览文件操作，确认无误后再正式写入。
+除非我明确要求，否则不要覆盖已有文件。
+```
+
+4. 如果你想自己精确控制命令，再先用 dry run 预览文件操作：
 
 ```bash
 python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run
 ```
 
-4. 确认预览结果正确后，再执行真正的启动：
+5. 确认预览结果正确后，再执行真正的启动：
 
 ```bash
 python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo
 ```
 
-5. 只有在你明确要覆盖已有下游文件时，才加上 `--force`。
+6. 只有在你明确要覆盖已有下游文件时，才加上 `--force`。
+
+## 一条命令安装整套工具链
+
+如果你想把 4 个连续性包一次装好，可以直接利用 `skill-installer` 现有的多路径能力：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path \
+    skills/skill-context-keeper \
+    skills/skill-phase-gate \
+    skills/skill-handoff-summary \
+    skills/skill-task-continuity
+```
+
+如果你需要固定到当前发布版本，再补上 `--ref v0.6.1`。
 
 ## 期望的下游布局
 

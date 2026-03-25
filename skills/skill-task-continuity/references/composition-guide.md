@@ -10,6 +10,15 @@ Use it to explain how the pieces fit together and to bootstrap downstream files,
 - `skill-handoff-summary` writes the continuation-oriented handoff when work pauses or changes owners.
 
 The suite package exists so a downstream repository can install one entry point, learn the system from one place, and copy starter files into its own repo.
+If the team wants all four packages available immediately, the suite can also be installed together with the three atomic packages in one `skill-installer` command.
+
+## Install Choices
+
+- install `skill-task-continuity` only when you want the suite entry point first
+- install the full suite in one command when you want all four packages available right away
+
+The suite package stays explicit: it does not auto-install the atomic skills for you.
+Instead, it documents the existing multi-path `skill-installer` flow so users can choose one command without hidden side effects.
 
 ## Explicit Invocation Wording
 
