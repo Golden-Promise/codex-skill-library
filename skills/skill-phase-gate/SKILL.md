@@ -1,24 +1,46 @@
 ---
 name: skill-phase-gate
-description: Use when the user needs to decide whether an ongoing coding task should be split into explicit phases, checkpoints, or exit criteria before more execution continues.
+description: Use when a meaningful coding checkpoint is needed before or after risky execution, such as a multi-file refactor, migration, or pre-commit pause.
 ---
 
 # Skill Phase Gate
 
 ## Overview
 
-Add clear phase boundaries to multi-step coding work when the task should not be treated as a single uninterrupted run.
-Use this skill for staged execution decisions, not for state refresh or pause handoffs.
+Use `skill-phase-gate` to add a compact preflight or postflight checkpoint around meaningful coding work.
+It is for operational checkpoints before or after execution, not for task-state ownership, generic planning, or final handoff writing.
 
 ## Use This Skill When
 
-- a task needs explicit phases before coding or migration work continues
-- the next step depends on checkpoints, review gates, or exit criteria
-- a thread is drifting into ad hoc execution and needs deliberate structure
-- you need to decide whether the work is large enough to stage at all
+- you are about to start a refactor, migration, or multi-file change and want a brief preflight gate
+- you have finished a meaningful edit and need a postflight checkpoint before commit or handoff
+- the task is risky enough that expected files, explicit non-goals, and a verification plan should be stated out loud
+- you want a pre-commit checkpoint for work that is substantial enough to deserve one more deliberate review pass
+
+## Do Not Use This Skill When
+
+- the request is a typo fix, tiny one-line edit, or similarly trivial change
+- the user only wants an explanation, walkthrough, or analysis with no checkpoint artifact
+- the main need is reconstructing current task state or preserving long-running state ownership
+- the main need is generating a full transfer packet or final handoff summary
+
+## Meaningful Checkpoint Bar
+
+This package is a good fit when the checkpoint serves a meaningful workflow boundary:
+
+- good fit: refactors, multi-file changes, risky edits, migration checkpoints, or pre-commit review passes
+- bad fit: typo fixes, tiny one-line changes, pure explanation tasks, or generic up-front planning
+
+## Package Boundary
+
+- `skill-phase-gate` can mention current task state only to support the immediate checkpoint
+- `skill-context-keeper` remains the owner of structured ongoing state and refreshes
+- this package does not replace planning packages, and it does not become a handoff generator
 
 ## References
 
-- `README.md` and `README.zh-CN.md`: package overview and usage guidance
-- `references/`: future public examples for phase splits, checkpoints, and gate prompts
-- `assets/`: future templates for phase plans, checkpoint lists, and exit criteria
+- `README.md` and `README.zh-CN.md`: install guidance, trigger boundaries, and non-goals
+- `assets/PREFLIGHT.template.md`: compact pre-execution gate
+- `assets/POSTFLIGHT.template.md`: compact post-execution gate
+- `references/use-cases.md` and `references/use-cases.zh-CN.md`: reader-facing positive and negative examples
+- `references/prompt-templates.en.md` and `references/prompt-templates.zh-CN.md`: ready-to-paste prompt patterns

@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Phase Gate"
-  short_description: "Add explicit phases, checkpoints, and exit criteria to long coding tasks"
-  default_prompt: "Use $skill-phase-gate when the task should be staged before more execution continues: decide whether the work needs explicit phases, define checkpoints and exit criteria, and keep the output focused on workflow boundaries rather than context refresh or handoff notes."
+  short_description: "Add meaningful preflight or postflight checkpoints to substantial coding work"
+  default_prompt: "Use $skill-phase-gate when the task needs a meaningful checkpoint before or after execution. Start from the task at hand, choose either a compact preflight or postflight gate, keep the output checklist-oriented, and avoid using this package for trivial one-line edits, pure explanation requests, long-term state ownership, or final handoff generation."
