@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Context Keeper"
-  short_description: "Refresh and reconstruct long-task state without taking over phase control or handoff writing"
-  default_prompt: "Use $skill-context-keeper when the task needs a reliable long-thread state refresh: reconstruct the current context, carry forward unresolved work, and keep the output focused on ongoing task state rather than phase gates or final handoff notes."
+  short_description: "Maintain structured long-task state without taking over workflow gates or final handoffs"
+  default_prompt: "Use $skill-context-keeper when the task needs a reliable long-thread state refresh: reconstruct the current context, keep facts separate from assumptions and decisions, update a downstream artifact such as .agent-state/TASK_STATE.md when requested, and keep the output focused on ongoing task state rather than phase gates or final handoff notes."
