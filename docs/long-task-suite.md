@@ -24,6 +24,8 @@ Handoff friction appears when a pause or transfer leaves too little signal for t
 
 The suite uses these distinctions to decide which package should trigger and which one should stay out of the way.
 
+The evaluation matrix uses normalized artifact paths and event tokens so the runner can validate results consistently.
+
 ## Package Map
 
 | Package | Responsibility | Trigger Shape |
@@ -76,14 +78,14 @@ The seed matrix lives in `evals/cases.csv`. The table below shows the initial co
 
 | Case | Package | Trigger | Prompt Shape | Expected Artifacts | Expected Events |
 | --- | --- | --- | --- | --- | --- |
-| `context_resume` | `skill-context-keeper` | Yes | Resume the last known state and carry forward unresolved work. | State snapshot, continuity note, or refreshed context summary. | Reload prior state, rebuild active facts, emit continuity summary. |
-| `context_resume_not_needed` | `skill-context-keeper` | No | Answer a one-off question with no continuity risk. | None. | Direct answer only; no state reload. |
-| `phase_gate_before_multi_step` | `skill-phase-gate` | Yes | Split a multi-step task into phases before coding starts. | Phase plan, checkpoint list, stop/go criteria. | Create phase boundaries and checkpoints. |
-| `tiny_edit_not_gate` | `skill-phase-gate` | No | Make a tiny local edit with no staged workflow. | None. | Skip gating for the small change. |
-| `handoff_before_pause` | `skill-handoff-summary` | Yes | Pause work and hand it to another agent. | Handoff summary, blockers, next actions. | Capture transfer state and mark the pause point. |
-| `handoff_not_needed` | `skill-handoff-summary` | No | Give a final answer without transfer notes. | None. | No handoff workflow event. |
-| `suite_bootstrap` | `skill-task-continuity` | Yes | Coordinate the long-task suite across the atomic packages. | Suite spec, package map, evaluation matrix. | Bootstrap downstream guidance and align package boundaries. |
-| `suite_boundary_clean` | `skill-task-continuity` | No | A trivial edit that merely mentions all the keywords. | None. | Do not promote a keyword match into suite orchestration. |
+| `context_resume` | `skill-context-keeper` | Yes | Resume the last known state and carry forward unresolved work. | `state/context.snapshot`, `state/continuity.note` | `context:reload`, `context:reconstruct`, `context:summary` |
+| `context_resume_not_needed` | `skill-context-keeper` | No | Answer a one-off question with no continuity risk. | `none` | `context:skip`, `direct:answer` |
+| `phase_gate_before_multi_step` | `skill-phase-gate` | Yes | Split a multi-step task into phases before coding starts. | `plan/phase.plan`, `plan/checkpoints.md`, `plan/exit-criteria.md` | `phase:split`, `phase:checkpoint`, `phase:gate` |
+| `tiny_edit_not_gate` | `skill-phase-gate` | No | Make a tiny local edit with no staged workflow. | `none` | `phase:skip`, `direct:edit` |
+| `handoff_before_pause` | `skill-handoff-summary` | Yes | Pause work and hand it to another agent. | `handoff/HANDOFF.md`, `handoff/blockers.md`, `handoff/next-steps.md` | `handoff:capture`, `handoff:pause`, `handoff:transfer` |
+| `handoff_not_needed` | `skill-handoff-summary` | No | Give a final answer without transfer notes. | `none` | `handoff:skip`, `direct:answer` |
+| `suite_bootstrap` | `skill-task-continuity` | Yes | Coordinate the long-task suite across the atomic packages. | `AGENTS.md`, `.agent-state/TASK_STATE.md`, `.agent-state/HANDOFF.md` | `bootstrap:agents_md`, `bootstrap:task_state`, `bootstrap:handoff` |
+| `suite_boundary_clean` | `skill-task-continuity` | No | A trivial edit that merely mentions all the keywords. | `none` | `bootstrap:skip`, `direct:edit` |
 
 ## Phase Plan
 

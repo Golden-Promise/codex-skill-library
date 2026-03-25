@@ -24,6 +24,8 @@
 
 这个套件就是用这三种差异来决定：哪些包应该触发，哪些包不该被卷进来。
 
+评估矩阵里的产物和事件都使用了规范化的路径和值，这样后续执行器就能稳定校验，而不是依赖自然语言猜测。
+
 ## 包结构图
 
 | 包 | 职责 | 触发形态 |
@@ -76,14 +78,14 @@
 
 | 用例 | 包 | 是否触发 | 提示形态 | 期望产物 | 期望事件 |
 | --- | --- | --- | --- | --- | --- |
-| `context_resume` | `skill-context-keeper` | 是 | 恢复最后已知状态，并把未完成工作带下去。 | 状态快照、连续性说明、或刷新后的上下文摘要。 | 重新载入旧状态、重建活动事实、输出连续性摘要。 |
-| `context_resume_not_needed` | `skill-context-keeper` | 否 | 回答一个一次性问题，没有连续性风险。 | 无。 | 直接回答，不重载状态。 |
-| `phase_gate_before_multi_step` | `skill-phase-gate` | 是 | 在开始编码前先把多步骤任务拆成阶段。 | 阶段计划、检查点列表、停/走标准。 | 创建阶段边界并定义检查点。 |
-| `tiny_edit_not_gate` | `skill-phase-gate` | 否 | 只做一个很小的本地修改，不需要分阶段。 | 无。 | 对小改动跳过门控。 |
-| `handoff_before_pause` | `skill-handoff-summary` | 是 | 暂停工作并交给另一个执行者。 | 交接摘要、阻塞点、下一步。 | 记录转交状态并标记暂停点。 |
-| `handoff_not_needed` | `skill-handoff-summary` | 否 | 直接给最终答案，不需要转交说明。 | 无。 | 不产生交接事件。 |
-| `suite_bootstrap` | `skill-task-continuity` | 是 | 协调长任务套件，让三个原子包一起工作。 | 套件规范、包结构图、评估矩阵。 | 启动下游指导并对齐包边界。 |
-| `suite_boundary_clean` | `skill-task-continuity` | 否 | 一个很小的编辑，只是碰巧提到了所有关键词。 | 无。 | 不要把关键词命中升级成套件编排。 |
+| `context_resume` | `skill-context-keeper` | 是 | 恢复最后已知状态，并把未完成工作带下去。 | `state/context.snapshot`、`state/continuity.note` | `context:reload`、`context:reconstruct`、`context:summary` |
+| `context_resume_not_needed` | `skill-context-keeper` | 否 | 回答一个一次性问题，没有连续性风险。 | `none` | `context:skip`、`direct:answer` |
+| `phase_gate_before_multi_step` | `skill-phase-gate` | 是 | 在开始编码前先把多步骤任务拆成阶段。 | `plan/phase.plan`、`plan/checkpoints.md`、`plan/exit-criteria.md` | `phase:split`、`phase:checkpoint`、`phase:gate` |
+| `tiny_edit_not_gate` | `skill-phase-gate` | 否 | 只做一个很小的本地修改，不需要分阶段。 | `none` | `phase:skip`、`direct:edit` |
+| `handoff_before_pause` | `skill-handoff-summary` | 是 | 暂停工作并交给另一个执行者。 | `handoff/HANDOFF.md`、`handoff/blockers.md`、`handoff/next-steps.md` | `handoff:capture`、`handoff:pause`、`handoff:transfer` |
+| `handoff_not_needed` | `skill-handoff-summary` | 否 | 直接给最终答案，不需要转交说明。 | `none` | `handoff:skip`、`direct:answer` |
+| `suite_bootstrap` | `skill-task-continuity` | 是 | 协调长任务套件，让三个原子包一起工作。 | `AGENTS.md`、`.agent-state/TASK_STATE.md`、`.agent-state/HANDOFF.md` | `bootstrap:agents_md`、`bootstrap:task_state`、`bootstrap:handoff` |
+| `suite_boundary_clean` | `skill-task-continuity` | 否 | 一个很小的编辑，只是碰巧提到了所有关键词。 | `none` | `bootstrap:skip`、`direct:edit` |
 
 ## 阶段计划
 
