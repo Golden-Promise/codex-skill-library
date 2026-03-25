@@ -90,14 +90,14 @@ class BootstrapSuiteTests(unittest.TestCase):
     def test_task_state_and_handoff_templates_match_atomic_assets(self):
         suite_task_state = ROOT / "assets" / "agent-state" / "TASK_STATE.template.md"
         atomic_task_state = (
-            ROOT.parents[1]
+            ROOT.parents[0]
             / "skill-context-keeper"
             / "assets"
             / "TASK_STATE.template.md"
         )
         suite_handoff = ROOT / "assets" / "agent-state" / "HANDOFF.template.md"
         atomic_handoff = (
-            ROOT.parents[1]
+            ROOT.parents[0]
             / "skill-handoff-summary"
             / "assets"
             / "HANDOFF.template.md"
