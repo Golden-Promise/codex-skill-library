@@ -40,6 +40,8 @@ python3 evals/run_evals.py
 python3 -m unittest discover -s evals -p 'test_*.py' -v
 ```
 
+套件运行器现在除了仓库形状检查之外，还会按提示词正负向、事件命名空间和严格产物映射来评分。
+
 ## 版本规则
 
 - 使用仓库级 tag，例如 `v0.1.0`、`v0.2.0`、`v1.0.0`
@@ -68,5 +70,5 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - 仓库级说明放在根目录 `README.md` 和 `docs/`
 - 运行时说明保留在具体 skill 包内部
-- 静态套件校验放在 `evals/`，方便维护者在不运行模型的情况下验证触发覆盖和包边界
+- 静态套件校验放在 `evals/`，方便维护者在不运行模型的情况下验证触发覆盖、包边界、事件命名空间和产物映射
 - 如果仓库面向公开分享，关键说明建议提供中英文两个版本

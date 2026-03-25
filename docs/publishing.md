@@ -40,6 +40,8 @@ python3 evals/run_evals.py
 python3 -m unittest discover -s evals -p 'test_*.py' -v
 ```
 
+The suite runner now scores prompt polarity, event namespaces, and strict artifact mapping in addition to repository shape checks.
+
 ## Versioning Rules
 
 - Use repository-level tags such as `v0.1.0`, `v0.2.0`, and `v1.0.0`.
@@ -68,5 +70,5 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - Keep repository-wide guidance in the root `README.md` and `docs/`.
 - Keep runtime guidance inside the skill package itself.
-- Keep static suite checks in `evals/` so maintainers can validate trigger coverage and package boundaries without executing a model.
+- Keep static suite checks in `evals/` so maintainers can validate trigger coverage, package boundaries, event namespaces, and artifact mapping without executing a model.
 - Prefer bilingual key docs when the repository is meant for public sharing.

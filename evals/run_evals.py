@@ -46,15 +46,21 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "references/prompt-templates.zh-CN.md",
             "assets/TASK_STATE.template.md",
         ],
-        "routing_phrases": [
+        "trigger_cues": [
             "use this skill when",
             "resuming a task",
+            "resume from the last known state",
+            "refresh state",
             "rebuilding the last known task state",
-            "updating a downstream state file such as `.agent-state/task_state.md`",
+            "carry forward unresolved todo",
+            "carry forward unresolved todos",
+            "update .agent-state/task_state.md",
         ],
-        "boundary_phrases": [
-            "do not run phase gates",
-            "do not generate final handoffs",
+        "suppress_cues": [
+            "one-off",
+            "do nothing else",
+            "just answer",
+            "punctuation question",
             "does not own workflow gating",
             "does not own final handoffs",
         ],
@@ -62,6 +68,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "state/context.snapshot": "assets/TASK_STATE.template.md",
             "state/continuity.note": "assets/TASK_STATE.template.md",
         },
+        "positive_event_prefixes": ["context:"],
+        "negative_event_prefixes": ["context:skip", "direct:answer"],
         "workflow_files": [
             "references/use-cases.md",
             "references/use-cases.zh-CN.md",
@@ -83,14 +91,22 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "assets/PREFLIGHT.template.md",
             "assets/POSTFLIGHT.template.md",
         ],
-        "routing_phrases": [
+        "trigger_cues": [
             "meaningful coding checkpoint",
-            "preflight or postflight",
-            "meaningful checkpoint bar",
+            "preflight",
+            "postflight",
+            "split",
+            "phases",
+            "multi-step",
+            "refactor",
+            "before coding",
             "use this skill when",
         ],
-        "boundary_phrases": [
+        "suppress_cues": [
             "not for trivial one-line edits",
+            "tiny edit",
+            "rename this heading",
+            "one-line change",
             "not for pure explanation tasks",
             "does not replace planning packages",
             "does not become a handoff generator",
@@ -100,6 +116,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "plan/checkpoints.md": "assets/PREFLIGHT.template.md",
             "plan/exit-criteria.md": "assets/POSTFLIGHT.template.md",
         },
+        "positive_event_prefixes": ["phase:"],
+        "negative_event_prefixes": ["phase:skip", "direct:edit"],
         "workflow_files": [
             "references/README.md",
             "references/README.zh-CN.md",
@@ -122,13 +140,20 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "references/prompt-templates.zh-CN.md",
             "assets/HANDOFF.template.md",
         ],
-        "routing_phrases": [
+        "trigger_cues": [
             "continuation-oriented",
             "handoff",
+            "write a handoff",
+            "pause",
+            "transfer",
             "use this skill when",
             "writing or refreshing a compact artifact such as `.agent-state/handoff.md`",
         ],
-        "boundary_phrases": [
+        "suppress_cues": [
+            "final answer",
+            "no handoff",
+            "just give me",
+            "do nothing else",
             "does not own long-term state",
             "does not own workflow gating",
             "not a full-project documentation",
@@ -139,6 +164,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "handoff/blockers.md": "assets/HANDOFF.template.md",
             "handoff/next-steps.md": "assets/HANDOFF.template.md",
         },
+        "positive_event_prefixes": ["handoff:"],
+        "negative_event_prefixes": ["handoff:skip", "direct:answer"],
         "workflow_files": [
             "references/README.md",
             "references/README.zh-CN.md",
@@ -160,16 +187,20 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "assets/agent-state/DECISIONS.template.md",
             "assets/agent-state/RUN_LOG.template.md",
         ],
-        "routing_phrases": [
+        "trigger_cues": [
             "bootstrapping the long-task continuity suite",
+            "continuity suite",
+            "set up the long-task continuity suite",
+            "coordinate",
             "deciding which atomic package should trigger first",
             "composition boundary",
             "use this skill when",
         ],
-        "boundary_phrases": [
-            "does not replace the three atomic skills",
+        "suppress_cues": [
+            "one-line readme fix",
+            "trivial edit",
             "do not use this package to mutate the public library root into a consumer repo",
-            "downstream templates",
+            "does not replace the three atomic skills",
             "route suite-shaped requests to the atomic package",
         ],
         "artifact_map": {
@@ -177,6 +208,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
             ".agent-state/HANDOFF.md": "assets/agent-state/HANDOFF.template.md",
         },
+        "positive_event_prefixes": ["bootstrap:"],
+        "negative_event_prefixes": ["bootstrap:skip", "direct:edit"],
         "workflow_files": [
             "references/composition-guide.md",
             "references/install-playbook.md",
@@ -256,19 +289,119 @@ def _check_required_files(package_root: Path, required_files: list[str]) -> list
     return missing
 
 
-def _contains_any(text: str, phrases: list[str]) -> bool:
+def _matched_phrases(text: str, phrases: list[str]) -> list[str]:
     normalized = _normalize_text(text)
-    return any(phrase in normalized for phrase in phrases)
+    return [phrase for phrase in phrases if phrase in normalized]
 
 
-def _artifact_targets(case: EvalCase, package_rules: dict[str, Any]) -> list[Path]:
+def _artifact_targets(case: EvalCase, package_rules: dict[str, Any]) -> tuple[list[Path], list[str]]:
     artifact_map: dict[str, str] = package_rules["artifact_map"]
     targets = []
+    unmapped = []
     for artifact in case.expected_artifacts:
         mapped = artifact_map.get(artifact)
         if mapped is not None:
             targets.append(mapped)
-    return [Path(target) for target in targets]
+        else:
+            unmapped.append(artifact)
+    return [Path(target) for target in targets], unmapped
+
+
+def _score_routing(case: EvalCase, package_rules: dict[str, Any]) -> dict[str, Any]:
+    trigger_hits = _matched_phrases(case.user_prompt, package_rules["trigger_cues"])
+    suppress_hits = _matched_phrases(case.user_prompt, package_rules["suppress_cues"])
+
+    if case.should_trigger:
+        status = "pass" if trigger_hits and not suppress_hits else "fail"
+        if status == "pass":
+            reason = f"trigger cues matched: {', '.join(trigger_hits)}"
+        else:
+            reason = (
+                "missing trigger cues or conflicting suppress cues: "
+                f"trigger={trigger_hits or ['none']}, suppress={suppress_hits or ['none']}"
+            )
+    else:
+        status = "pass" if suppress_hits else "fail"
+        if status == "pass":
+            reason = f"suppress cues matched: {', '.join(suppress_hits)}"
+        else:
+            reason = "missing suppress cues for a should-not-trigger case"
+
+    return {
+        "status": status,
+        "reason": reason,
+        "trigger_hits": trigger_hits,
+        "suppress_hits": suppress_hits,
+    }
+
+
+def _score_events(case: EvalCase, package_rules: dict[str, Any]) -> dict[str, Any]:
+    allowed_prefixes = (
+        package_rules["positive_event_prefixes"]
+        if case.should_trigger
+        else package_rules["negative_event_prefixes"]
+    )
+    matching = []
+    mismatched = []
+    for event in case.expected_events:
+        if any(event.startswith(prefix) for prefix in allowed_prefixes):
+            matching.append(event)
+        else:
+            mismatched.append(event)
+
+    if not case.expected_events:
+        status = "fail"
+        reason = "expected events were not provided"
+    elif mismatched:
+        status = "fail"
+        reason = (
+            "event tokens do not match the expected namespace: "
+            f"allowed={allowed_prefixes}, mismatched={mismatched}"
+        )
+    else:
+        status = "pass"
+        reason = f"event namespace matched: {', '.join(matching)}"
+
+    return {
+        "status": status,
+        "reason": reason,
+        "matching": matching,
+        "mismatched": mismatched,
+    }
+
+
+def _score_docs(package_root: Path, package_rules: dict[str, Any]) -> dict[str, Any]:
+    missing_files = _check_required_files(package_root, package_rules["required_files"])
+    missing_workflow_docs = _check_required_files(package_root, package_rules["workflow_files"])
+    boundary_sources = (
+        _read_text(package_root / "README.md")
+        + "\n"
+        + _read_text(package_root / "README.zh-CN.md")
+        + "\n"
+        + _read_text(package_root / "SKILL.md")
+    )
+    boundary_hits = _matched_phrases(boundary_sources, package_rules["suppress_cues"])
+
+    if missing_files:
+        status = "fail"
+        reason = f"missing required files: {', '.join(missing_files)}"
+    elif missing_workflow_docs:
+        status = "fail"
+        reason = f"missing workflow docs: {', '.join(missing_workflow_docs)}"
+    elif not boundary_hits:
+        status = "fail"
+        reason = "missing boundary language in README and SKILL docs"
+    else:
+        status = "pass"
+        reason = "required docs, workflow docs, and boundary language are present"
+
+    return {
+        "status": status,
+        "reason": reason,
+        "missing_files": missing_files,
+        "missing_workflow_docs": missing_workflow_docs,
+        "boundary_hits": boundary_hits,
+    }
 
 
 def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
@@ -291,27 +424,16 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
         result["details"]["unknown_package"] = case.package
         return result
 
-    missing_files = _check_required_files(package_root, package_rules["required_files"])
-    if missing_files:
-        docs_status = "fail"
-        docs_reason = f"missing required files: {', '.join(missing_files)}"
-    else:
-        docs_status = "pass"
-        docs_reason = "required docs and assets are present"
+    routing = _score_routing(case, package_rules)
+    events = _score_events(case, package_rules)
+    docs = _score_docs(package_root, package_rules)
 
-    sk_text = _read_text(package_root / "SKILL.md")
-    readme_text = _read_text(package_root / "README.md")
-    readme_zh_text = _read_text(package_root / "README.zh-CN.md")
-    routing_status = "pass" if _contains_any(sk_text + "\n" + readme_text, package_rules["routing_phrases"]) else "fail"
-    routing_reason = "routing hints present" if routing_status == "pass" else "missing routing hints"
-
-    boundary_sources = readme_text + "\n" + readme_zh_text + "\n" + sk_text
-    workflow_status = "pass" if _contains_any(boundary_sources, package_rules["boundary_phrases"]) else "fail"
-    workflow_reason = "workflow and boundary language present" if workflow_status == "pass" else "missing workflow boundary language"
-
-    artifact_targets = [package_root / target for target in _artifact_targets(case, package_rules)]
-    artifact_missing = [str(path.relative_to(package_root)) for path in artifact_targets if not path.exists()]
-    if artifact_missing:
+    artifact_targets, unmapped_artifacts = _artifact_targets(case, package_rules)
+    artifact_missing = [str((package_root / path).relative_to(package_root)) for path in artifact_targets if not (package_root / path).exists()]
+    if unmapped_artifacts:
+        artifact_status = "fail"
+        artifact_reason = f"unmapped expected artifacts: {', '.join(unmapped_artifacts)}"
+    elif artifact_missing:
         artifact_status = "fail"
         artifact_reason = f"missing mapped artifacts: {', '.join(artifact_missing)}"
     else:
@@ -326,17 +448,29 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
         guardrail_reason = "optional guardrails parsed"
 
     result["dimensions"] = {
-        "routing_quality": {"status": routing_status, "reason": routing_reason},
+        "routing_quality": {
+            "status": routing["status"],
+            "reason": routing["reason"],
+        },
         "artifact_presence": {"status": artifact_status, "reason": artifact_reason},
-        "workflow_completeness": {"status": workflow_status, "reason": workflow_reason},
-        "docs_clarity": {"status": docs_status, "reason": docs_reason},
+        "workflow_completeness": {
+            "status": events["status"],
+            "reason": events["reason"],
+        },
+        "docs_clarity": {"status": docs["status"], "reason": docs["reason"]},
         "guardrails": {"status": guardrail_status, "reason": guardrail_reason},
     }
 
     result["details"] = {
         "required_files": package_rules["required_files"],
+        "workflow_files": package_rules["workflow_files"],
         "expected_events": list(case.expected_events),
         "expected_artifacts": list(case.expected_artifacts),
+        "trigger_hits": routing["trigger_hits"],
+        "suppress_hits": routing["suppress_hits"],
+        "matching_events": events["matching"],
+        "mismatched_events": events["mismatched"],
+        "unmapped_artifacts": unmapped_artifacts,
     }
     return result
 
