@@ -2,6 +2,14 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [0.5.1] - 2026-03-25
+
+### Changed
+
+- Polish the published `skill-governance` docs so the package README reads more like a GitHub landing page, the `use-cases` pages read more like command references, and runtime metadata stays aligned with the public package voice.
+- Add natural-language install examples to the package README for both the latest install path and a pinned `ref`.
+- Add missing `upgrade` and `retire` command examples to the reference pages and tighten prompt-template naming across the package docs.
+
 ## [0.5.0] - 2026-03-24
 
 ### Added

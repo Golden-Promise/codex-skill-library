@@ -34,6 +34,11 @@ If you are starting fresh, begin with project takeover, project setup, or a pre-
 
 To install `skill-governance`, use the standard package path in your Codex workspace, then choose the release or ref that fits your workflow.
 
+You can ask Codex in natural language:
+
+- `Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.`
+- `Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.5.1.`
+
 For command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
 
 ## Common Paths
