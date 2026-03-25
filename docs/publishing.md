@@ -33,6 +33,13 @@ python3 scripts/manage_skill.py --validate-only
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
+Long-task continuity suite validation:
+
+```bash
+python3 evals/run_evals.py
+python3 -m unittest discover -s evals -p 'test_*.py' -v
+```
+
 ## Versioning Rules
 
 - Use repository-level tags such as `v0.1.0`, `v0.2.0`, and `v1.0.0`.
@@ -61,4 +68,5 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 
 - Keep repository-wide guidance in the root `README.md` and `docs/`.
 - Keep runtime guidance inside the skill package itself.
+- Keep static suite checks in `evals/` so maintainers can validate trigger coverage and package boundaries without executing a model.
 - Prefer bilingual key docs when the repository is meant for public sharing.
