@@ -38,5 +38,5 @@ Describe what looks stale or missing, then ask the skill to reconstruct the curr
 ## References
 
 - `SKILL.md` for trigger routing and package boundaries
-- `references/` for future public examples and prompt patterns
+- [references/README.md](references/README.md) for the package boundary and the planned reader-facing reference scope
 - `assets/` for future state snapshot and continuity note templates

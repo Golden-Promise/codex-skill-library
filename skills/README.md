@@ -8,7 +8,7 @@ This directory contains the installable skill packages published by `codex-skill
 
 1. Scan the table below to find the skill that matches your task.
 2. Open the package README in your preferred language.
-3. Use the package references when you need examples or prompt wording.
+3. Use the package reference pages for boundary notes now, and later for examples or prompt wording.
 
 ## Published Packages
 

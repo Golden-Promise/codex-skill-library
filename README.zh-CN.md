@@ -36,7 +36,7 @@
 1. 先看 [skills/README.zh-CN.md](skills/README.zh-CN.md) 浏览当前可用 skill。
 2. 进入具体 skill 包的 `README.md` 了解它是否适合你的场景。
 3. 使用 `skill-installer` 进行安装，通常直接安装到默认的 Codex 共享库。
-4. 需要更详细示例时，继续阅读该包下的 `references/`。
+4. 现在可先阅读该包下的参考页了解边界说明，后续阶段再继续使用其中补充的示例与提示词资料。
 
 ## 安装示例
 

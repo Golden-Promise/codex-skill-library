@@ -36,7 +36,7 @@ This repository is designed for people who want to:
 1. Open the package list in [skills/README.md](skills/README.md).
 2. Choose a skill and read its package `README.md`.
 3. Install it with `skill-installer`, usually into the default Codex shared library.
-4. Use the package references for examples, prompts, and deeper guidance.
+4. Use the package reference pages for boundary notes now, and later for examples, prompts, and deeper guidance.
 
 ## Install Example
 

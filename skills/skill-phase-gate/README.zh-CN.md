@@ -38,5 +38,5 @@
 ## References
 
 - `SKILL.md`：触发路由与包边界
-- `references/`：后续面向读者的示例与提示词模式
+- [references/README.zh-CN.md](references/README.zh-CN.md)：包边界说明，以及后续面向读者参考资料的范围
 - `assets/`：后续的阶段计划、检查点和退出条件模板

@@ -38,5 +38,5 @@ Describe which continuity problems are in play, which atomic packages are expect
 ## References
 
 - `SKILL.md` for trigger routing and package boundaries
-- `references/` for future public examples and prompt patterns
+- [references/README.md](references/README.md) for the package boundary and the planned reader-facing reference scope
 - `assets/` for future suite bootstrap and coordination templates
