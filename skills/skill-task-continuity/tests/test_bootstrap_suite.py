@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "bootstrap_suite.py"
 LIBRARY_ROOT = ROOT.parents[1]
-REPO_ROOT = ROOT.parents[2]
+REPO_ROOT = ROOT.parents[1]
 TEMPLATE_MAP = {
     "AGENTS.md": "assets/AGENTS.repo-template.md",
     ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
