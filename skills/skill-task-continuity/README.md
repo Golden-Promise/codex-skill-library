@@ -4,112 +4,80 @@
 
 ## Overview
 
-`skill-task-continuity` is the suite entry point for long-task continuity.
-It explains how the continuity packages fit together and ships a bootstrap helper that copies downstream templates into a consumer repository.
-It does not replace the atomic skills.
+`skill-task-continuity` is the beginner entry package for the long-task continuity suite.
+Start here if you are setting up the continuity workflow in a project for the first time.
 
-## Core Capabilities
+## Start Here In 30 Seconds
 
-`skill-task-continuity` focuses on composition and downstream setup.
+- Use this when: you want to set up the continuity workflow in a repo, understand the suite, or decide which continuity skill to use next.
+- You'll get: starter files for a downstream repo, a simple long-task loop, and a clear route to the atomic skills.
+- Typical output: a downstream `AGENTS.md` plus `.agent-state/` starter files.
 
-- explain how `skill-context-keeper`, `skill-phase-gate`, and `skill-handoff-summary` fit together
-- bootstrap downstream files such as `AGENTS.md` and `.agent-state/*.md`
-- route suite-shaped requests to the atomic package that owns the next action
-- keep the public-package boundary explicit so templates remain downstream assets, not live repo-root runtime files
+If you want to tell Codex exactly what to do:
 
-## Best For
-
-- adopting the continuity workflow in a downstream repository for the first time
-- setting up downstream templates before long-running work starts
-- deciding which atomic package should own the next action
-- teaching maintainers or downstream users how the suite composes without blurring package boundaries
-
-## What It Is Not For
-
-- replacing `skill-context-keeper` for ordinary state refresh work
-- replacing `skill-phase-gate` for a normal checkpoint
-- replacing `skill-handoff-summary` for a simple pause or transfer note
-- turning this public library checkout into a consumer repo
-
-## Install
-
-Choose one of these install paths:
-
-- install only `skill-task-continuity` when you want the suite entry docs and downstream bootstrap helper first
-- install the full suite in one command when you want all four continuity packages available immediately
-
-Installing `skill-task-continuity` does not auto-install the three atomic packages.
-Use the full-suite install command when you want all four packages together without running four separate installer commands.
-
-You can ask Codex in natural language:
-
-- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity.`
-- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using ref v0.6.1.`
-- `Use skill-installer to install the full long-task continuity suite from Golden-Promise/codex-skill-library at skills/skill-context-keeper, skills/skill-phase-gate, skills/skill-handoff-summary, and skills/skill-task-continuity.`
-
-If you want the direct command for the full suite, install all four packages in one command:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path \
-    skills/skill-context-keeper \
-    skills/skill-phase-gate \
-    skills/skill-handoff-summary \
-    skills/skill-task-continuity
-```
-
-Add `--ref v0.6.1` when you want to pin the current published release.
-
-For downstream bootstrap walkthroughs and prompt wording, see [references/install-playbook.md](references/install-playbook.md).
-
-## Recommended Downstream Layout
-
-```text
-AGENTS.md
-.agent-state/
-  TASK_STATE.md
-  HANDOFF.md
-  DECISIONS.md
-  RUN_LOG.md
-```
-
-`TASK_STATE.md` and `HANDOFF.md` are duplicated copies of the atomic package templates for downstream convenience.
-The atomic packages remain the source of truth for their behavior and wording.
-
-## Common Paths
-
-Start with one of these three paths:
-
-1. Bootstrap a downstream repository with `AGENTS.md` and `.agent-state/` templates.
-2. Read the composition guide and decide which atomic package owns the next action.
-3. Add thin repo-local wrappers only when a downstream repository truly needs them.
-
-The bootstrap helper requires an explicit target and refuses to bootstrap inside this public skill library checkout.
-
-If you want Codex to handle bootstrap in natural language, say:
+Try this first:
 
 - `Use skill-task-continuity to bootstrap the long-task continuity starter files into /path/to/downstream-repo. Preview the file operations first, then apply them if the preview looks correct. Do not overwrite existing files unless I explicitly ask.`
 
-If you want exact CLI control instead, use `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` to preview changes, then rerun without `--dry-run` to apply them.
+## Install
 
-## How The Suite Composes
+For most newcomers, natural-language installation is the easiest path.
 
-Use the atomic skills directly in downstream work:
+You can ask Codex to install only this package:
 
-- `Use $skill-context-keeper to refresh .agent-state/TASK_STATE.md before more implementation work.`
-- `Use $skill-phase-gate for a preflight before this risky multi-file change.`
-- `Use $skill-handoff-summary to write .agent-state/HANDOFF.md before we pause.`
+- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity.`
 
-The recommended long-task loop is:
+You can also ask Codex to install the full suite:
 
-1. Read the state files before resuming.
-2. Gate meaningful changes when the checkpoint adds value.
-3. Refresh task state after meaningful work.
-4. Write a handoff when pausing or transferring ownership.
+- `Use skill-installer to install the full long-task continuity suite from Golden-Promise/codex-skill-library at skills/skill-context-keeper, skills/skill-phase-gate, skills/skill-handoff-summary, and skills/skill-task-continuity.`
 
-Repo-local `.agents/skills/` wrappers or examples are optional.
-If you add them, keep them thin and point back to the atomic skills instead of replacing them.
+Installing `skill-task-continuity` does not auto-install the atomic packages.
+If you want all four packages at once, install the full suite in one command or use the full-suite natural-language prompt above.
+
+If you want the exact shell commands, jump to [Install Details](#install-details).
+
+## What Gets Created In Your Repo
+
+The bootstrap helper prepares downstream starter files such as:
+
+- `AGENTS.md`
+- `.agent-state/TASK_STATE.md`
+- `.agent-state/HANDOFF.md`
+- `.agent-state/DECISIONS.md`
+- `.agent-state/RUN_LOG.md`
+
+`TASK_STATE.md` and `HANDOFF.md` are convenience copies of the atomic package templates so a downstream repo can start quickly.
+
+## Fastest Setup
+
+After installation, the fastest setup path is:
+
+1. Ask Codex to bootstrap the starter files into your downstream repo.
+2. Review the created `AGENTS.md` and `.agent-state/` files.
+3. Start the first real task by calling the atomic package that owns the next action.
+
+If you need exact CLI control instead, use `python3 skills/skill-task-continuity/scripts/bootstrap_suite.py --target /path/to/downstream-repo --dry-run` first, then rerun without `--dry-run` to apply.
+
+## Which Skill To Use Next
+
+- Use `skill-context-keeper` when the task is active but the state picture is stale.
+- Use `skill-phase-gate` when the next step is a risky or multi-file change.
+- Use `skill-handoff-summary` when you are about to pause or transfer the work.
+
+## Don't Use This When
+
+- you only need one atomic package for one immediate action
+- you only need to refresh task state
+- you only need a checkpoint around a meaningful change
+- you only need a pause or transfer note
+
+This package does not replace the three atomic skills and does not turn this public library checkout into a consumer repo.
+
+## Related Skills
+
+- `skill-context-keeper` for `.agent-state/TASK_STATE.md`
+- `skill-phase-gate` for preflight and postflight checkpoints
+- `skill-handoff-summary` for `.agent-state/HANDOFF.md`
 
 ## Documentation
 
@@ -119,3 +87,29 @@ If you add them, keep them thin and point back to the atomic skills instead of r
 - Install playbook: [references/install-playbook.md](references/install-playbook.md)
 - Chinese install playbook: [references/install-playbook.zh-CN.md](references/install-playbook.zh-CN.md)
 - Downstream templates copied by the bootstrap helper: `assets/`
+
+## Install Details
+
+Replace `/path/to/install-skill-from-github.py` with the actual path to your local `skill-installer` checkout.
+
+Install only this package:
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-task-continuity \
+  --ref v0.6.1
+```
+
+Install the full suite in one command:
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path \
+    skills/skill-context-keeper \
+    skills/skill-phase-gate \
+    skills/skill-handoff-summary \
+    skills/skill-task-continuity \
+  --ref v0.6.1
+```

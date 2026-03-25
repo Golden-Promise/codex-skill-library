@@ -4,61 +4,56 @@
 
 ## 概述
 
-`skill-context-keeper` 是一个专注型包，专门用于在长时间编码任务中恢复和刷新结构化任务状态。
-它帮助下一轮从当前最可信、已验证的任务图景继续，而不会扩展成检查点、流程控制或最终交接说明。
+`skill-context-keeper` 是一个专注型包，用于在长时间编码任务中刷新结构化任务状态。
+当任务还没结束，但你手上的任务图景已经变旧、变散或不再完全可信时，就该用它。
 
-## 核心能力
+## 30 秒快速开始
 
-`skill-context-keeper` 只聚焦一件事：让进行中的任务状态保持可信、可续做。
+- 什么时候用：任务仍在继续，但当前上下文已经陈旧、分散，或者可信度不够。
+- 你会得到什么：一个紧凑、可信的任务快照，把事实、假设、决策、风险和下一步动作分清楚。
+- 典型产物：更新 `.agent-state/TASK_STATE.md`。
 
-- 根据已验证的仓库事实重建当前任务图景
-- 清楚区分事实、假设、决策、风险和下一步动作
-- 刷新诸如 `.agent-state/TASK_STATE.md` 的紧凑下游状态文件
-- 只保留下一轮继续执行所需的连续性，不膨胀成整套工作流包
+如果你想直接告诉 Codex 怎么做：
 
-## 适用场景
+先这样对 Codex 说：
 
-- 任务暂停后重新进入，且上下文已经开始漂移
-- 在继续改代码前先重建当前任务状态
-- 用一个稳定入口刷新待办、假设和最近变更
-- 对齐线程认知与仓库现状，避免带着旧前提继续推进
-
-如果你在几个连续性包之间做选择，而当前主要问题是“任务状态过时或散落”，优先从这个包开始。
-
-## 不适用场景
-
-- 把任务拆成分阶段执行
-- 决定检查点规则或阶段退出条件
-- 为另一个执行者撰写暂停或转交说明
-- 启动整套长任务连续性套件
+- `请用 skill-context-keeper 根据仓库现状刷新当前任务状态。`
 
 ## 安装
 
-安装 `skill-context-keeper` 时，请使用本仓库中的标准发布路径，并按你的工作流选择 release 或 ref。
-
-你也可以直接这样对 Codex 说：
+你可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-context-keeper 安装 skill-context-keeper。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-context-keeper 安装 skill-context-keeper，并使用 ref v0.6.1。`
 
-关于触发示例和提示词措辞，可查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如果你想看精确的 shell 命令，可以直接跳到后面的 [安装细节](#安装细节)。
 
-## 常用路径
+## 会创建或更新什么文件？
 
-可以先从下面三条路径开始：
+最典型的下游文件是 `.agent-state/TASK_STATE.md`。
 
-1. 在任务暂停一段时间后恢复上下文。
-2. 在继续实现前刷新当前任务状态。
-3. 把事实、未决问题和下一步动作收敛到 `.agent-state/TASK_STATE.md`。
+当你希望刷新或重写这个任务状态文件，让下一轮可以从一个可信摘要继续时，就该用这个包。它通常会帮助你整理：
 
-如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
+- 当前目标
+- 仓库里的已验证事实
+- 已完成工作
+- 开放问题和风险
+- 下一步推荐动作
 
-## 直接告诉 Codex 怎么做
+## 不适合什么时候用
 
-如果你想直接用自然语言告诉 Codex，可以这样说：
+- 你需要为高风险改动加 preflight 或 postflight 检查点
+- 你需要写一份可交接、可暂停的 handoff
+- 你是第一次在仓库里搭建整套连续性工作流
+- 你想要的是泛化的流程控制，而不是状态刷新
 
-- `请用 skill-context-keeper 根据仓库现状刷新当前任务状态。`
-- `请用 skill-context-keeper 重建最近一次可信任务状态，并重写 .agent-state/TASK_STATE.md。`
+这个包不负责 workflow gating，也不负责 final handoffs。
+
+## 相关技能
+
+- `skill-phase-gate`：适合高价值的 preflight / postflight 检查点
+- `skill-handoff-summary`：适合暂停或转交时写 handoff
+- `skill-task-continuity`：适合第一次搭建整套连续性流程
 
 ## 文档
 
@@ -68,3 +63,14 @@
 - 中文提示词模板：[references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - 任务状态模板：[assets/TASK_STATE.template.md](assets/TASK_STATE.template.md)
+
+## 安装细节
+
+把 `/path/to/install-skill-from-github.py` 换成你本地 `skill-installer` 仓库里的实际脚本路径。
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper \
+  --ref v0.6.1
+```

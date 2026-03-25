@@ -4,63 +4,59 @@
 
 ## 概述
 
-`skill-handoff-summary` 是一个专注型包，用于在长时间编码任务需要暂停或转交时，生成面向续做的简洁交接摘要。
-它把状态、阻塞点、需保留的硬约束，以及“下一步到底做什么”整理成紧凑的重启说明，避免下一位执行者从零翻线程历史。
+`skill-handoff-summary` 是一个专注型包，用于写出面向续做的暂停说明或转交说明。
+它服务的是诸如 `.agent-state/HANDOFF.md` 这样的紧凑下游产物，而不是整项目文档。
 
-## 核心能力
+## 30 秒快速开始
 
-`skill-handoff-summary` 只专注一个结果：写出短小、可信、可直接复用的交接。
+- 什么时候用：工作马上要暂停、换人，或者切进新的会话。
+- 你会得到什么：一份紧凑的重启说明，里面有当前状态、硬约束、开放问题和精确下一步。
+- 典型产物：更新 `.agent-state/HANDOFF.md`。
 
-- 写入诸如 `.agent-state/HANDOFF.md` 的紧凑下游产物
-- 保留当前状态、开放问题、硬约束，以及精确的下一步动作
-- 给下一次线程或会话附上一段可直接复用的 resume prompt
-- 聚焦续做，而不是膨胀成整项目文档
+如果你需要一份耐用的重启说明，就用它。
+如果你只是想在聊天里快速同步状态，就不要用它。
 
-## 适用场景
+如果你想直接告诉 Codex 怎么做：
 
-- 一次工作结束时还有未完成事项，需要先暂停
-- 把任务交给另一位执行者，并提供可信的重启说明
-- 在上下文继续变旧之前，先记录阻塞点、已做决定和下一步动作
-- 降低长线程在交接后的恢复成本
+先这样对 Codex 说：
 
-如果你已经确定工作即将暂停或换人，这个包就是更合适的入口。
-
-## 不适用场景
-
-- 在继续工作前重建当前任务状态
-- 决定一个任务是否需要分阶段或检查点
-- 以套件级工作流统筹多个原子包
-- 维护覆盖整个任务的长期状态
-- 生成整项目说明或仓库导览
-- 在根本不需要交接时替代最终用户答复
+- `请用 skill-handoff-summary 在暂停前写一个紧凑、面向续做的交接摘要。`
 
 ## 安装
 
-安装 `skill-handoff-summary` 时，请使用本仓库中的标准发布路径，并按你的工作流选择 release 或 ref。
-
-你也可以直接这样对 Codex 说：
+你可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary，并使用 ref v0.6.1。`
 
-关于触发示例和提示词措辞，可查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如果你想看精确的 shell 命令，可以直接跳到后面的 [安装细节](#安装细节)。
 
-## 常用路径
+## 会创建或更新什么文件？
 
-可以先从下面三条路径开始：
+最典型的下游文件是 `.agent-state/HANDOFF.md`。
 
-1. 在一次会话结束时暂停仍未完成的工作。
-2. 把任务转交给另一位执行者，并保留重启上下文。
-3. 在 `.agent-state/HANDOFF.md` 中写下精确下一步和可复用的 resume prompt。
+当你希望这个文件帮你保留下列信息时，就该用这个包：
 
-如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
+- 任务摘要
+- 当前状态
+- 本次会话改了什么
+- 需要保留的硬约束
+- 开放问题
+- 精确下一步动作
+- 一段可复用的 resume prompt
 
-## 直接告诉 Codex 怎么做
+## 不适合什么时候用
 
-如果你想直接用自然语言告诉 Codex，可以这样说：
+- 你需要在继续工作前先重建当前任务状态
+- 你需要给高风险或多文件改动加检查点
+- 你只是想在当前聊天里快速同步一下状态
+- 你要写的是整项目说明，而不是 continuation-oriented handoff
 
-- `请用 skill-handoff-summary 在暂停前写一个紧凑、面向续做的交接摘要。`
-- `请用 skill-handoff-summary 把交接写到 .agent-state/HANDOFF.md，并附上下一次会话可复用的 resume prompt。`
+## 相关技能
+
+- `skill-context-keeper`：适合刷新 `.agent-state/TASK_STATE.md`
+- `skill-phase-gate`：适合 preflight / postflight 检查点
+- `skill-task-continuity`：适合第一次搭建流程和做套件级路由
 
 ## 文档
 
@@ -71,3 +67,14 @@
 - 中文提示词模板：[references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - 交接模板：[assets/HANDOFF.template.md](assets/HANDOFF.template.md)
+
+## 安装细节
+
+把 `/path/to/install-skill-from-github.py` 换成你本地 `skill-installer` 仓库里的实际脚本路径。
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary \
+  --ref v0.6.1
+```

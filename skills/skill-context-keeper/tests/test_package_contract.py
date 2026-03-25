@@ -53,6 +53,36 @@ class ContextKeeperPackageTests(unittest.TestCase):
         self.assertIn("if you want to tell codex exactly what to do", text)
         self.assertIn("use skill-context-keeper to refresh the current task state", text)
 
+    def test_readme_has_fast_entry_sections(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        for heading in [
+            "## Start Here In 30 Seconds",
+            "## Install",
+            "## What File Will This Create Or Update?",
+            "## Don't Use This When",
+            "## Related Skills",
+        ]:
+            self.assertIn(heading, text)
+        self.assertIn("Typical output:", text)
+        self.assertIn(".agent-state/TASK_STATE.md", text)
+        self.assertIn("Try this first:", text)
+        self.assertIn("Use skill-context-keeper", text)
+
+    def test_chinese_readme_has_fast_entry_sections(self):
+        text = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        for heading in [
+            "## 30 秒快速开始",
+            "## 安装",
+            "## 会创建或更新什么文件？",
+            "## 不适合什么时候用",
+            "## 相关技能",
+        ]:
+            self.assertIn(heading, text)
+        self.assertIn("典型产物：", text)
+        self.assertIn(".agent-state/TASK_STATE.md", text)
+        self.assertIn("先这样对 Codex 说：", text)
+        self.assertIn("请用 skill-context-keeper", text)
+
     def test_reference_indexes_point_to_published_files(self):
         english = (ROOT / "references" / "README.md").read_text(encoding="utf-8")
         chinese = (ROOT / "references" / "README.zh-CN.md").read_text(encoding="utf-8")

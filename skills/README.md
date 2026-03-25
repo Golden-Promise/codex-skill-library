@@ -4,11 +4,25 @@
 
 This directory contains the installable skill packages published by `codex-skill-library`.
 
+## Pick the Right Continuity Skill
+
+Use this quick guide first:
+
+- I paused a task and need to rebuild the current picture.
+  Start with `skill-context-keeper`.
+- I am about to make a risky or multi-file change.
+  Start with `skill-phase-gate`.
+- I need to stop now and leave a durable restart note.
+  Start with `skill-handoff-summary`.
+- I want to set up the whole continuity workflow in a repo for the first time.
+  Start with `skill-task-continuity`.
+
 ## How To Use This Index
 
-1. Scan the table below to find the skill that matches your task.
-2. Open the package README in your preferred language.
-3. Use the package reference pages for boundary notes now, and later for examples or prompt wording.
+1. Start with the quick picker above if you are working on continuity setup or continuity workflow tasks.
+2. Scan the table below to find the package that matches your next action.
+3. Open the package README in your preferred language.
+4. Use the package reference pages for examples, prompt wording, and deeper boundary notes when needed.
 
 ## Published Packages
 
