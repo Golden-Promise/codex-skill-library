@@ -5,70 +5,52 @@
 ## 概述
 
 `skill-phase-gate` 用于在有分量的编码工作前后加入紧凑的 preflight / postflight 检查点。
-它帮助高风险执行保持清晰，但不会接管长期任务状态、泛化规划或最终交接。
+如果“加一道检查点”这件事本身就有价值，就该用它。
 
-## 核心能力
+## 30 秒快速开始
 
-`skill-phase-gate` 聚焦的是把高价值检查点做得清楚、可重复。
+- 什么时候用：你马上要做高风险、多文件，或其他明显有分量的改动。
+- 你会得到什么：一个紧凑的检查点，把范围、约束、验证方式和剩余风险说清楚。
+- 典型产物：一个按 `assets/PREFLIGHT.template.md` 组织的 preflight 说明，以及一个按 `assets/POSTFLIGHT.template.md` 组织的 postflight 说明。
 
-- 围绕目标、约束、范围和验证计划定义 preflight 检查点
-- 围绕实际改动、实际验证和剩余风险记录 postflight 检查点
-- 只在有分量的改动中显式使用检查点，而不是给每个小动作都加门
-- 把长期状态交给 `skill-context-keeper`，把交接交给 `skill-handoff-summary`
+如果你想直接告诉 Codex 怎么做：
 
-## 适用场景
+先这样对 Codex 说：
 
-- 在重构、迁移或多文件改动前做 preflight
-- 在完成一次有分量的修改后做 postflight，核对实际改动和验证结果
-- 对高风险编辑先明确预期修改范围、明确不改动的范围以及验证计划
-- 在提交前增加一次有意义的检查点
-
-如果价值主要来自“先停下来确认范围和验证方式”，这个包就是更合适的入口。
-
-## 检查点门槛
-
-只有当“加一道检查点”本身有价值时才适合使用：
-
-- 适合：重构、多文件修改、高风险编辑、提交前检查点
-- 不适合：typo 修复、极小的一行改动、纯说明类请求、泛化规划
-
-## 不适用场景
-
-- 不适合琐碎的一行改动
-- 不适合纯解释或纯讲解任务
-- 重建过时或缺失的任务上下文
-- 在中断后刷新当前状态
-- 为另一个执行者撰写暂停或转交说明
-- 持有本应由 `skill-context-keeper` 维护的长期状态
-- 统筹整套长任务连续性套件
+- `请用 skill-phase-gate 在这次高风险多文件修改前生成一个 preflight gate。`
 
 ## 安装
 
-安装 `skill-phase-gate` 时，请使用本仓库中的标准发布路径，并按你的工作流选择 release 或 ref。
-
-你也可以直接这样对 Codex 说：
+你可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用 ref v0.6.1。`
 
-关于触发示例和提示词措辞，可查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
+如果你想看精确的 shell 命令，可以直接跳到后面的 [安装细节](#安装细节)。
 
-## 常用路径
+## 会创建或更新什么文件？
 
-可以先从下面三条路径开始：
+这个包通常会创建或刷新一份 preflight 检查点说明、一份 postflight 检查点说明，或者两者都写。
 
-1. 在重构、迁移或高风险多文件改动前做 preflight。
-2. 在完成有分量的实现后做 postflight。
-3. 在提交前为重要改动增加一次有意识的检查点。
+它自带的两个模板就是最直接的起点：
 
-如果你想直接套用提示词模板，请查看 [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)。
+- [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
+- [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)
 
-## 直接告诉 Codex 怎么做
+## 不适合什么时候用
 
-如果你想直接用自然语言告诉 Codex，可以这样说：
+- 这次改动只是一个琐碎的一行编辑
+- 这次工作只是纯解释、纯说明
+- 当前真正的问题是任务状态过旧，而不是检查点缺失
+- 你需要的是暂停或转交 handoff，而不是流程检查点
 
-- `请用 skill-phase-gate 在这次高风险多文件修改前生成一个 preflight gate。`
-- `请用 skill-phase-gate 在我提交前为这次有分量的改动生成一个 postflight gate。`
+这个包不适合 trivial one-line edits，也不适合 pure explanation tasks。
+
+## 相关技能
+
+- `skill-context-keeper`：适合在重要工作前后重建任务状态
+- `skill-handoff-summary`：适合暂停或转交时写 handoff
+- `skill-task-continuity`：适合第一次搭建整套流程和做套件级路由
 
 ## 文档
 
@@ -80,3 +62,14 @@
 - English prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - preflight 清单：[assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
 - postflight 清单：[assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)
+
+## 安装细节
+
+把 `/path/to/install-skill-from-github.py` 换成你本地 `skill-installer` 仓库里的实际脚本路径。
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate \
+  --ref v0.6.1
+```

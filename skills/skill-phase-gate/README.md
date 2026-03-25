@@ -5,70 +5,52 @@
 ## Overview
 
 `skill-phase-gate` adds compact preflight and postflight checkpoints around meaningful coding work.
-It keeps risky execution intentional without taking over long-term task state, generic planning, or final handoffs.
+If the checkpoint itself adds value, use this skill.
 
-## Core Capabilities
+## Start Here In 30 Seconds
 
-`skill-phase-gate` focuses on making high-value checkpoints crisp and repeatable.
+- Use this when: you are about to make a risky, multi-file, or otherwise meaningful change.
+- You'll get: a compact checkpoint that makes scope, constraints, verification, and remaining risk explicit.
+- Typical outputs: a preflight note shaped like `assets/PREFLIGHT.template.md` and a postflight note shaped like `assets/POSTFLIGHT.template.md`.
 
-- define a preflight checkpoint around goal, constraints, scope, and verification
-- capture a postflight checkpoint around actual changes, validations, and remaining risks
-- make checkpoint use explicit for meaningful edits instead of every small action
-- leave long-term state to `skill-context-keeper` and handoffs to `skill-handoff-summary`
+If you want to tell Codex exactly what to do:
 
-## Best For
+Try this first:
 
-- preflight before a refactor, migration, or other multi-file change
-- postflight after a meaningful edit when you want to verify what actually changed
-- risky edits where expected files, explicit non-goals, and a verification plan should be clear
-- pre-commit checkpoints when the work deserves one more deliberate pass
-
-If the value comes from pausing to confirm scope and validation, this package is the right fit.
-
-## Checkpoint Bar
-
-Use this package when the checkpoint itself is valuable:
-
-- good fit: refactors, multi-file changes, risky edits, or pre-commit checkpoints
-- bad fit: typo fixes, tiny one-line changes, pure explanation tasks, or generic planning requests
-
-## What It Is Not For
-
-- not for trivial one-line edits
-- not for pure explanation tasks
-- reconstructing stale or missing task context
-- summarizing the current state after an interruption
-- writing a pause note or transfer package for another agent
-- owning long-term state that belongs to `skill-context-keeper`
-- orchestrating the whole long-task continuity suite
+- `Use skill-phase-gate to create a preflight gate before this risky multi-file change.`
 
 ## Install
-
-To install `skill-phase-gate`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate.`
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref v0.6.1.`
 
-For direct trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
+If you want the exact shell command, jump to [Install Details](#install-details).
 
-## Common Paths
+## What File Will This Create Or Update?
 
-Start with one of these three paths:
+This package usually creates or refreshes a preflight checkpoint note, a postflight checkpoint note, or both.
 
-1. Run a preflight before a refactor, migration, or risky multi-file change.
-2. Run a postflight after meaningful implementation work.
-3. Add a deliberate pre-commit checkpoint when the change deserves one.
+Use the shipped templates as the starting shape:
 
-If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
+- [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
+- [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)
 
-## Direct Codex Usage
+## Don't Use This When
 
-If you want to tell Codex exactly what to do, say:
+- the change is a trivial one-line edit
+- the work is a pure explanation task
+- the main problem is stale task state rather than checkpoint value
+- you need a pause or transfer handoff instead of a workflow checkpoint
 
-- `Use skill-phase-gate to create a preflight gate before this risky multi-file change.`
-- `Use skill-phase-gate to create a postflight gate for this meaningful edit before I commit.`
+This package is not for trivial one-line edits and is not for pure explanation tasks.
+
+## Related Skills
+
+- `skill-context-keeper` for rebuilding task state before or after meaningful work
+- `skill-handoff-summary` for pause and transfer notes
+- `skill-task-continuity` for first-time setup and suite-level routing
 
 ## Documentation
 
@@ -80,3 +62,14 @@ If you want to tell Codex exactly what to do, say:
 - Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - Preflight checklist: [assets/PREFLIGHT.template.md](assets/PREFLIGHT.template.md)
 - Postflight checklist: [assets/POSTFLIGHT.template.md](assets/POSTFLIGHT.template.md)
+
+## Install Details
+
+Replace `/path/to/install-skill-from-github.py` with the actual path to your local `skill-installer` checkout.
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate \
+  --ref v0.6.1
+```

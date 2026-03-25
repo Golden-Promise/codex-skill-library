@@ -54,6 +54,38 @@ class SkillPhaseGatePackageTests(unittest.TestCase):
         self.assertIn("if you want to tell codex exactly what to do", text)
         self.assertIn("use skill-phase-gate to create a preflight gate", text)
 
+    def test_readme_has_fast_entry_sections(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        for heading in [
+            "## Start Here In 30 Seconds",
+            "## Install",
+            "## What File Will This Create Or Update?",
+            "## Don't Use This When",
+            "## Related Skills",
+        ]:
+            self.assertIn(heading, text)
+        self.assertIn("Typical outputs:", text)
+        self.assertIn("PREFLIGHT.template.md", text)
+        self.assertIn("POSTFLIGHT.template.md", text)
+        self.assertIn("Try this first:", text)
+        self.assertIn("Use skill-phase-gate", text)
+
+    def test_chinese_readme_has_fast_entry_sections(self):
+        text = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        for heading in [
+            "## 30 秒快速开始",
+            "## 安装",
+            "## 会创建或更新什么文件？",
+            "## 不适合什么时候用",
+            "## 相关技能",
+        ]:
+            self.assertIn(heading, text)
+        self.assertIn("典型产物：", text)
+        self.assertIn("PREFLIGHT.template.md", text)
+        self.assertIn("POSTFLIGHT.template.md", text)
+        self.assertIn("先这样对 Codex 说：", text)
+        self.assertIn("请用 skill-phase-gate", text)
+
 
 if __name__ == "__main__":
     unittest.main()

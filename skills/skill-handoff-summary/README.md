@@ -4,64 +4,59 @@
 
 ## Overview
 
-`skill-handoff-summary` is the focused package for writing continuation-oriented pause or transfer summaries when long-running coding work needs to stop and resume later.
-It turns status, blockers, preserved constraints, and the exact next action into a compact restart note so the next session does not have to reconstruct intent from scattered thread history.
+`skill-handoff-summary` is the focused package for writing continuation-oriented pause or transfer notes.
 It is for compact downstream artifacts such as `.agent-state/HANDOFF.md`, not whole-project documentation.
 
-## Core Capabilities
+## Start Here In 30 Seconds
 
-`skill-handoff-summary` specializes in one narrow outcome: a handoff that is short, trusted, and immediately reusable.
+- Use this when: work is about to pause, switch owners, or cross into a new session.
+- You'll get: a compact restart note with current status, hard constraints, open problems, and the exact next action.
+- Typical output: updates `.agent-state/HANDOFF.md`.
 
-- write concise downstream artifacts such as `.agent-state/HANDOFF.md`
-- preserve current status, open problems, hard constraints, and the exact next action
-- include a reusable resume prompt for the next thread or session
-- stay focused on continuation instead of expanding into whole-project documentation
+Need a durable restart note? Use this.
+Just need a quick status update in chat? Don't use this.
 
-## Best For
+If you want to tell Codex exactly what to do:
 
-- pausing work at the end of a session with open tasks still pending
-- transferring a task to another agent that needs a trusted restart note
-- capturing blockers, decisions, and next actions before context goes stale
-- reducing the cost of resuming a thread after a handoff
+Try this first:
 
-If you already know the work is about to pause or change hands, this package is the right starting point.
-
-## What It Is Not For
-
-- rebuilding the current task state before work continues
-- deciding whether a task needs staged phases or checkpoints
-- coordinating the atomic packages as one suite-level workflow
-- maintaining long-term state across the whole task
-- producing whole-project documentation or repository tours
-- replacing the final user-facing answer when no handoff is needed
+- `Use skill-handoff-summary to write a compact continuation-oriented handoff before we pause.`
 
 ## Install
-
-To install `skill-handoff-summary`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary.`
 - `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary using ref v0.6.1.`
 
-For direct trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
+If you want the exact shell command, jump to [Install Details](#install-details).
 
-## Common Paths
+## What File Will This Create Or Update?
 
-Start with one of these three paths:
+The typical downstream file is `.agent-state/HANDOFF.md`.
 
-1. Pause a session while important work is still open.
-2. Transfer a task to another agent and preserve the restart context.
-3. Write `.agent-state/HANDOFF.md` with the exact next action and a reusable resume prompt.
+Use this package when you want that file to preserve:
 
-If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
+- task summary
+- current status
+- what changed in the current session
+- hard constraints to preserve
+- open problems
+- the exact next action
+- a reusable resume prompt
 
-## Direct Codex Usage
+## Don't Use This When
 
-If you want to tell Codex exactly what to do, say:
+- you need to rebuild the current task state before more work continues
+- you need a checkpoint around a risky or multi-file change
+- you only need a quick status note inside the current chat
+- you want whole-project documentation instead of a continuation-oriented handoff
 
-- `Use skill-handoff-summary to write a compact continuation-oriented handoff before we pause.`
-- `Use skill-handoff-summary to write .agent-state/HANDOFF.md with the exact next action and a reusable resume prompt.`
+## Related Skills
+
+- `skill-context-keeper` for refreshing `.agent-state/TASK_STATE.md`
+- `skill-phase-gate` for preflight and postflight checkpoints
+- `skill-task-continuity` for first-time continuity setup and routing
 
 ## Documentation
 
@@ -72,3 +67,14 @@ If you want to tell Codex exactly what to do, say:
 - Prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - Handoff template: [assets/HANDOFF.template.md](assets/HANDOFF.template.md)
+
+## Install Details
+
+Replace `/path/to/install-skill-from-github.py` with the actual path to your local `skill-installer` checkout.
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary \
+  --ref v0.6.1
+```

@@ -4,67 +4,56 @@
 
 ## Overview
 
-`skill-context-keeper` is the focused package for recovering and refreshing structured task state during long-running coding work.
-It helps the next turn start from the best verified picture of the task without expanding into checkpoints, workflow control, or final handoff writing.
+`skill-context-keeper` is the focused package for refreshing structured task state during long-running coding work.
+Use it when the task is still ongoing, but the working context is stale.
 
-## Core Capabilities
+## Start Here In 30 Seconds
 
-`skill-context-keeper` is designed for one job: keeping ongoing task state trustworthy and resumable.
+- Use this when: the task is still active, but the current picture is stale, scattered, or partially trusted.
+- You'll get: a compact, verified task snapshot that separates facts, assumptions, decisions, risks, and next actions.
+- Typical output: updates `.agent-state/TASK_STATE.md`.
 
-- rebuild the current task picture from verified repository facts
-- keep facts, assumptions, decisions, risks, and next actions clearly separated
-- refresh compact downstream state files such as `.agent-state/TASK_STATE.md`
-- preserve just enough continuity for the next turn without turning into a full workflow package
+If you want to tell Codex exactly what to do:
 
-Use this skill when the main problem is stale or scattered task context rather than workflow control.
+Try this first:
 
-## Best For
-
-- resuming a paused task after the working context has drifted
-- resuming a task after an interruption or stale summary
-- rebuilding the current state before making more code changes
-- rebuilding the last known task state before new work continues
-- refreshing open TODOs, assumptions, and recent changes in one place
-- reconciling what the thread believes with what the repository now shows
-
-If you are picking an entry point, start here when the main problem is stale or scattered task context.
-
-## What It Is Not For
-
-- breaking a task into staged execution phases
-- deciding checkpoint rules or phase exit criteria
-- writing a final pause or transfer handoff for another agent
-- bootstrapping the full long-task continuity suite
-
-This package does not own workflow gating and does not own final handoffs.
+- `Use skill-context-keeper to refresh the current task state from the repository before we continue.`
 
 ## Install
-
-To install `skill-context-keeper`, use the standard published package path in this repository and choose the release or ref that fits your workflow.
 
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper.`
 - `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper using ref v0.6.1.`
 
-For trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
+If you want the exact shell command, jump to [Install Details](#install-details).
 
-## Common Paths
+## What File Will This Create Or Update?
 
-Start with one of these three paths:
+The typical downstream file is `.agent-state/TASK_STATE.md`.
 
-1. Resume a paused task after the working picture has drifted.
-2. Refresh task state before more implementation work.
-3. Reconcile facts, open issues, and the next action in `.agent-state/TASK_STATE.md`.
+Use this package when you want to refresh or rewrite that task-state file so the next turn can resume from a trusted summary of:
 
-If you want ready-to-paste prompts, see [references/prompt-templates.en.md](references/prompt-templates.en.md).
+- the current objective
+- current repository facts
+- completed work
+- open issues and risks
+- the next recommended action
 
-## Direct Codex Usage
+## Don't Use This When
 
-If you want to tell Codex exactly what to do, say:
+- you need a preflight or postflight checkpoint around a risky change
+- you need a durable pause or transfer handoff
+- you are setting up the full continuity workflow in a repo for the first time
+- you want generic workflow control instead of state refresh
 
-- `Use skill-context-keeper to refresh the current task state from the repository before we continue.`
-- `Use skill-context-keeper to rebuild the last known task state and rewrite .agent-state/TASK_STATE.md.`
+This package does not own workflow gating and does not own final handoffs.
+
+## Related Skills
+
+- `skill-phase-gate` for meaningful preflight and postflight checkpoints
+- `skill-handoff-summary` for pause and transfer notes
+- `skill-task-continuity` for first-time continuity setup and suite-level guidance
 
 ## Documentation
 
@@ -74,3 +63,14 @@ If you want to tell Codex exactly what to do, say:
 - Prompt templates: [references/prompt-templates.en.md](references/prompt-templates.en.md)
 - Chinese prompt templates: [references/prompt-templates.zh-CN.md](references/prompt-templates.zh-CN.md)
 - Task-state template: [assets/TASK_STATE.template.md](assets/TASK_STATE.template.md)
+
+## Install Details
+
+Replace `/path/to/install-skill-from-github.py` with the actual path to your local `skill-installer` checkout.
+
+```bash
+python3 /path/to/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper \
+  --ref v0.6.1
+```
