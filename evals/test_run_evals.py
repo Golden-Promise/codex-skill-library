@@ -1,8 +1,10 @@
 import csv
 import importlib.util
+import re
 import tempfile
 import sys
 import unittest
+import shutil
 from pathlib import Path
 
 
@@ -253,6 +255,110 @@ class RunEvalsTests(unittest.TestCase):
         self.assertEqual(report["summary"]["failed"], 1)
         self.assertEqual(case["dimensions"]["artifact_presence"]["status"], "fail")
         self.assertIn("unmapped", case["dimensions"]["artifact_presence"]["reason"])
+
+    def test_routing_quality_fails_when_trigger_docs_are_missing(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_root = Path(tmpdir) / "repo"
+            package_root = repo_root / "skills" / "skill-context-keeper"
+            shutil.copytree(ROOT / "skills" / "skill-context-keeper", package_root)
+            for relative in ["README.md", "README.zh-CN.md", "SKILL.md"]:
+                path = package_root / relative
+                text = path.read_text(encoding="utf-8")
+                for index, cue in enumerate(module.PACKAGE_RULES["skill-context-keeper"]["trigger_cues"]):
+                    text = re.sub(
+                        re.escape(cue),
+                        f"REMOVED_TRIGGER_{index}",
+                        text,
+                        flags=re.IGNORECASE,
+                    )
+                path.write_text(text, encoding="utf-8")
+
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "context_resume",
+                        "package": "skill-context-keeper",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "We’ve been iterating for a while; please resume from the last known state, summarize what changed, and carry forward unresolved TODOs.",
+                        "expected_artifacts": "state/context.snapshot|state/continuity.note",
+                        "expected_events": "context:reload|context:reconstruct|context:summary",
+                        "notes": "trigger docs should be required",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(repo_root, csv_path)
+
+        case = next(item for item in report["cases"] if item["case_id"] == "context_resume")
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["routing_quality"]["status"], "fail")
+        self.assertIn("routing docs", case["dimensions"]["routing_quality"]["reason"])
+
+    def test_workflow_completeness_rejects_bogus_same_namespace_token(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_workflow",
+                        "package": "skill-phase-gate",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "We need to split this multi-step refactor into phases before coding.",
+                        "expected_artifacts": "plan/phase.plan",
+                        "expected_events": "phase:anything",
+                        "notes": "should fail when same-namespace nonsense tokens are used",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["workflow_completeness"]["status"], "fail")
+        self.assertIn("allowed tokens", case["dimensions"]["workflow_completeness"]["reason"])
+
+    def test_guardrails_fail_when_invalid_metadata_values_are_present(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_guardrails",
+                        "package": "skill-task-continuity",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "Set up the long-task continuity suite and coordinate the context keeper, phase gate, and handoff packages.",
+                        "expected_artifacts": "AGENTS.md",
+                        "expected_events": "bootstrap:agents_md",
+                        "notes": "invalid guardrail metadata should fail",
+                        "max_commands": "0",
+                        "max_verbosity": "extreme",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["guardrails"]["status"], "fail")
+        self.assertIn("guardrail", case["dimensions"]["guardrails"]["reason"])
 
 
 if __name__ == "__main__":
