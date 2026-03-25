@@ -6,6 +6,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SkillPhaseGatePackageTests(unittest.TestCase):
+    def test_core_package_files_exist(self):
+        for path in [
+            ROOT / "README.md",
+            ROOT / "README.zh-CN.md",
+            ROOT / "SKILL.md",
+            ROOT / "agents" / "openai.yaml",
+            ROOT / "references" / "use-cases.md",
+            ROOT / "references" / "use-cases.zh-CN.md",
+            ROOT / "references" / "prompt-templates.en.md",
+            ROOT / "references" / "prompt-templates.zh-CN.md",
+        ]:
+            self.assertTrue(path.exists(), f"expected package file to exist: {path}")
+
     def test_checklist_assets_exist(self):
         self.assertTrue((ROOT / "assets" / "PREFLIGHT.template.md").exists())
         self.assertTrue((ROOT / "assets" / "POSTFLIGHT.template.md").exists())
