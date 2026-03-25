@@ -26,6 +26,10 @@ This repository is designed for people who want to:
 | Skill | Best For | Docs |
 | --- | --- | --- |
 | `skill-governance` | Governing skill assets with task-first add, enable, doctor, repair, audit, and document flows | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
+| `skill-context-keeper` | Refreshing or reconstructing long-task state without turning it into phase planning or a final handoff | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
+| `skill-phase-gate` | Splitting multi-step coding work into explicit phases, checkpoints, and exit criteria | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
+| `skill-handoff-summary` | Writing pause or transfer summaries with status, blockers, and next steps | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
+| `skill-task-continuity` | Coordinating the long-task continuity suite across the three narrower continuity packages | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
 
 ## Quick Start
 
@@ -65,6 +69,10 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - English skill index: [skills/README.md](skills/README.md)
 - 中文技能索引: [skills/README.zh-CN.md](skills/README.zh-CN.md)
 - `skill-governance` package: [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md)
+- `skill-context-keeper` package: [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md)
+- `skill-phase-gate` package: [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md)
+- `skill-handoff-summary` package: [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md)
+- `skill-task-continuity` package: [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md)
 - Repository publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
 
@@ -80,6 +88,10 @@ codex-skill-library/
     README.md
     README.zh-CN.md
     skill-governance/
+    skill-context-keeper/
+    skill-phase-gate/
+    skill-handoff-summary/
+    skill-task-continuity/
 ```
 
 ## For Maintainers

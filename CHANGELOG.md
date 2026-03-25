@@ -2,6 +2,14 @@
 
 All notable changes to `codex-skill-library` should be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Add scaffolded package roots for `skill-context-keeper`, `skill-phase-gate`, `skill-handoff-summary`, and `skill-task-continuity`, including bilingual README landing pages, routing-first `SKILL.md` files, OpenAI agent metadata, and visible first-pass package directories.
+- Add downstream bootstrap support for the long-task continuity suite through initial package metadata, install entry points, and repository index coverage.
+- Add evaluation scaffolding support by reserving package directories for future references, scripts, tests, and template assets tied to the long-task continuity suite.
+
 ## [0.5.1] - 2026-03-25
 
 ### Changed

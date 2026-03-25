@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Task Continuity"
+  short_description: "Coordinate the long-task continuity suite across state, phase, and handoff boundaries"
+  default_prompt: "Use $skill-task-continuity when the task is explicitly about bootstrapping or coordinating the long-task continuity suite: route across context refresh, phase gates, and handoff concerns while keeping atomic package boundaries clear."

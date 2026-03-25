@@ -26,6 +26,10 @@
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
 | `skill-governance` | 用任务式入口治理 skill 资产，包括新增、启用、体检、修复、审计和补文档 | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
+| `skill-context-keeper` | 在长任务中刷新或重建当前工作状态，不扩展成阶段规划或最终交接 | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
+| `skill-phase-gate` | 把多步骤编码任务拆成明确阶段、检查点和退出条件 | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
+| `skill-handoff-summary` | 在暂停或转交时整理状态、阻塞点和下一步摘要 | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
+| `skill-task-continuity` | 在三个连续性原子包之间做套件级协调与边界控制 | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
 
 ## 快速开始
 
@@ -65,6 +69,10 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - English skill index: [skills/README.md](skills/README.md)
 - 中文技能索引: [skills/README.zh-CN.md](skills/README.zh-CN.md)
 - `skill-governance` 包说明: [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md)
+- `skill-context-keeper` 包说明: [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md)
+- `skill-phase-gate` 包说明: [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md)
+- `skill-handoff-summary` 包说明: [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md)
+- `skill-task-continuity` 包说明: [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md)
 - English publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
 
@@ -80,6 +88,10 @@ codex-skill-library/
     README.md
     README.zh-CN.md
     skill-governance/
+    skill-context-keeper/
+    skill-phase-gate/
+    skill-handoff-summary/
+    skill-task-continuity/
 ```
 
 ## 给维护者

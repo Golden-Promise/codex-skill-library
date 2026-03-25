@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Handoff Summary"
+  short_description: "Write concise pause and transfer notes for long-running coding work"
+  default_prompt: "Use $skill-handoff-summary when the task is pausing or changing hands: capture current status, blockers, open questions, and next steps in a concise handoff without turning it into a new workflow plan."
