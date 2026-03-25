@@ -73,12 +73,20 @@ class ManageSkillTests(unittest.TestCase):
     def setUpClass(cls):
         cls.module = load_manage_skill_module()
 
+    def child_env(self, overrides: dict[str, str] | None = None) -> dict[str, str]:
+        env = dict(os.environ)
+        env.pop("CI", None)
+        if overrides:
+            env.update(overrides)
+        return env
+
     def run_script(self, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             ["python3", str(SCRIPT_PATH), *args],
             check=False,
             text=True,
             capture_output=True,
+            env=self.child_env(),
         )
 
     def run_script_with_env(
@@ -86,14 +94,12 @@ class ManageSkillTests(unittest.TestCase):
         env: dict[str, str],
         *args: str,
     ) -> subprocess.CompletedProcess[str]:
-        merged_env = dict(os.environ)
-        merged_env.update(env)
         return subprocess.run(
             ["python3", str(SCRIPT_PATH), *args],
             check=False,
             text=True,
             capture_output=True,
-            env=merged_env,
+            env=self.child_env(env),
         )
 
     def run_script_from_path(self, script_path: Path, cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -103,6 +109,7 @@ class ManageSkillTests(unittest.TestCase):
             text=True,
             capture_output=True,
             cwd=str(cwd),
+            env=self.child_env(),
         )
 
     def test_default_prompt_generation_is_consistent(self):
@@ -130,6 +137,67 @@ class ManageSkillTests(unittest.TestCase):
             ),
             prompt,
         )
+
+    def test_run_script_ignores_host_ci_by_default(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            library_root = Path(tmpdir) / "_skill-library"
+            project_root = Path(tmpdir) / "demo-project"
+            canonical_dir = library_root / "demo-skill"
+            write_skill_dir(canonical_dir, skill_name="demo-skill")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            previous_ci = os.environ.get("CI")
+            os.environ["CI"] = "1"
+            try:
+                result = self.run_script(
+                    "enable",
+                    "demo-skill",
+                    "--library-root",
+                    str(library_root),
+                    "--project-root",
+                    str(project_root),
+                )
+            finally:
+                if previous_ci is None:
+                    os.environ.pop("CI", None)
+                else:
+                    os.environ["CI"] = previous_ci
+
+            project_exposure = project_root / ".agents" / "skills" / "demo-skill"
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(project_exposure.is_symlink())
+
+    def test_run_script_from_path_ignores_host_ci_by_default(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_root = Path(tmpdir) / "demo-project"
+            source_dir = project_root / "skill-governance"
+            scripts_dir = source_dir / "scripts"
+            write_skill_dir(source_dir, skill_name="skill-governance")
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            script_copy = scripts_dir / "manage_skill.py"
+            shutil.copy2(SCRIPT_PATH, script_copy)
+            shutil.copytree(ROOT_DIR / "scripts" / "skill_governance", scripts_dir / "skill_governance")
+            project_root.mkdir(parents=True, exist_ok=True)
+
+            previous_ci = os.environ.get("CI")
+            os.environ["CI"] = "1"
+            try:
+                result = self.run_script_from_path(
+                    script_copy,
+                    project_root,
+                    "--bootstrap-project-layout",
+                )
+            finally:
+                if previous_ci is None:
+                    os.environ.pop("CI", None)
+                else:
+                    os.environ["CI"] = previous_ci
+
+            project_link = project_root / ".agents" / "skills" / "skill-governance"
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(project_link.is_symlink())
 
     def test_validate_only_defaults_to_runtime_skill_dir(self):
         result = self.run_script("--validate-only")
