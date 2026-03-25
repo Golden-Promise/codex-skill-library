@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -24,6 +25,23 @@ class BootstrapSuiteTests(unittest.TestCase):
             text=True,
             capture_output=True,
         )
+
+    def test_bootstrap_allows_downstream_repo_with_installed_package_layout(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            downstream_root = Path(tmpdir) / "consumer-repo"
+            installed_package = downstream_root / "skills" / "skill-task-continuity"
+            shutil.copytree(ROOT, installed_package)
+
+            installed_script = installed_package / "scripts" / "bootstrap_suite.py"
+            result = subprocess.run(
+                ["python3", str(installed_script), "--target", str(downstream_root)],
+                check=False,
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((downstream_root / "AGENTS.md").exists())
 
     def test_bootstrap_copies_expected_files(self):
         with tempfile.TemporaryDirectory() as tmpdir:
