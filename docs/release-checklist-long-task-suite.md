@@ -7,7 +7,7 @@ Use this checklist when preparing the long-task continuity suite for merge, tag 
 ## 1. Pre-Release Sanity
 
 - Confirm the worktree is clean: `git status --short`
-- Confirm the release target is still `v0.6.0`; if more user-visible scope landed, recalculate before tagging.
+- Confirm the release target is still `v0.6.1`; if more user-visible scope landed, recalculate before tagging.
 - Re-read the repository entry docs and indexes:
   - [README.md](../README.md)
   - [README.zh-CN.md](../README.zh-CN.md)
@@ -96,8 +96,8 @@ done
 
 ## 6. Changelog And Version Confirmation
 
-- Confirm the next release is still `v0.6.0`.
-- Confirm pinned install examples that reference a tag use `v0.6.0`.
+- Confirm the next release is still `v0.6.1`.
+- Confirm pinned install examples that reference a tag use `v0.6.1`.
 - Confirm `CHANGELOG.md` is ready to ship with minimal or no editing.
 
 ## 7. Tag And GitHub Release
@@ -106,8 +106,8 @@ done
 - Create the tag:
 
 ```bash
-git tag v0.6.0
-git push origin v0.6.0
+git tag v0.6.1
+git push origin v0.6.1
 ```
 
 - Create the GitHub Release using the prepared release notes draft.
@@ -128,7 +128,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.0 \
+    --ref v0.6.1 \
     --dest "$tmpdir"
 done
 ```

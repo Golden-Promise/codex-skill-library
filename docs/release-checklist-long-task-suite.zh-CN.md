@@ -7,7 +7,7 @@
 ## 1. 发布前基本检查
 
 - 确认工作树干净：`git status --short`
-- 确认目标版本仍然是 `v0.6.0`；如果又插入了新的用户可见范围，先重新判断版本再打 tag。
+- 确认目标版本仍然是 `v0.6.1`；如果又插入了新的用户可见范围，先重新判断版本再打 tag。
 - 重新检查仓库入口和索引页：
   - [README.md](../README.md)
   - [README.zh-CN.md](../README.zh-CN.md)
@@ -96,8 +96,8 @@ done
 
 ## 6. 变更日志与版本确认
 
-- 确认下一次发布仍然是 `v0.6.0`。
-- 确认所有固定 tag 的安装示例都使用 `v0.6.0`。
+- 确认下一次发布仍然是 `v0.6.1`。
+- 确认所有固定 tag 的安装示例都使用 `v0.6.1`。
 - 确认 `CHANGELOG.md` 已经达到“基本不用再改就能发”的状态。
 
 ## 7. 打 Tag 与 GitHub Release
@@ -106,8 +106,8 @@ done
 - 创建并推送 tag：
 
 ```bash
-git tag v0.6.0
-git push origin v0.6.0
+git tag v0.6.1
+git push origin v0.6.1
 ```
 
 - 使用准备好的 release notes draft 创建 GitHub Release。
@@ -128,7 +128,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.0 \
+    --ref v0.6.1 \
     --dest "$tmpdir"
 done
 ```

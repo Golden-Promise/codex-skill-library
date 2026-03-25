@@ -61,7 +61,7 @@ That workflow is intentionally small: it runs package test directories under `sk
 - Increase the minor version for backward-compatible additions.
 - Increase the major version when package layout or workflow changes in a breaking way.
 - Keep `skills/skill-governance` stable as the public install path.
-- For the current long-task continuity publication pass, the expected next minor release is `v0.6.0` unless other user-visible scope lands first.
+- After withdrawing the original `v0.6.0` tag, the current long-task continuity publication target is `v0.6.1`.
 
 ## Install Smoke Tests For The Continuity Packages
 
@@ -116,7 +116,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.0 \
+    --ref v0.6.1 \
     --dest "$tmpdir"
 done
 ```

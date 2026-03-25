@@ -38,7 +38,7 @@
 你也可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity。`
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity，并使用 ref v0.6.0。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity，并使用 ref v0.6.1。`
 
 关于下游启动流程和提示词措辞，可查看 [references/install-playbook.zh-CN.md](references/install-playbook.zh-CN.md)。
 

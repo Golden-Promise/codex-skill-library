@@ -37,7 +37,7 @@
 你也可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance。`
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance，并使用 ref v0.6.0。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-governance 安装 skill-governance，并使用 ref v0.6.1。`
 
 关于命令模式和进阶说明，请查看 [references/use-cases.zh-CN.md](references/use-cases.zh-CN.md)。
 

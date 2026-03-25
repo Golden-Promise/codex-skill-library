@@ -38,7 +38,7 @@ To install `skill-task-continuity`, use the standard published package path in t
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity.`
-- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using ref v0.6.0.`
+- `Use skill-installer to install skill-task-continuity from Golden-Promise/codex-skill-library at skills/skill-task-continuity using ref v0.6.1.`
 
 For downstream bootstrap walkthroughs and prompt wording, see [references/install-playbook.md](references/install-playbook.md).
 

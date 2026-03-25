@@ -22,7 +22,7 @@ Install a specific tagged release:
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.6.0
+  --ref v0.6.1
 ```
 
 ## Commands

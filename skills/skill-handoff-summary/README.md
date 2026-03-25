@@ -6,6 +6,7 @@
 
 `skill-handoff-summary` is the focused package for writing continuation-oriented pause or transfer summaries when long-running coding work needs to stop and resume later.
 It turns status, blockers, preserved constraints, and the exact next action into a compact restart note so the next session does not have to reconstruct intent from scattered thread history.
+It is for compact downstream artifacts such as `.agent-state/HANDOFF.md`, not whole-project documentation.
 
 ## Core Capabilities
 
@@ -41,7 +42,7 @@ To install `skill-handoff-summary`, use the standard published package path in t
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary.`
-- `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary using ref v0.6.0.`
+- `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary using ref v0.6.1.`
 
 For direct trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
 

@@ -49,7 +49,7 @@ To install `skill-phase-gate`, use the standard published package path in this r
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate.`
-- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref v0.6.0.`
+- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref v0.6.1.`
 
 For direct trigger examples and prompt wording, see [references/use-cases.md](references/use-cases.md).
 

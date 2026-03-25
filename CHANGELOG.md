@@ -17,7 +17,9 @@ All notable changes to `codex-skill-library` should be documented in this file.
 ### Changed
 
 - Update root docs, skills indexes, and publishing guides so all four continuity packages are discoverable, install guidance stays aligned with `skill-installer`, and maintainers can find smoke-test and release-checklist steps quickly.
-- Tighten continuity package README install guidance with direct, copyable install examples for `main` and the planned `v0.6.0` release.
+- Move command-heavy install examples out of the repository root README and keep package-level install guidance closer to the published package entry points.
+- Polish the four continuity package READMEs so they read more like package landing pages, stay friendlier for first-time readers, and preserve strict package boundaries.
+- Keep pinned install guidance aligned to the upcoming `v0.6.1` release after withdrawing the original `v0.6.0` tag.
 - Treat the continuity eval contract as a release-facing surface: routing now depends on published trigger guidance, workflow tokens must match exact package and polarity contracts, and optional guardrail metadata must be valid when present.
 
 ## [0.5.1] - 2026-03-25

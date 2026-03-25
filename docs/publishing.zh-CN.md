@@ -61,7 +61,7 @@ Pull request 应运行 [.github/workflows/pull-request-checks.yml](../.github/wo
 - 向后兼容的增强提升次版本
 - 如果包结构或工作流有破坏性变化，则提升主版本
 - 对外安装路径尽量保持稳定，例如 `skills/skill-governance`
-- 对当前这次长任务连续性发布加固来说，如果没有新的用户可见范围插入，下一次次版本发布应为 `v0.6.0`
+- 由于原始 `v0.6.0` tag 已撤回，当前这次长任务连续性发布的目标版本应为 `v0.6.1`
 
 ## 连续性包的安装 Smoke Test
 
@@ -116,7 +116,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.0 \
+    --ref v0.6.1 \
     --dest "$tmpdir"
 done
 ```
