@@ -2,14 +2,12 @@
 
 import argparse
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 LIBRARY_ROOT = PACKAGE_ROOT.parents[1]
-PUBLIC_REPO_SLUG = "Golden-Promise/codex-skill-library"
 TEMPLATE_MAP = {
     "AGENTS.md": "assets/AGENTS.repo-template.md",
     ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
@@ -40,32 +38,38 @@ def parse_args():
     )
     return parser.parse_args()
 
+
+PUBLIC_LIBRARY_MARKER_FILES = [
+    "README.md",
+    "skills/README.md",
+    "skills/README.zh-CN.md",
+    "docs/publishing.md",
+    "docs/publishing.zh-CN.md",
+]
+PUBLIC_LIBRARY_MARKER_PACKAGES = [
+    "skill-context-keeper",
+    "skill-phase-gate",
+    "skill-handoff-summary",
+    "skill-task-continuity",
+]
+
+
 def looks_like_public_library_checkout(root):
     if root != LIBRARY_ROOT:
         return False
 
-    readme_path = root / "README.md"
-    if not readme_path.exists():
+    if any(not (root / relative_path).exists() for relative_path in PUBLIC_LIBRARY_MARKER_FILES):
         return False
 
-    readme_text = readme_path.read_text(encoding="utf-8")
+    readme_text = (root / "README.md").read_text(encoding="utf-8")
     if not readme_text.startswith("# codex-skill-library"):
         return False
 
-    try:
-        result = subprocess.run(
-            ["git", "-C", str(root), "config", "--get", "remote.origin.url"],
-            check=False,
-            text=True,
-            capture_output=True,
-        )
-    except OSError:
-        return False
+    for package_name in PUBLIC_LIBRARY_MARKER_PACKAGES:
+        if not (root / "skills" / package_name / "README.md").exists():
+            return False
 
-    if result.returncode != 0:
-        return False
-
-    return PUBLIC_REPO_SLUG in result.stdout.strip()
+    return True
 
 
 def validate_target(target):
