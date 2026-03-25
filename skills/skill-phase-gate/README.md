@@ -40,6 +40,23 @@ You can ask Codex in natural language:
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate.`
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using the release or ref I specify.`
 
+Or run `skill-installer` directly:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate
+```
+
+Pin the planned continuity-suite release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 Use this package at a meaningful checkpoint before or after implementation work.

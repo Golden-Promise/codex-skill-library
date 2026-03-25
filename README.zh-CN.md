@@ -26,43 +26,46 @@
 | Skill | 适用场景 | 文档 |
 | --- | --- | --- |
 | `skill-governance` | 用任务式入口治理 skill 资产，包括新增、启用、体检、修复、审计和补文档 | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
-| `skill-context-keeper` | 在长任务中刷新或重建当前工作状态，不扩展成阶段规划或最终交接 | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
-| `skill-phase-gate` | 把多步骤编码任务拆成明确阶段、检查点和退出条件 | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
-| `skill-handoff-summary` | 在暂停或转交时整理状态、阻塞点和下一步摘要 | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
-| `skill-task-continuity` | 在三个连续性原子包之间做套件级协调与边界控制 | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
+| `skill-context-keeper` | 刷新当前任务状态，不扩展成检查点或交接职责 | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
+| `skill-phase-gate` | 在有分量的改动前后加入 preflight / postflight 检查点 | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
+| `skill-handoff-summary` | 在暂停或换人时生成紧凑、面向续做的交接摘要 | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
+| `skill-task-continuity` | 负责连续性套件的启动与组合，但不替代原子包 | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
 
 ## 快速开始
 
 1. 先看 [skills/README.zh-CN.md](skills/README.zh-CN.md) 浏览当前可用 skill。
 2. 进入具体 skill 包的 `README.md` 了解它是否适合你的场景。
-3. 使用 `skill-installer` 进行安装，通常直接安装到默认的 Codex 共享库。
-4. 现在可先阅读该包下的参考页了解边界说明，后续阶段再继续使用其中补充的示例与提示词资料。
+3. 使用 `skill-installer` 安装目标包，可直接跟踪 `main`，也可固定到某个 tag。
+4. 如果你需要整套连续性流程的启动或组合说明，先从 `skill-task-continuity` 开始；如果只需要单个动作，直接安装对应的原子包。
+5. 现在可先阅读该包下的参考页了解边界说明，后续阶段再继续使用其中补充的示例与提示词资料。
 
 ## 安装示例
 
-从当前仓库安装 `skill-governance`：
+从仓库默认分支安装连续性套件入口包：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance
+  --path skills/skill-task-continuity
 ```
 
-固定安装当前发布版本：
+固定安装即将发布的连续性套件版本：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance \
-  --ref v0.5.1
+  --path skills/skill-task-continuity \
+  --ref v0.6.0
 ```
 
-也可以直接使用 GitHub tree URL：
+也可以直接使用 GitHub tree URL 指向公开包页面：
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-governance
+  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-task-continuity
 ```
+
+如果你要做四个连续性包的维护者 smoke test，请直接看 [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)。
 
 ## 阅读入口
 
@@ -75,6 +78,8 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - `skill-task-continuity` 包说明: [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md)
 - English publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
+- English continuity-suite release checklist: [docs/release-checklist-long-task-suite.md](docs/release-checklist-long-task-suite.md)
+- 中文连续性套件发布清单: [docs/release-checklist-long-task-suite.zh-CN.md](docs/release-checklist-long-task-suite.zh-CN.md)
 
 ## 仓库结构
 
@@ -97,4 +102,5 @@ codex-skill-library/
 ## 给维护者
 
 仓库级的版本、发布流程和校验说明统一放在 [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)。
-如果你是第一次发布这个仓库，建议先看那份文档，而不是直接从包内运行时说明开始。
+连续性套件发布清单在 [docs/release-checklist-long-task-suite.zh-CN.md](docs/release-checklist-long-task-suite.zh-CN.md)。
+如果你是第一次发布这个仓库，建议先看这些维护者文档，而不是直接从包内运行时说明开始。

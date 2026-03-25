@@ -6,11 +6,19 @@ All notable changes to `codex-skill-library` should be documented in this file.
 
 ### Added
 
-- Add scaffolded package roots for `skill-context-keeper`, `skill-phase-gate`, `skill-handoff-summary`, and `skill-task-continuity`, including bilingual README landing pages, routing-first `SKILL.md` files, OpenAI agent metadata, and visible first-pass package directories.
-- Add bootstrap groundwork for the long-task continuity suite through initial package metadata, install entry points, and repository index coverage.
-- Add evaluation scaffolding groundwork by reserving package directories for future references, scripts, tests, and template assets tied to the long-task continuity suite.
-- Add a static CSV-driven evaluation harness under `evals/` with repo-local reporting for trigger routing, artifact expectations, event namespaces, boundary language, and future guardrail columns.
-- Tighten the long-task continuity eval harness so routing now depends on published trigger guidance, workflow tokens match exact package/polarity contracts, and optional guardrail metadata is validated rather than just parsed.
+- Publish four long-task continuity packages under `skills/`: `skill-context-keeper`, `skill-phase-gate`, `skill-handoff-summary`, and `skill-task-continuity`.
+- Add bilingual package entry docs, routing-first `SKILL.md` files, OpenAI agent metadata, reader-facing references, downstream template assets, and package contract tests for the new continuity packages.
+- Add the continuity-suite bootstrap helper and downstream template set for `AGENTS.md` plus `.agent-state/*.md` files without turning the repository root into a consumer repo.
+- Add `docs/long-task-suite.md` and `docs/long-task-suite.zh-CN.md` so maintainers and readers can understand the suite architecture without opening package internals.
+- Add a static continuity eval harness under `evals/` with seed cases, per-package artifact checks, routing checks, exact workflow-token checks, and optional guardrail metadata validation.
+- Add a pull-request workflow for published package tests plus continuity eval checks.
+- Add bilingual release checklist guidance for the continuity-suite publication flow.
+
+### Changed
+
+- Update root docs, skills indexes, and publishing guides so all four continuity packages are discoverable, install guidance stays aligned with `skill-installer`, and maintainers can find smoke-test and release-checklist steps quickly.
+- Tighten continuity package README install guidance with direct, copyable install examples for `main` and the planned `v0.6.0` release.
+- Treat the continuity eval contract as a release-facing surface: routing now depends on published trigger guidance, workflow tokens must match exact package and polarity contracts, and optional guardrail metadata must be valid when present.
 
 ## [0.5.1] - 2026-03-25
 

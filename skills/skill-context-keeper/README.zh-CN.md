@@ -45,6 +45,23 @@
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-context-keeper 安装 skill-context-keeper。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-context-keeper 安装 skill-context-keeper，并使用我指定的 release 或 ref。`
 
+如果你想直接运行 `skill-installer`，可使用：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper
+```
+
+固定到本次连续性套件计划发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 当任务在继续执行前需要一次可靠的状态刷新时，就从这个包开始。

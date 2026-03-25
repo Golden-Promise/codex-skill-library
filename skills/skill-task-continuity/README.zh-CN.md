@@ -31,6 +31,23 @@
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-task-continuity 安装 skill-task-continuity，并使用我指定的 release 或 ref。`
 
+如果你想直接运行 `skill-installer`，可使用：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-task-continuity
+```
+
+固定到本次连续性套件计划发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-task-continuity \
+  --ref v0.6.0
+```
+
 ## 启动下游仓库
 
 先用 dry run 预览即将写入的文件：

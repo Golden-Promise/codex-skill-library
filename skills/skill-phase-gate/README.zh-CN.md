@@ -40,6 +40,23 @@
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用我指定的 release 或 ref。`
 
+如果你想直接运行 `skill-installer`，可使用：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate
+```
+
+固定到本次连续性套件计划发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-phase-gate \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 在实现前后的关键检查点调用这个包。

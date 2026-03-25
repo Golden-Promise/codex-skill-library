@@ -37,7 +37,7 @@ To install `skill-governance`, use the standard package path in your Codex works
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance.`
-- `Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.5.1.`
+- `Use skill-installer to install skill-governance from Golden-Promise/codex-skill-library at skills/skill-governance using ref v0.6.0.`
 
 For command patterns and advanced installation notes, see [references/use-cases.md](references/use-cases.md).
 

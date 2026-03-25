@@ -46,6 +46,23 @@ You can ask Codex in natural language:
 - `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary.`
 - `Use skill-installer to install skill-handoff-summary from Golden-Promise/codex-skill-library at skills/skill-handoff-summary using the release or ref I specify.`
 
+Or run `skill-installer` directly:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary
+```
+
+Pin the planned continuity-suite release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 Reach for this package when execution is about to pause or move to another owner.

@@ -45,6 +45,23 @@ You can ask Codex in natural language:
 - `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper.`
 - `Use skill-installer to install skill-context-keeper from Golden-Promise/codex-skill-library at skills/skill-context-keeper using the release or ref I specify.`
 
+Or run `skill-installer` directly:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper
+```
+
+Pin the planned continuity-suite release:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-context-keeper \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 Start when the task needs a reliable state refresh before execution continues.

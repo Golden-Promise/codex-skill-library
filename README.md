@@ -26,43 +26,46 @@ This repository is designed for people who want to:
 | Skill | Best For | Docs |
 | --- | --- | --- |
 | `skill-governance` | Governing skill assets with task-first add, enable, doctor, repair, audit, and document flows | [EN](skills/skill-governance/README.md) / [中文](skills/skill-governance/README.zh-CN.md) |
-| `skill-context-keeper` | Refreshing or reconstructing long-task state without turning it into phase planning or a final handoff | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
-| `skill-phase-gate` | Splitting multi-step coding work into explicit phases, checkpoints, and exit criteria | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
-| `skill-handoff-summary` | Writing pause or transfer summaries with status, blockers, and next steps | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
-| `skill-task-continuity` | Coordinating the long-task continuity suite across the three narrower continuity packages | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
+| `skill-context-keeper` | Refreshing current task state without drifting into checkpoints or handoff ownership | [EN](skills/skill-context-keeper/README.md) / [中文](skills/skill-context-keeper/README.zh-CN.md) |
+| `skill-phase-gate` | Adding preflight and postflight checkpoints around meaningful edits | [EN](skills/skill-phase-gate/README.md) / [中文](skills/skill-phase-gate/README.zh-CN.md) |
+| `skill-handoff-summary` | Writing compact continuation handoffs when work pauses or changes owners | [EN](skills/skill-handoff-summary/README.md) / [中文](skills/skill-handoff-summary/README.zh-CN.md) |
+| `skill-task-continuity` | Bootstrapping and composing the continuity suite without replacing the atomic packages | [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md) |
 
 ## Quick Start
 
 1. Open the package list in [skills/README.md](skills/README.md).
 2. Choose a skill and read its package `README.md`.
-3. Install it with `skill-installer`, usually into the default Codex shared library.
-4. Use the package reference pages for boundary notes now, and later for examples, prompts, and deeper guidance.
+3. Install the package you want with `skill-installer`, using either `main` or a tagged release.
+4. For the continuity workflow, start with `skill-task-continuity` when you need suite bootstrap or composition guidance, or install the narrower atomic package directly.
+5. Use the package reference pages for boundary notes now, and later for examples, prompts, and deeper guidance.
 
-## Install Example
+## Install Examples
 
-Install `skill-governance` from this repository:
-
-```bash
-python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance
-```
-
-Install the current release:
+Install the suite entry package from the repository default branch:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
-  --path skills/skill-governance \
-  --ref v0.5.1
+  --path skills/skill-task-continuity
 ```
 
-Install from a GitHub tree URL:
+Pin the upcoming continuity-suite release:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
-  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-governance
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-task-continuity \
+  --ref v0.6.0
 ```
+
+Install from a GitHub tree URL when you want the public package page directly:
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --url https://github.com/Golden-Promise/codex-skill-library/tree/main/skills/skill-task-continuity
+```
+
+For maintainer smoke-test commands covering all four continuity packages, use [docs/publishing.md](docs/publishing.md).
 
 ## Reading Guide
 
@@ -75,6 +78,8 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - `skill-task-continuity` package: [EN](skills/skill-task-continuity/README.md) / [中文](skills/skill-task-continuity/README.zh-CN.md)
 - Repository publishing guide: [docs/publishing.md](docs/publishing.md)
 - 中文发布说明: [docs/publishing.zh-CN.md](docs/publishing.zh-CN.md)
+- Release checklist for the continuity suite: [docs/release-checklist-long-task-suite.md](docs/release-checklist-long-task-suite.md)
+- 中文连续性套件发布清单: [docs/release-checklist-long-task-suite.zh-CN.md](docs/release-checklist-long-task-suite.zh-CN.md)
 
 ## Repository Layout
 
@@ -97,4 +102,5 @@ codex-skill-library/
 ## For Maintainers
 
 Repository versioning, release flow, and validation steps are documented in [docs/publishing.md](docs/publishing.md).
-If you are publishing this repository for the first time, start there instead of the package runtime docs.
+The continuity-suite release checklist lives in [docs/release-checklist-long-task-suite.md](docs/release-checklist-long-task-suite.md).
+If you are publishing this repository for the first time, start with those maintainer docs instead of the package runtime docs.

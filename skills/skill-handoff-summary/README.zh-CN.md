@@ -46,6 +46,23 @@
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary。`
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary，并使用我指定的 release 或 ref。`
 
+如果你想直接运行 `skill-installer`，可使用：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary
+```
+
+固定到本次连续性套件计划发布版本：
+
+```bash
+python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
+  --repo Golden-Promise/codex-skill-library \
+  --path skills/skill-handoff-summary \
+  --ref v0.6.0
+```
+
 ## How To Use
 
 当执行即将暂停，或者任务要移交给另一个负责人时，就使用这个包。
