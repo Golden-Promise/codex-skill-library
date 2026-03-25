@@ -28,8 +28,8 @@
 ## Resume Prompt
 
 ```text
-Resume this task from .agent-state/HANDOFF.md.
-Continue from the recorded status, preserve the listed constraints, inspect the files of interest,
-resolve the open problems in priority order, perform the exact next action first,
-and update the handoff if anything material changes.
+请从 .agent-state/HANDOFF.md 继续这个任务。
+沿着已记录的当前状态往下推进，保留其中列出的约束，先检查提到的相关文件，
+再按优先级处理开放问题，优先执行“精确下一步动作”，
+并在出现任何重要变化时更新这份交接。
 ```

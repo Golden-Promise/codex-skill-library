@@ -12,6 +12,8 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
             ROOT / "README.zh-CN.md",
             ROOT / "SKILL.md",
             ROOT / "agents" / "openai.yaml",
+            ROOT / "references" / "README.md",
+            ROOT / "references" / "README.zh-CN.md",
             ROOT / "references" / "use-cases.md",
             ROOT / "references" / "use-cases.zh-CN.md",
             ROOT / "references" / "prompt-templates.en.md",
@@ -54,6 +56,14 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
         text = (ROOT / "assets" / "HANDOFF.template.md").read_text(encoding="utf-8")
         self.assertIn("Resume Prompt", text)
         self.assertIn("Resume this task from .agent-state/HANDOFF.md.", text)
+
+    def test_chinese_references_use_natural_resume_prompt_wording(self):
+        for path in [
+            ROOT / "references" / "use-cases.zh-CN.md",
+            ROOT / "references" / "prompt-templates.zh-CN.md",
+        ]:
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("请从 .agent-state/HANDOFF.md 继续这个任务。", text)
 
 
 if __name__ == "__main__":
