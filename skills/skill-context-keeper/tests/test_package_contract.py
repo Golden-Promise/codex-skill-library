@@ -10,9 +10,12 @@ class ContextKeeperPackageTests(unittest.TestCase):
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: skill-context-keeper", text)
 
-    def test_readmes_exist(self):
+    def test_core_package_files_exist(self):
         self.assertTrue((ROOT / "README.md").exists())
         self.assertTrue((ROOT / "README.zh-CN.md").exists())
+        self.assertTrue((ROOT / "agents" / "openai.yaml").exists())
+        self.assertTrue((ROOT / "references" / "prompt-templates.en.md").exists())
+        self.assertTrue((ROOT / "references" / "prompt-templates.zh-CN.md").exists())
 
     def test_task_state_template_has_required_sections(self):
         text = (ROOT / "assets" / "TASK_STATE.template.md").read_text(encoding="utf-8")
@@ -30,19 +33,28 @@ class ContextKeeperPackageTests(unittest.TestCase):
         ]:
             self.assertIn(heading, text)
 
-    def test_reference_guides_include_trigger_sections(self):
-        for relative_path in [
-            ROOT / "references" / "use-cases.md",
-            ROOT / "references" / "use-cases.zh-CN.md",
-        ]:
-            text = relative_path.read_text(encoding="utf-8")
-            self.assertRegex(text, r"(?im)^## .*positive trigger")
-            self.assertRegex(text, r"(?im)^## .*negative trigger")
+    def test_english_use_cases_include_trigger_sections(self):
+        text = (ROOT / "references" / "use-cases.md").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?im)^## +Positive Trigger Prompts$")
+        self.assertRegex(text, r"(?im)^## +Negative Trigger Prompts$")
+
+    def test_chinese_use_cases_include_trigger_sections(self):
+        text = (ROOT / "references" / "use-cases.zh-CN.md").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^## +适用触发示例$")
+        self.assertRegex(text, r"(?m)^## +不适用触发示例$")
 
     def test_readme_spells_out_package_boundary(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("does not own workflow gating", text)
         self.assertIn("does not own final handoffs", text)
+
+    def test_reference_indexes_point_to_published_files(self):
+        english = (ROOT / "references" / "README.md").read_text(encoding="utf-8")
+        chinese = (ROOT / "references" / "README.zh-CN.md").read_text(encoding="utf-8")
+
+        for text in [english, chinese]:
+            self.assertIn("use-cases", text)
+            self.assertIn("prompt-templates", text)
 
 
 if __name__ == "__main__":
