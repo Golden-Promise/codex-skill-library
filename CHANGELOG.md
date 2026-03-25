@@ -10,6 +10,7 @@ All notable changes to `codex-skill-library` should be documented in this file.
 - Add bootstrap groundwork for the long-task continuity suite through initial package metadata, install entry points, and repository index coverage.
 - Add evaluation scaffolding groundwork by reserving package directories for future references, scripts, tests, and template assets tied to the long-task continuity suite.
 - Add a static CSV-driven evaluation harness under `evals/` with repo-local reporting for trigger routing, artifact expectations, event namespaces, boundary language, and future guardrail columns.
+- Tighten the long-task continuity eval harness so routing now depends on published trigger guidance, workflow tokens match exact package/polarity contracts, and optional guardrail metadata is validated rather than just parsed.
 
 ## [0.5.1] - 2026-03-25
 

@@ -68,8 +68,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "state/context.snapshot": "assets/TASK_STATE.template.md",
             "state/continuity.note": "assets/TASK_STATE.template.md",
         },
-        "positive_event_prefixes": ["context:"],
-        "negative_event_prefixes": ["context:skip", "direct:answer"],
+        "positive_events": ["context:reload", "context:reconstruct", "context:summary"],
+        "negative_events": ["context:skip", "direct:answer"],
         "workflow_files": [
             "references/use-cases.md",
             "references/use-cases.zh-CN.md",
@@ -116,8 +116,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "plan/checkpoints.md": "assets/PREFLIGHT.template.md",
             "plan/exit-criteria.md": "assets/POSTFLIGHT.template.md",
         },
-        "positive_event_prefixes": ["phase:"],
-        "negative_event_prefixes": ["phase:skip", "direct:edit"],
+        "positive_events": ["phase:split", "phase:checkpoint", "phase:gate"],
+        "negative_events": ["phase:skip", "direct:edit"],
         "workflow_files": [
             "references/README.md",
             "references/README.zh-CN.md",
@@ -164,8 +164,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             "handoff/blockers.md": "assets/HANDOFF.template.md",
             "handoff/next-steps.md": "assets/HANDOFF.template.md",
         },
-        "positive_event_prefixes": ["handoff:"],
-        "negative_event_prefixes": ["handoff:skip", "direct:answer"],
+        "positive_events": ["handoff:capture", "handoff:pause", "handoff:transfer"],
+        "negative_events": ["handoff:skip", "direct:answer"],
         "workflow_files": [
             "references/README.md",
             "references/README.zh-CN.md",
@@ -208,8 +208,8 @@ PACKAGE_RULES: dict[str, dict[str, Any]] = {
             ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
             ".agent-state/HANDOFF.md": "assets/agent-state/HANDOFF.template.md",
         },
-        "positive_event_prefixes": ["bootstrap:"],
-        "negative_event_prefixes": ["bootstrap:skip", "direct:edit"],
+        "positive_events": ["bootstrap:agents_md", "bootstrap:task_state", "bootstrap:handoff"],
+        "negative_events": ["bootstrap:skip", "direct:edit"],
         "workflow_files": [
             "references/composition-guide.md",
             "references/install-playbook.md",
@@ -307,66 +307,86 @@ def _artifact_targets(case: EvalCase, package_rules: dict[str, Any]) -> tuple[li
     return [Path(target) for target in targets], unmapped
 
 
-def _score_routing(case: EvalCase, package_rules: dict[str, Any]) -> dict[str, Any]:
+def _score_routing(package_root: Path, case: EvalCase, package_rules: dict[str, Any]) -> dict[str, Any]:
     trigger_hits = _matched_phrases(case.user_prompt, package_rules["trigger_cues"])
     suppress_hits = _matched_phrases(case.user_prompt, package_rules["suppress_cues"])
+    docs_sources = (
+        _read_text(package_root / "README.md")
+        + "\n"
+        + _read_text(package_root / "README.zh-CN.md")
+        + "\n"
+        + _read_text(package_root / "SKILL.md")
+    )
+    docs_trigger_hits = _matched_phrases(docs_sources, package_rules["trigger_cues"])
+    docs_suppress_hits = _matched_phrases(docs_sources, package_rules["suppress_cues"])
+
+    docs_ok = bool(docs_trigger_hits and docs_suppress_hits)
 
     if case.should_trigger:
-        status = "pass" if trigger_hits and not suppress_hits else "fail"
+        status = "pass" if trigger_hits and not suppress_hits and docs_ok else "fail"
         if status == "pass":
-            reason = f"trigger cues matched: {', '.join(trigger_hits)}"
+            reason = (
+                f"trigger cues matched: {', '.join(trigger_hits)}; "
+                f"routing docs matched: {', '.join(docs_trigger_hits)}"
+            )
         else:
             reason = (
-                "missing trigger cues or conflicting suppress cues: "
-                f"trigger={trigger_hits or ['none']}, suppress={suppress_hits or ['none']}"
+                "missing trigger cues, conflicting suppress cues, or routing docs guidance: "
+                f"trigger={trigger_hits or ['none']}, suppress={suppress_hits or ['none']}, "
+                f"docs_trigger={docs_trigger_hits or ['none']}, docs_suppress={docs_suppress_hits or ['none']}"
             )
     else:
-        status = "pass" if suppress_hits else "fail"
+        status = "pass" if suppress_hits and docs_ok else "fail"
         if status == "pass":
-            reason = f"suppress cues matched: {', '.join(suppress_hits)}"
+            reason = (
+                f"suppress cues matched: {', '.join(suppress_hits)}; "
+                f"routing docs matched: {', '.join(docs_suppress_hits)}"
+            )
         else:
-            reason = "missing suppress cues for a should-not-trigger case"
+            reason = (
+                "missing suppress cues, or routing docs guidance is incomplete: "
+                f"trigger={trigger_hits or ['none']}, suppress={suppress_hits or ['none']}, "
+                f"docs_trigger={docs_trigger_hits or ['none']}, docs_suppress={docs_suppress_hits or ['none']}"
+            )
 
     return {
         "status": status,
         "reason": reason,
         "trigger_hits": trigger_hits,
         "suppress_hits": suppress_hits,
+        "docs_trigger_hits": docs_trigger_hits,
+        "docs_suppress_hits": docs_suppress_hits,
     }
 
 
 def _score_events(case: EvalCase, package_rules: dict[str, Any]) -> dict[str, Any]:
-    allowed_prefixes = (
-        package_rules["positive_event_prefixes"]
+    allowed_events = (
+        package_rules["positive_events"]
         if case.should_trigger
-        else package_rules["negative_event_prefixes"]
+        else package_rules["negative_events"]
     )
-    matching = []
-    mismatched = []
-    for event in case.expected_events:
-        if any(event.startswith(prefix) for prefix in allowed_prefixes):
-            matching.append(event)
-        else:
-            mismatched.append(event)
+    expected_events = list(case.expected_events)
+    allowed_set = set(allowed_events)
+    expected_set = set(expected_events)
 
-    if not case.expected_events:
+    if not expected_events:
         status = "fail"
         reason = "expected events were not provided"
-    elif mismatched:
+    elif expected_set != allowed_set or len(expected_events) != len(allowed_events):
         status = "fail"
         reason = (
-            "event tokens do not match the expected namespace: "
-            f"allowed={allowed_prefixes}, mismatched={mismatched}"
+            "expected events do not match the allowed tokens for this package and polarity: "
+            f"allowed={allowed_events}, actual={expected_events}"
         )
     else:
         status = "pass"
-        reason = f"event namespace matched: {', '.join(matching)}"
+        reason = f"expected events matched exactly: {', '.join(expected_events)}"
 
     return {
         "status": status,
         "reason": reason,
-        "matching": matching,
-        "mismatched": mismatched,
+        "matching": expected_events if status == "pass" else [],
+        "mismatched": [] if status == "pass" else expected_events,
     }
 
 
@@ -404,6 +424,34 @@ def _score_docs(package_root: Path, package_rules: dict[str, Any]) -> dict[str, 
     }
 
 
+def _score_guardrails(case: EvalCase) -> dict[str, Any]:
+    if case.max_commands is None and case.max_verbosity is None:
+        return {
+            "status": "skipped",
+            "reason": "no optional guardrails configured",
+            "invalid": [],
+        }
+
+    invalid = []
+    if case.max_commands is not None and case.max_commands <= 0:
+        invalid.append("max_commands must be a positive integer")
+    if case.max_verbosity is not None and case.max_verbosity not in {"low", "medium", "high"}:
+        invalid.append("max_verbosity must be one of low, medium, or high")
+
+    if invalid:
+        return {
+            "status": "fail",
+            "reason": f"invalid guardrail metadata: {', '.join(invalid)}",
+            "invalid": invalid,
+        }
+
+    return {
+        "status": "pass",
+        "reason": "optional guardrail metadata is valid",
+        "invalid": [],
+    }
+
+
 def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
     package_rules = PACKAGE_RULES.get(case.package)
     package_root = _package_dir(repo_root, case.package)
@@ -424,7 +472,7 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
         result["details"]["unknown_package"] = case.package
         return result
 
-    routing = _score_routing(case, package_rules)
+    routing = _score_routing(package_root, case, package_rules)
     events = _score_events(case, package_rules)
     docs = _score_docs(package_root, package_rules)
 
@@ -440,12 +488,7 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
         artifact_status = "pass"
         artifact_reason = "expected artifact templates are present"
 
-    if case.max_commands is None and case.max_verbosity is None:
-        guardrail_status = "skipped"
-        guardrail_reason = "no optional guardrails configured"
-    else:
-        guardrail_status = "pass"
-        guardrail_reason = "optional guardrails parsed"
+    guardrails = _score_guardrails(case)
 
     result["dimensions"] = {
         "routing_quality": {
@@ -458,7 +501,7 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
             "reason": events["reason"],
         },
         "docs_clarity": {"status": docs["status"], "reason": docs["reason"]},
-        "guardrails": {"status": guardrail_status, "reason": guardrail_reason},
+        "guardrails": {"status": guardrails["status"], "reason": guardrails["reason"]},
     }
 
     result["details"] = {
@@ -468,9 +511,12 @@ def evaluate_case(repo_root: Path, case: EvalCase) -> dict[str, Any]:
         "expected_artifacts": list(case.expected_artifacts),
         "trigger_hits": routing["trigger_hits"],
         "suppress_hits": routing["suppress_hits"],
+        "docs_trigger_hits": routing["docs_trigger_hits"],
+        "docs_suppress_hits": routing["docs_suppress_hits"],
         "matching_events": events["matching"],
         "mismatched_events": events["mismatched"],
         "unmapped_artifacts": unmapped_artifacts,
+        "guardrail_invalid": guardrails["invalid"],
     }
     return result
 

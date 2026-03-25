@@ -41,6 +41,7 @@ python3 -m unittest discover -s evals -p 'test_*.py' -v
 ```
 
 套件运行器现在除了仓库形状检查之外，还会按提示词正负向、事件命名空间和严格产物映射来评分。
+路由评分还要求已发布的 `SKILL.md` 和 README 中保留触发提示，而可选的 guardrail 字段会以静态元数据合同来校验。
 
 ## 版本规则
 
@@ -71,4 +72,5 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - 仓库级说明放在根目录 `README.md` 和 `docs/`
 - 运行时说明保留在具体 skill 包内部
 - 静态套件校验放在 `evals/`，方便维护者在不运行模型的情况下验证触发覆盖、包边界、事件命名空间和产物映射
+- 当 `evals/cases.csv` 出现可选列时，把 `max_commands` 视为正整数合同，把 `max_verbosity` 视为 `low` / `medium` / `high` 的元数据检查
 - 如果仓库面向公开分享，关键说明建议提供中英文两个版本

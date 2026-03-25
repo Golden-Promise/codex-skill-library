@@ -8,11 +8,11 @@ It uses `evals/cases.csv` as the seed matrix and checks the published repository
 - CSV parsing and normalization
 - should-trigger vs should-not-trigger coverage from prompt polarity
 - expected artifact templates for each package, with strict token-to-template mapping
-- routing hints in `SKILL.md` and package READMEs
+- routing hints in `SKILL.md` and package READMEs, plus prompt polarity evidence
 - boundary language and non-overlap guidance in package READMEs
-- expected event tokens by package namespace and case polarity
+- expected event tokens by exact package and polarity contract
 - suite-level downstream templates and assets for `skill-task-continuity`
-- optional command-count or verbosity guardrails when future cases add them
+- static guardrail metadata validation when optional columns are present
 
 ## Run It
 
@@ -35,5 +35,5 @@ python3 -m unittest discover -s evals -p 'test_*.py' -v
 ## Adding Cases
 
 Add a new row to `evals/cases.csv`, then rerun the harness.
-If the case needs optional guardrails later, add the relevant CSV columns and the runner will normalize them without changing the API.
-For polarity-sensitive cases, make sure the prompt cues, expected events, and artifact tokens all match the package’s routing boundary.
+If the case needs optional guardrails later, add the relevant CSV columns and the runner will validate `max_commands > 0` and `max_verbosity` in `low|medium|high`.
+For polarity-sensitive cases, make sure the prompt cues, routing docs, expected events, and artifact tokens all match the package’s routing boundary.

@@ -41,6 +41,7 @@ python3 -m unittest discover -s evals -p 'test_*.py' -v
 ```
 
 The suite runner now scores prompt polarity, event namespaces, and strict artifact mapping in addition to repository shape checks.
+Routing quality also requires trigger guidance to remain visible in published `SKILL.md` and README files, and guardrail metadata is validated statically when optional columns are present.
 
 ## Versioning Rules
 
@@ -71,4 +72,5 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 - Keep repository-wide guidance in the root `README.md` and `docs/`.
 - Keep runtime guidance inside the skill package itself.
 - Keep static suite checks in `evals/` so maintainers can validate trigger coverage, package boundaries, event namespaces, and artifact mapping without executing a model.
+- Treat `max_commands` as a positive integer contract and `max_verbosity` as a `low` / `medium` / `high` metadata check when those columns appear in `evals/cases.csv`.
 - Prefer bilingual key docs when the repository is meant for public sharing.
