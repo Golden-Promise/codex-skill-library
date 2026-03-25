@@ -21,6 +21,30 @@ def load_runner_module():
     return module
 
 
+def write_cases_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    fieldnames = [
+        "case_id",
+        "package",
+        "scenario_type",
+        "should_trigger",
+        "user_prompt",
+        "expected_artifacts",
+        "expected_events",
+        "notes",
+    ]
+    extra_fields = []
+    for row in rows:
+        for key in row:
+            if key not in fieldnames and key not in extra_fields:
+                extra_fields.append(key)
+    fieldnames.extend(extra_fields)
+
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 class RunEvalsTests(unittest.TestCase):
     def test_seed_cases_csv_has_expected_columns(self):
         self.assertTrue(CASES_CSV.exists(), "seed cases file should exist")
@@ -92,20 +116,143 @@ class RunEvalsTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "cases.csv"
-            csv_path.write_text(
-                "\n".join(
-                    [
-                        "case_id,package,scenario_type,should_trigger,user_prompt,expected_artifacts,expected_events,notes,max_commands,max_verbosity",
-                        "demo,skill-context-keeper,positive,yes,Refresh state,assets/TASK_STATE.template.md,context:reload,optional guardrails,3,low",
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "demo",
+                        "package": "skill-context-keeper",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "Refresh state",
+                        "expected_artifacts": "assets/TASK_STATE.template.md",
+                        "expected_events": "context:reload",
+                        "notes": "optional guardrails",
+                        "max_commands": "3",
+                        "max_verbosity": "low",
+                    }
+                ],
             )
 
             cases = module.load_cases(csv_path)
             self.assertEqual(cases[0].max_commands, 3)
             self.assertEqual(cases[0].max_verbosity, "low")
+
+    def test_positive_case_requires_trigger_cues_to_pass(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_positive",
+                        "package": "skill-context-keeper",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "Please answer this one-off punctuation question in the README and do nothing else.",
+                        "expected_artifacts": "state/context.snapshot",
+                        "expected_events": "context:reload",
+                        "notes": "should fail if routing ignores polarity",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["routing_quality"]["status"], "fail")
+        self.assertIn("trigger cues", case["dimensions"]["routing_quality"]["reason"])
+
+    def test_negative_case_requires_suppress_cues_to_block_routing(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_negative",
+                        "package": "skill-handoff-summary",
+                        "scenario_type": "negative",
+                        "should_trigger": "no",
+                        "user_prompt": "Please write a handoff with blockers and next steps for the pause.",
+                        "expected_artifacts": "none",
+                        "expected_events": "handoff:skip|direct:answer",
+                        "notes": "should fail if negative polarity is ignored",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["routing_quality"]["status"], "fail")
+        self.assertIn("suppress cues", case["dimensions"]["routing_quality"]["reason"])
+
+    def test_expected_events_must_match_package_namespace(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_events",
+                        "package": "skill-phase-gate",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "We need to split this multi-step refactor into phases before coding.",
+                        "expected_artifacts": "plan/phase.plan",
+                        "expected_events": "context:reload",
+                        "notes": "should fail if expected events are not scored",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["workflow_completeness"]["status"], "fail")
+        self.assertIn("event", case["dimensions"]["workflow_completeness"]["reason"])
+
+    def test_unmapped_expected_artifacts_fail_strict_mapping(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "cases.csv"
+            write_cases_csv(
+                csv_path,
+                [
+                    {
+                        "case_id": "bad_artifacts",
+                        "package": "skill-handoff-summary",
+                        "scenario_type": "positive",
+                        "should_trigger": "yes",
+                        "user_prompt": "I need to stop for today; please write a handoff with blockers and next steps.",
+                        "expected_artifacts": "handoff/HANDOFF.md|handoff/missing.md",
+                        "expected_events": "handoff:capture",
+                        "notes": "should fail if unmapped artifact tokens are ignored",
+                    }
+                ],
+            )
+
+            report = module.run_evaluations(ROOT, csv_path)
+
+        case = report["cases"][0]
+        self.assertEqual(report["summary"]["failed"], 1)
+        self.assertEqual(case["dimensions"]["artifact_presence"]["status"], "fail")
+        self.assertIn("unmapped", case["dimensions"]["artifact_presence"]["reason"])
 
 
 if __name__ == "__main__":
