@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Context Packet"
+  short_description: "Compress the next turn into a minimum context object"
+  default_prompt: "Use $skill-context-packet when the next root or subtask turn needs a compact packet instead of a full state file: write .agent-state/root/PACKET.md or .agent-state/subtasks/<slug>/PACKET.md, preserve only the minimum objective, scope, inputs, facts, constraints, risks, exit criteria, and next command, and avoid taking over root-state refresh, subtask-state refresh, workflow gates, or handoffs."

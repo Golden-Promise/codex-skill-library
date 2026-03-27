@@ -4,8 +4,8 @@
 
 ## Overview
 
-`skill-phase-gate` adds compact preflight and postflight checkpoints around meaningful coding work.
-If the checkpoint itself adds value, use this skill.
+`skill-phase-gate` adds an optional operational checkpoint around meaningful coding work.
+If the checkpoint itself adds value for risky edits, use this skill.
 
 ## Start Here In 30 Seconds
 
@@ -24,7 +24,7 @@ Try this first:
 You can ask Codex in natural language:
 
 - `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate.`
-- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref v0.6.1.`
+- `Use skill-installer to install skill-phase-gate from Golden-Promise/codex-skill-library at skills/skill-phase-gate using ref <tag-or-commit>.`
 
 If you want the exact shell command, jump to [Install Details](#install-details).
 
@@ -42,13 +42,19 @@ Use the shipped templates as the starting shape:
 - the change is a trivial one-line edit
 - the work is a pure explanation task
 - the main problem is stale task state rather than checkpoint value
+- the main problem is root-state refresh rather than checkpoint value
+- the main problem is packet compression rather than checkpoint value
+- the main problem is suite bootstrap rather than checkpoint value
 - you need a pause or transfer handoff instead of a workflow checkpoint
 
-This package is not for trivial one-line edits and is not for pure explanation tasks.
+This package is not for trivial one-line edits, is not for pure explanation tasks, is not for root-state refresh, is not for packet compression, and is not for suite bootstrap.
+Treat it as an optional operational checkpoint for risky edits.
 
 ## Related Skills
 
-- `skill-context-keeper` for rebuilding task state before or after meaningful work
+- `skill-context-keeper` for rebuilding root task state before or after meaningful work
+- `skill-subtask-context` for bounded child-task state
+- `skill-context-packet` for packet-sized next-turn context
 - `skill-handoff-summary` for pause and transfer notes
 - `skill-task-continuity` for first-time setup and suite-level routing
 
@@ -71,5 +77,5 @@ Replace `/path/to/install-skill-from-github.py` with the actual path to your loc
 python3 /path/to/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-phase-gate \
-  --ref v0.6.1
+  --ref <tag-or-commit>
 ```

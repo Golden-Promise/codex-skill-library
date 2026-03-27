@@ -2,97 +2,116 @@
 
 ## Problem Statement
 
-Long threads usually do not fail all at once. They fail by degrees: the shared state gets stale, the workflow loses its shape, and handoffs become too thin for the next agent to trust.
+Long-running work rarely fails in one dramatic moment.
+It drifts.
 
-This suite exists to make those failure modes explicit. It treats long-task degradation as three separate problems:
+- root state becomes stale or bloated
+- child-task details leak into the wrong place
+- the next turn loads too much context
+- risky edits lose checkpoints
+- pauses leave the next agent guessing
 
-- state drift, where the working picture no longer matches reality
-- workflow drift, where the task stops following a deliberate sequence of phases and checkpoints
-- handoff friction, where another agent cannot resume without guessing
+The context protocol exists to make those failure modes explicit and routable.
+Instead of treating “continuity” as one vague summary problem, the suite separates root state, subtask state, packet compression, checkpoints, and handoffs.
 
-The goal is not to add more ceremony. The goal is to make continuity measurable so that long tasks stay resumable, inspectable, and transferable.
+## The Context Protocol
 
-## State Drift, Workflow Drift, And Handoff Friction
+The current suite is organized around three state layers:
 
-These three failure modes overlap, but they are not the same thing.
+- **Root state:** the durable top-level picture for the main task
+- **Subtask state:** bounded child-task context that should not pollute the root summary
+- **Packets:** the minimum context object for the next root or subtask turn
 
-State drift appears when summaries, context, or task memory lag behind the actual work. The risk is silent divergence: the thread sounds confident while carrying the wrong assumptions.
+These layers are backed by a repo-first starter layout:
 
-Workflow drift appears when a task that needs staged execution starts behaving like a single shot. The work may still move forward, but it loses checkpoints, decision points, and clear boundaries.
+- `AGENTS.md`
+- `.agent-state/INDEX.md`
+- `.agent-state/root/`
+- `.agent-state/subtasks/`
+- `.agent-state/archive/`
 
-Handoff friction appears when a pause or transfer leaves too little signal for the next agent. The work is not necessarily wrong, just expensive to resume.
-
-The suite uses these distinctions to decide which package should trigger and which one should stay out of the way.
-
-The evaluation matrix uses normalized artifact paths and event tokens so the runner can validate results consistently.
+Beginner mode usually stays in `INDEX.md` plus `.agent-state/root/`.
+Expanded mode starts when work is split into child tasks or archived into packet-sized continuation objects.
 
 ## Package Map
 
 | Package | Responsibility | Trigger Shape |
 | --- | --- | --- |
-| `skill-context-keeper` | Preserve and reconstruct working state across long threads, especially after interruptions or stale summaries. | Resume, refresh, or reconcile context. |
-| `skill-phase-gate` | Decide when work needs phase boundaries, checkpoints, or a deliberate pause before execution continues. | Split, gate, or stage the work. |
-| `skill-handoff-summary` | Produce a clean transfer note when work is paused or handed to another agent. | Summarize status, blockers, and next steps. |
-| `skill-task-continuity` | Orchestrate the three atomic packages when the task itself is about maintaining long-thread continuity. | Bootstrap the suite, coordinate boundaries, and keep the flow coherent. |
+| `skill-context-keeper` | Refresh and compress trusted root-task state. | The root task is active but stale, noisy, or bloated. |
+| `skill-subtask-context` | Open, refresh, or close bounded child-task state. | A child task needs its own local scope and restart state. |
+| `skill-context-packet` | Write the minimum context packet for the next turn. | The next step needs less than a full state file. |
+| `skill-phase-gate` | Add an optional operational checkpoint around risky work. | A meaningful multi-file change needs explicit preflight or postflight control. |
+| `skill-handoff-summary` | Capture a compact root or subtask handoff. | Work is about to pause, transfer, or cross sessions. |
+| `skill-task-continuity` | Bootstrap the suite and route to the correct atomic package. | A repo needs starter files, protocol guidance, or package-selection help. |
+
+## Compatibility And Migration
+
+If you previously thought of this suite as four packages that handled “state, gates, handoff, and orchestration,” you should read the migration guide:
+
+- [docs/context-protocol-migration.md](context-protocol-migration.md)
+- [docs/context-protocol-migration.zh-CN.md](context-protocol-migration.zh-CN.md)
+
+The short version:
+
+- root-state refresh still belongs to `skill-context-keeper`
+- `skill-phase-gate` is no longer the continuity center
+- subtask isolation now has a first-class owner: `skill-subtask-context`
+- minimal next-turn injection now has a first-class owner: `skill-context-packet`
 
 ## Repository Boundary Rules
 
 This repository is a public installable skill library, so the suite docs must stay reader-facing and maintainable.
 
-- Keep the suite spec in `docs/`, not in live agent state files.
-- Do not create a root `AGENTS.md`, `.agent-state/`, or public-package `.agents/skills` content for this task.
-- Treat `evals/cases.csv` as the source of truth for trigger coverage, but keep the prose docs understandable on their own.
-- Describe package boundaries in plain language; do not require readers to open package implementation files first.
-- Prefer the narrowest package that matches the prompt. The composition package should not steal work that belongs to an atomic package.
-- Make ambiguity explicit in the matrix so maintainers can see when a keyword match is not a real trigger.
+- Keep public architecture in `docs/`, not in live repo state files for this library itself.
+- Treat `evals/cases.csv` as the normalized routing matrix, not as a private scratchpad.
+- Prefer the narrowest package that matches the request.
+- Do not let the suite entry package steal work that belongs to a single atomic package.
+- Keep beginner-mode guidance obvious for users who do not need subtask splitting yet.
+- Keep migration guidance explicit so older four-package users do not guess their way into the new model.
 
 ## Success Criteria
 
-### Outcome
+The suite is successful when a downstream repo can follow this path without rereading a whole thread:
 
-- Long-thread work can be resumed, paused, or transferred without losing intent.
-- The suite catches both false positives and false negatives for the four target packages.
-- A maintainer can understand the architecture and boundaries without opening package source files.
+1. bootstrap continuity starter files
+2. refresh root state
+3. split a bounded subtask
+4. inject only a packet into the next execution turn
+5. checkpoint a risky change when needed
+6. pause with a valid handoff
+7. resume from root or subtask artifacts without context bleed
 
-### Process
+## Seed Evaluation Matrix
 
-- The eval matrix includes positive trigger cases and negative trigger cases for every atomic package.
-- The matrix includes at least one composition-package bootstrap case and one boundary-protection case.
-- Each case records the expected artifacts and the expected workflow event or command shape when that matters.
-
-### Style
-
-- The docs stay concise, public-reader-friendly, and easy to scan.
-- English and Chinese versions share the same major section order.
-- Trigger notes read like maintainer guidance, not like internal scratchpad text.
-
-### Efficiency
-
-- Maintainers can validate the suite from the docs and CSV without reverse-engineering package code.
-- The matrix is small enough to extend without becoming noisy.
-- Ambiguous prompts are documented once, then reused as regression coverage.
-
-## Initial Evaluation Matrix
-
-The seed matrix lives in `evals/cases.csv`. The table below shows the initial coverage shape and the kinds of expected artifacts and workflow events to look for.
+The seed matrix lives in `evals/cases.csv`.
+It now validates the protocol model rather than the older flat-layout model.
 
 | Case | Package | Trigger | Prompt Shape | Expected Artifacts | Expected Events |
 | --- | --- | --- | --- | --- | --- |
-| `context_resume` | `skill-context-keeper` | Yes | Resume the last known state and carry forward unresolved work. | `state/context.snapshot`, `state/continuity.note` | `context:reload`, `context:reconstruct`, `context:summary` |
-| `context_resume_not_needed` | `skill-context-keeper` | No | Answer a one-off question with no continuity risk. | `none` | `context:skip`, `direct:answer` |
-| `phase_gate_before_multi_step` | `skill-phase-gate` | Yes | Split a multi-step task into phases before coding starts. | `plan/phase.plan`, `plan/checkpoints.md`, `plan/exit-criteria.md` | `phase:split`, `phase:checkpoint`, `phase:gate` |
-| `tiny_edit_not_gate` | `skill-phase-gate` | No | Make a tiny local edit with no staged workflow. | `none` | `phase:skip`, `direct:edit` |
-| `handoff_before_pause` | `skill-handoff-summary` | Yes | Pause work and hand it to another agent. | `handoff/HANDOFF.md`, `handoff/blockers.md`, `handoff/next-steps.md` | `handoff:capture`, `handoff:pause`, `handoff:transfer` |
-| `handoff_not_needed` | `skill-handoff-summary` | No | Give a final answer without transfer notes. | `none` | `handoff:skip`, `direct:answer` |
-| `suite_bootstrap` | `skill-task-continuity` | Yes | Coordinate the long-task suite across the atomic packages. | `AGENTS.md`, `.agent-state/TASK_STATE.md`, `.agent-state/HANDOFF.md` | `bootstrap:agents_md`, `bootstrap:task_state`, `bootstrap:handoff` |
-| `suite_boundary_clean` | `skill-task-continuity` | No | A trivial edit that merely mentions all the keywords. | `none` | `bootstrap:skip`, `direct:edit` |
+| `root_state_refresh` | `skill-context-keeper` | Yes | Refresh the root task picture from the repo. | `root/task_state` | `root:refresh`, `root:reconcile`, `root:compress` |
+| `root_state_compress` | `skill-context-keeper` | Yes | Shrink bloated root state without opening a new packet-only flow. | `root/task_state` | `root:refresh`, `root:reconcile`, `root:compress` |
+| `root_state_refresh_not_needed` | `skill-context-keeper` | No | A trivial one-off ask with no continuity risk. | `none` | `root:skip`, `route:other` |
+| `subtask_split_from_root` | `skill-subtask-context` | Yes | Split bounded child work from the root thread. | `subtask/task_state` | `subtask:split`, `subtask:refresh`, `subtask:isolate` |
+| `subtask_resume_from_packet` | `skill-subtask-context` | Yes | Refresh local state for a child task resumed from a packet. | `subtask/task_state` | `subtask:split`, `subtask:refresh`, `subtask:isolate` |
+| `subtask_state_not_needed` | `skill-subtask-context` | No | Stay in root state; do not open a child task. | `none` | `subtask:skip`, `route:root_or_packet` |
+| `packet_root_minimal_injection` | `skill-context-packet` | Yes | Compress the next root turn into a minimal packet. | `root/packet` | `packet:compose`, `packet:trim`, `packet:inject` |
+| `packet_not_needed_for_full_refresh` | `skill-context-packet` | No | Do a full-state refresh instead of packet compression. | `none` | `packet:skip`, `route:state_or_handoff` |
+| `phase_gate_risky_checkpoint` | `skill-phase-gate` | Yes | Add a checkpoint around risky multi-file work. | `phase/preflight`, `phase/postflight` | `phase:preflight`, `phase:checkpoint`, `phase:postflight` |
+| `tiny_edit_not_gate` | `skill-phase-gate` | No | Make a trivial local edit. | `none` | `phase:skip`, `direct:edit` |
+| `handoff_subtask_pause` | `skill-handoff-summary` | Yes | Pause a child task and leave a restart note. | `subtask/handoff` | `handoff:capture`, `handoff:pause`, `handoff:resume` |
+| `handoff_not_needed` | `skill-handoff-summary` | No | Give a final answer with no continuation artifact. | `none` | `handoff:skip`, `direct:answer` |
+| `suite_bootstrap_protocol` | `skill-task-continuity` | Yes | Bootstrap the protocol and route across the suite. | `suite/agents`, `suite/index`, root and subtask templates | `suite:bootstrap`, `suite:route`, `suite:explain` |
+| `suite_boundary_clean` | `skill-task-continuity` | No | Mention continuity keywords inside a trivial README fix. | `none` | `suite:skip`, `direct:edit` |
 
-## Phase Plan
+## Validation Strategy
 
-The current task is the bootstrap phase: define the suite, seed the matrix, and make the boundaries legible.
+The current static harness checks:
 
-Phase 1 should keep the documentation stable while the package implementations are still being shaped. That means adding new cases only when they improve coverage, not when they repeat the same trigger in different words.
+- routing polarity
+- exact event namespaces
+- strict artifact mapping
+- required file presence
+- workflow-doc coverage
+- boundary language in published docs
 
-Phase 2 should expand the matrix with more realistic long-thread scenarios, especially ones where the wrong package could plausibly trigger.
-
-Phase 3 should use the suite as a regression harness for future package changes, so trigger behavior stays narrow and intentional.
+That gives maintainers a regression surface for the protocol without requiring live model execution.

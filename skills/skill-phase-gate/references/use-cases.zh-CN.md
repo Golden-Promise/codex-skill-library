@@ -1,7 +1,7 @@
 # skill-phase-gate 使用场景
 
-`skill-phase-gate` 适用于围绕有分量的编码工作增加检查点。
-它可以在高风险执行前提供紧凑的 preflight，也可以在完成一次有意义的修改后提供紧凑的 postflight；长期任务状态仍由 `skill-context-keeper` 持有。
+`skill-phase-gate` 适用于围绕有分量的编码工作增加一个 optional operational checkpoint。
+它可以在高风险执行前提供紧凑的 preflight，也可以在完成一次有意义的修改后提供紧凑的 postflight；root-state refresh、subtask state 和 packet compression 仍由其他包持有。
 
 ## 适用触发示例
 
@@ -15,6 +15,9 @@
 - `把这个 typo 改掉就行，只有一行。`
 - `只解释一下这个包怎么用，不要生成任何检查点产物。`
 - `刷新当前任务状态，并在接下来一小时持续维护摘要。`
+- `先刷新根任务状态，再继续实现。`
+- `把下一轮压成一个很小的 packet，而不是生成 gate。`
+- `第一次在这个仓库里启动整套连续性工具链。`
 - `给下一个接手的 agent 写最终交接包。`
 
 ## 常见使用方式
@@ -44,5 +47,7 @@ postflight gate 只是检查点，不替代最终交接包。
 
 ## 状态归属边界
 
-如果线程还需要持续维护任务状态，请继续交给 `skill-context-keeper`。
+如果线程还需要持续维护 root 任务状态，请继续交给 `skill-context-keeper`。
+如果线程需要 subtask local state，请交给 `skill-subtask-context`。
+如果线程需要 packet-sized 的下一轮上下文，请交给 `skill-context-packet`。
 `skill-phase-gate` 可以在检查点里简短提到当前状态，但不拥有长期任务记录。

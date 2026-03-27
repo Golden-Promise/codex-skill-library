@@ -6,20 +6,17 @@ All notable changes to `codex-skill-library` should be documented in this file.
 
 ### Added
 
-- Publish four long-task continuity packages under `skills/`: `skill-context-keeper`, `skill-phase-gate`, `skill-handoff-summary`, and `skill-task-continuity`.
-- Add bilingual package entry docs, routing-first `SKILL.md` files, OpenAI agent metadata, reader-facing references, downstream template assets, and package contract tests for the new continuity packages.
-- Add the continuity-suite bootstrap helper and downstream template set for `AGENTS.md` plus `.agent-state/*.md` files without turning the repository root into a consumer repo.
-- Add `docs/long-task-suite.md` and `docs/long-task-suite.zh-CN.md` so maintainers and readers can understand the suite architecture without opening package internals.
-- Add a static continuity eval harness under `evals/` with seed cases, per-package artifact checks, routing checks, exact workflow-token checks, and optional guardrail metadata validation.
-- Add a pull-request workflow for published package tests plus continuity eval checks.
-- Add bilingual release checklist guidance for the continuity-suite publication flow.
+- Publish the context-protocol continuity suite under `skills/`, including the new atomic packages `skill-subtask-context` and `skill-context-packet`.
+- Add layered starter assets for `AGENTS.md`, `.agent-state/INDEX.md`, `.agent-state/root/`, `.agent-state/subtasks/`, and archive directories through the continuity bootstrap helper.
+- Add bilingual migration guides in [docs/context-protocol-migration.md](docs/context-protocol-migration.md) and [docs/context-protocol-migration.zh-CN.md](docs/context-protocol-migration.zh-CN.md).
+- Add protocol-era suite overview docs that describe root state, subtask state, packets, checkpoints, and handoffs as separate continuity objects.
+- Expand the static continuity eval harness to cover six packages, root/subtask/packet artifact tokens, and protocol-era workflow cases.
 
 ### Changed
 
-- Update root docs, skills indexes, and publishing guides so all four continuity packages are discoverable, install guidance stays aligned with `skill-installer`, and maintainers can find smoke-test and release-checklist steps quickly.
-- Move command-heavy install examples out of the repository root README and keep package-level install guidance closer to the published package entry points.
-- Polish the four continuity package READMEs so they read more like package landing pages, stay friendlier for first-time readers, and preserve strict package boundaries.
-- Keep pinned install guidance aligned to the upcoming `v0.6.1` release after withdrawing the original `v0.6.0` tag.
+- Refocus `skill-context-keeper` on root-state refresh and compression, `skill-handoff-summary` on root/subtask handoffs, and `skill-phase-gate` on optional operational checkpoints.
+- Update root repository indexes and suite docs so the six-package continuity model is discoverable from the repo landing pages.
+- Rewrite publishing and release-checklist docs around protocol validation, six-package smoke tests, and release-scope-driven tag selection instead of a fixed placeholder version.
 - Treat the continuity eval contract as a release-facing surface: routing now depends on published trigger guidance, workflow tokens must match exact package and polarity contracts, and optional guardrail metadata must be valid when present.
 
 ## [0.5.1] - 2026-03-25

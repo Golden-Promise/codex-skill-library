@@ -7,8 +7,8 @@ description: Use when a meaningful coding checkpoint is needed before or after r
 
 ## Overview
 
-Use `skill-phase-gate` to add a compact preflight or postflight checkpoint around meaningful coding work.
-It is for operational checkpoints before or after execution, not for task-state ownership, generic planning, or final handoff writing.
+Use `skill-phase-gate` to add an optional operational checkpoint around meaningful coding work.
+It is for risky edits before or after execution, not for root-state refresh, packet compression, suite bootstrap, generic planning, or final handoff writing.
 
 ## Use This Skill When
 
@@ -22,6 +22,8 @@ It is for operational checkpoints before or after execution, not for task-state 
 - the request is a typo fix, tiny one-line edit, or similarly trivial change
 - the user only wants an explanation, walkthrough, or analysis with no checkpoint artifact
 - the main need is reconstructing current task state or preserving long-running state ownership
+- the main need is packet compression for the next live turn
+- the main need is suite bootstrap or routing
 - the main need is generating a full transfer packet or final handoff summary
 
 ## Meaningful Checkpoint Bar
@@ -34,8 +36,10 @@ This package is a good fit when the checkpoint serves a meaningful workflow boun
 ## Package Boundary
 
 - `skill-phase-gate` can mention current task state only to support the immediate checkpoint
-- `skill-context-keeper` remains the owner of structured ongoing state and refreshes
-- this package does not replace planning packages, and it does not become a handoff generator
+- `skill-context-keeper` remains the owner of root-state refresh and compression
+- `skill-subtask-context` remains the owner of local child-task state
+- `skill-context-packet` remains the owner of packet-sized next-turn context
+- this package does not replace suite bootstrap, planning packages, or handoff generation
 
 ## References
 

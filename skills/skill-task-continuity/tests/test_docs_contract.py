@@ -18,12 +18,16 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
         self.assertIn("skill-phase-gate", english_text)
         self.assertIn("skill-handoff-summary", english_text)
         self.assertIn("skill-task-continuity", english_text)
+        self.assertIn("skill-subtask-context", english_text)
+        self.assertIn("skill-context-packet", english_text)
 
         self.assertIn("## 选择合适的连续性技能", chinese_text)
         self.assertIn("skill-context-keeper", chinese_text)
         self.assertIn("skill-phase-gate", chinese_text)
         self.assertIn("skill-handoff-summary", chinese_text)
         self.assertIn("skill-task-continuity", chinese_text)
+        self.assertIn("skill-subtask-context", chinese_text)
+        self.assertIn("skill-context-packet", chinese_text)
 
     def test_english_readme_mentions_full_suite_install(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -33,11 +37,16 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
         self.assertIn("one command", lowered)
         for skill_path in [
             "skills/skill-context-keeper",
+            "skills/skill-subtask-context",
+            "skills/skill-context-packet",
             "skills/skill-phase-gate",
             "skills/skill-handoff-summary",
             "skills/skill-task-continuity",
         ]:
             self.assertIn(skill_path, text)
+        self.assertIn(".agent-state/index.md", lowered)
+        self.assertIn(".agent-state/root/packet.md", lowered)
+        self.assertIn("beginner mode", lowered)
 
     def test_chinese_readme_mentions_full_suite_install(self):
         text = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
@@ -46,11 +55,16 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
         self.assertIn("整套", text)
         for skill_path in [
             "skills/skill-context-keeper",
+            "skills/skill-subtask-context",
+            "skills/skill-context-packet",
             "skills/skill-phase-gate",
             "skills/skill-handoff-summary",
             "skills/skill-task-continuity",
         ]:
             self.assertIn(skill_path, text)
+        self.assertIn(".agent-state/INDEX.md", text)
+        self.assertIn(".agent-state/root/PACKET.md", text)
+        self.assertIn("beginner mode", text.lower())
 
     def test_english_install_playbook_prefers_natural_language_bootstrap(self):
         text = (ROOT / "references" / "install-playbook.md").read_text(encoding="utf-8")
@@ -79,6 +93,7 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
             "## Start Here In 30 Seconds",
             "## What Gets Created In Your Repo",
             "## Fastest Setup",
+            "## Beginner Mode",
             "## Which Skill To Use Next",
             "## Install",
             "## Related Skills",
@@ -89,6 +104,7 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
             "## 30 秒快速开始",
             "## 你的仓库里会创建什么",
             "## 最快的开始方式",
+            "## Beginner Mode",
             "## 下一步该用哪个技能",
             "## 安装",
             "## 相关技能",
@@ -97,8 +113,14 @@ class SkillTaskContinuityDocsContractTests(unittest.TestCase):
 
         self.assertIn("Try this first:", english)
         self.assertIn("Use skill-task-continuity", english)
+        self.assertIn("skill-subtask-context", english)
+        self.assertIn("skill-context-packet", english)
+        self.assertIn("INDEX.md", english)
         self.assertIn("先这样对 Codex 说：", chinese)
         self.assertIn("请用 skill-task-continuity", chinese)
+        self.assertIn("skill-subtask-context", chinese)
+        self.assertIn("skill-context-packet", chinese)
+        self.assertIn("INDEX.md", chinese)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # skill-phase-gate Use Cases
 
-`skill-phase-gate` is for meaningful checkpoints around substantial coding work.
-Use it for a compact preflight before risky execution or a compact postflight after a meaningful edit, while leaving long-term task state with `skill-context-keeper`.
+`skill-phase-gate` is for optional operational checkpoints around substantial coding work.
+Use it for a compact preflight before risky execution or a compact postflight after a meaningful edit, while leaving root-state refresh, subtask state, and packet compression to sibling packages.
 
 ## Positive Trigger Prompts
 
@@ -15,6 +15,9 @@ Use it for a compact preflight before risky execution or a compact postflight af
 - `Fix this typo in one line and move on.`
 - `Explain how this package works without generating any checkpoint artifact.`
 - `Refresh the current task state and keep an ongoing summary for the next hour of work.`
+- `Refresh the root task state before we keep coding.`
+- `Compress the next turn into a small packet instead of creating a gate.`
+- `Bootstrap the whole continuity suite in this repo.`
 - `Write the final handoff package for the next agent taking over.`
 
 ## Common Use Cases
@@ -44,5 +47,7 @@ The postflight gate is a checkpoint, not a replacement for a final handoff packa
 
 ## State Ownership Boundary
 
-If the thread also needs durable task-state ownership, keep that with `skill-context-keeper`.
+If the thread also needs durable root-state ownership, keep that with `skill-context-keeper`.
+If the thread needs subtask-local state, use `skill-subtask-context`.
+If the thread needs packet-sized next-turn context, use `skill-context-packet`.
 `skill-phase-gate` may mention the current state briefly inside the checkpoint, but it does not own the running task record.

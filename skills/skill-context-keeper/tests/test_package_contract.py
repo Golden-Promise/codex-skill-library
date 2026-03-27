@@ -29,6 +29,7 @@ class ContextKeeperPackageTests(unittest.TestCase):
             "## Next Recommended Action",
             "## Verification Still Needed",
             "## Recent Decisions",
+            "## Compression / Archive Notes",
             "## Resume Checklist",
         ]:
             self.assertIn(heading, text)
@@ -44,14 +45,16 @@ class ContextKeeperPackageTests(unittest.TestCase):
         self.assertRegex(text, r"(?m)^## +不适用触发示例$")
 
     def test_readme_spells_out_package_boundary(self):
-        text = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("does not own workflow gating", text)
+        text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+        self.assertIn("root-state refresh", text)
+        self.assertIn("compression", text)
+        self.assertIn("does not own subtask state", text)
         self.assertIn("does not own final handoffs", text)
 
     def test_readme_includes_direct_natural_language_usage(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
         self.assertIn("if you want to tell codex exactly what to do", text)
-        self.assertIn("use skill-context-keeper to refresh the current task state", text)
+        self.assertIn("use skill-context-keeper to refresh the root task state", text)
 
     def test_readme_has_fast_entry_sections(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -64,7 +67,7 @@ class ContextKeeperPackageTests(unittest.TestCase):
         ]:
             self.assertIn(heading, text)
         self.assertIn("Typical output:", text)
-        self.assertIn(".agent-state/TASK_STATE.md", text)
+        self.assertIn(".agent-state/root/TASK_STATE.md", text)
         self.assertIn("Try this first:", text)
         self.assertIn("Use skill-context-keeper", text)
 
@@ -79,7 +82,7 @@ class ContextKeeperPackageTests(unittest.TestCase):
         ]:
             self.assertIn(heading, text)
         self.assertIn("典型产物：", text)
-        self.assertIn(".agent-state/TASK_STATE.md", text)
+        self.assertIn(".agent-state/root/TASK_STATE.md", text)
         self.assertIn("先这样对 Codex 说：", text)
         self.assertIn("请用 skill-context-keeper", text)
 

@@ -10,11 +10,19 @@ PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 LIBRARY_ROOT = PACKAGE_ROOT.parents[1]
 TEMPLATE_MAP = {
     "AGENTS.md": "assets/AGENTS.repo-template.md",
-    ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
-    ".agent-state/HANDOFF.md": "assets/agent-state/HANDOFF.template.md",
-    ".agent-state/DECISIONS.md": "assets/agent-state/DECISIONS.template.md",
-    ".agent-state/RUN_LOG.md": "assets/agent-state/RUN_LOG.template.md",
+    ".agent-state/INDEX.md": "assets/agent-state/INDEX.template.md",
+    ".agent-state/root/TASK_STATE.md": "assets/agent-state/root/TASK_STATE.template.md",
+    ".agent-state/root/PACKET.md": "assets/agent-state/root/PACKET.template.md",
+    ".agent-state/root/HANDOFF.md": "assets/agent-state/root/HANDOFF.template.md",
+    ".agent-state/root/DECISIONS.md": "assets/agent-state/root/DECISIONS.template.md",
+    ".agent-state/root/RUN_LOG.md": "assets/agent-state/root/RUN_LOG.template.md",
 }
+STARTER_DIRECTORIES = [
+    ".agent-state/subtasks",
+    ".agent-state/archive/root",
+    ".agent-state/archive/subtasks",
+    ".agent-state/archive/packets",
+]
 
 
 def parse_args():
@@ -84,15 +92,42 @@ def iter_operations(target, force):
     for destination_rel, source_rel in TEMPLATE_MAP.items():
         source = PACKAGE_ROOT / source_rel
         destination = target / destination_rel
-        action = "overwrite" if destination.exists() and force else "skip" if destination.exists() else "create"
+        action = (
+            "overwrite"
+            if destination.exists() and force
+            else "skip"
+            if destination.exists()
+            else "create"
+        )
         yield action, source, destination
+
+
+def iter_directory_operations(target):
+    for destination_rel in STARTER_DIRECTORIES:
+        destination = target / destination_rel
+        action = "skip-dir" if destination.exists() else "create-dir"
+        yield action, destination
 
 
 def apply_operations(target, force, dry_run):
     validate_target(target)
+    created_directories = 0
     created = 0
     overwritten = 0
     skipped = 0
+
+    for action, destination in iter_directory_operations(target):
+        if action == "skip-dir":
+            print(f"[skip-dir] {destination}")
+            continue
+
+        created_directories += 1
+        verb = "would mkdir" if dry_run else "mkdir"
+        print(f"[create-dir] {verb} {destination}")
+        if dry_run:
+            continue
+
+        destination.mkdir(parents=True, exist_ok=True)
 
     for action, source, destination in iter_operations(target, force):
         if action == "skip":
@@ -114,7 +149,8 @@ def apply_operations(target, force, dry_run):
         shutil.copyfile(source, destination)
 
     print(
-        f"Summary: {created} create, {overwritten} overwrite, {skipped} skip"
+        f"Summary: {created_directories} create-dir, {created} create, "
+        f"{overwritten} overwrite, {skipped} skip"
         + (" (dry-run)" if dry_run else "")
     )
 

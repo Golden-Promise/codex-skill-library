@@ -22,7 +22,7 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.6.1
+  --ref <release-tag>
 ```
 
 ## 命令总览

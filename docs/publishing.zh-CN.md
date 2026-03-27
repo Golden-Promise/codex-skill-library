@@ -13,11 +13,12 @@
 - 保持 `skill-installer` 可用的稳定安装路径
 - 让仓库级说明清晰、规范、便于阅读
 - 让 skill 包内运行时文档与仓库发布说明分层明确
+- 让六包版本的 context protocol 易于校验和发布
 
 ## 推荐发布流程
 
-1. 检查各个 skill 包 README、仓库索引页和发布文档是否清晰、可发布。
-2. 在 [CHANGELOG.md](../CHANGELOG.md) 中更新对读者可见的改动，并确认本次发布的目标 tag。
+1. 检查各个 skill 包 README、仓库索引页、迁移说明、suite overview 和发布文档是否清晰、可发布。
+2. 在 [CHANGELOG.md](../CHANGELOG.md) 中更新对读者可见的改动，并根据真实发布范围确定下一个 `<release-tag>`。
 3. 在打开或合并 PR 之前，先跑完包级测试、eval 测试和连续性种子矩阵。
 4. 让 PR checks workflow 再次验证同一组核心包合同和 eval 合同。
 5. 在打 tag 之前，先从已推送的发布分支或 `main` 跑一遍安装 smoke test。
@@ -40,15 +41,22 @@ done
 (cd skills/skill-governance && python3 scripts/manage_skill.py --validate-only)
 ```
 
-长任务连续性套件的校验方式：
+面向 protocol 的连续性校验：
 
 ```bash
 python3 -m unittest discover -s evals -p 'test_*.py' -v
 python3 evals/run_evals.py
 ```
 
-套件运行器现在除了仓库形状检查之外，还会按提示词正负向、事件命名空间和严格产物映射来评分。
-路由评分还要求已发布的 `SKILL.md` 和 README 中保留触发提示，而可选的 guardrail 字段会以静态元数据合同来校验。
+打 tag 前，还应人工 spot-check：
+
+- [docs/context-protocol-migration.md](context-protocol-migration.md)
+- [docs/context-protocol-migration.zh-CN.md](context-protocol-migration.zh-CN.md)
+- [docs/long-task-suite.md](long-task-suite.md)
+- [docs/long-task-suite.zh-CN.md](long-task-suite.zh-CN.md)
+
+连续性 runner 现在会跨 root state、subtask state、packet、checkpoint 和 handoff 评分提示词正负向、事件命名空间与严格产物映射。
+路由评分还要求已发布的 `SKILL.md` 和 README 中保留触发提示，而可选 guardrail 字段会以静态元数据合同来校验。
 
 ## Pull Request Checks
 
@@ -60,8 +68,8 @@ Pull request 应运行 [.github/workflows/pull-request-checks.yml](../.github/wo
 - 使用仓库级 tag，例如 `v0.1.0`、`v0.2.0`、`v1.0.0`
 - 向后兼容的增强提升次版本
 - 如果包结构或工作流有破坏性变化，则提升主版本
-- 对外安装路径尽量保持稳定，例如 `skills/skill-governance`
-- 由于原始 `v0.6.0` tag 已撤回，当前这次长任务连续性发布的目标版本应为 `v0.6.1`
+- 对外安装路径尽量保持在 `skills/<skill-name>/` 下，除非是明确的破坏性发布
+- 下一个 `<release-tag>` 应根据 `CHANGELOG.md` 和真实的读者可见范围来确定，而不是沿用旧占位版本
 
 ## 连续性包的安装 Smoke Test
 
@@ -72,6 +80,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -91,6 +101,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -109,6 +121,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -116,7 +130,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.1 \
+    --ref <release-tag> \
     --dest "$tmpdir"
 done
 ```

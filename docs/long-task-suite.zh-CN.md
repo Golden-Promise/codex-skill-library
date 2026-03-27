@@ -2,97 +2,115 @@
 
 ## 问题陈述
 
-长线程通常不是一次性坏掉的，而是逐步退化：共享状态开始过时，工作流失去节奏，交接信息也变得不足以让下一位执行者放心接手。
+长任务很少是一次性坏掉的。
+它更常见的失败方式是逐步漂移：
 
-这套文档要解决的，就是把这些退化模式说清楚。我们把长任务中的失效拆成三类：
+- root state 变旧、变散、变臃肿
+- child-task 细节泄漏到不该去的地方
+- 下一轮加载了过多上下文
+- risky edit 缺少 checkpoint
+- 暂停后让下一位执行者靠猜继续
 
-- 状态漂移，也就是工作认知和真实进展开始脱节
-- 流程漂移，也就是本来需要分阶段推进的任务变成了没有检查点的直冲
-- 交接摩擦，也就是换人之后需要靠猜才能继续
+`context protocol` 的目标，就是把这些退化模式变成可路由、可验证、可维护的对象。
+它不再把“连续性”当成一个模糊的摘要问题，而是明确拆成 root state、subtask state、packet compression、checkpoint 和 handoff。
 
-目标不是增加仪式感，而是让连续性变成可观察、可验证、可维护的东西。只有这样，长任务才更容易恢复、审阅和转交。
+## Context Protocol
 
-## 状态漂移、流程漂移、与交接摩擦
+当前套件围绕三层状态组织：
 
-这三种问题彼此相关，但并不相同。
+- **Root state：** 主任务的持久顶层图景
+- **Subtask state：** 不应该污染 root summary 的局部子任务上下文
+- **Packet：** 下一轮 root 或 subtask 执行真正需要的最小上下文对象
 
-状态漂移通常表现为摘要、上下文或任务记忆已经跟不上真实工作进度。它最大的风险是悄悄偏离：线程表面上很顺，实际上已经带着错误前提继续往前走。
+这三层默认落在一个 repo-first 的启动布局里：
 
-流程漂移则发生在需要分阶段推进的任务被当成一次性动作处理。工作可能还在继续，但检查点、决策点和边界感都会变弱。
+- `AGENTS.md`
+- `.agent-state/INDEX.md`
+- `.agent-state/root/`
+- `.agent-state/subtasks/`
+- `.agent-state/archive/`
 
-交接摩擦出现在暂停或转交之后，下一位执行者拿到的信息不够完整，必须重新猜测当前状态。问题不一定是错误，但一定会增加恢复成本。
-
-这个套件就是用这三种差异来决定：哪些包应该触发，哪些包不该被卷进来。
-
-评估矩阵里的产物和事件都使用了规范化的路径和值，这样后续执行器就能稳定校验，而不是依赖自然语言猜测。
+Beginner mode 通常只使用 `INDEX.md` 和 `.agent-state/root/`。
+当任务需要拆子任务，或者需要把活跃上下文压成 packet 并移入 archive 时，才进入 expanded mode。
 
 ## 包结构图
 
 | 包 | 职责 | 触发形态 |
 | --- | --- | --- |
-| `skill-context-keeper` | 在长线程中保存和重建工作状态，尤其适合处理中断或过时摘要后的恢复。 | 恢复、刷新、或对齐上下文。 |
-| `skill-phase-gate` | 判断任务是否需要阶段边界、检查点，或在继续执行前先停一下。 | 拆分、门控、或分阶段推进。 |
-| `skill-handoff-summary` | 在任务暂停或转交时产出清晰的交接说明。 | 总结状态、阻塞点和下一步。 |
-| `skill-task-continuity` | 当任务本身就是为了维持长线程连续性时，统筹前三个原子包。 | 启动套件、协调边界、保持流程连贯。 |
+| `skill-context-keeper` | 刷新并压缩可信的 root-task state | root 任务还在继续，但当前图景已经过时、嘈杂或过大 |
+| `skill-subtask-context` | 打开、刷新或关闭有边界的 child-task state | 某段工作需要自己的局部范围和重启状态 |
+| `skill-context-packet` | 为下一轮写最小上下文 packet | 下一步只需要比完整 state 更小的注入面 |
+| `skill-phase-gate` | 为 risky work 加一个可选操作检查点 | 有分量的多文件改动需要显式 preflight / postflight |
+| `skill-handoff-summary` | 生成 root 或 subtask 的紧凑 handoff | 工作即将暂停、转交或跨 session |
+| `skill-task-continuity` | 启动套件并路由到正确的原子包 | repo 需要 starter files、协议说明或选包帮助 |
+
+## 兼容与迁移
+
+如果你之前把这套东西理解成“4 个包分别负责状态、gate、handoff 和 orchestration”，现在应该看迁移说明：
+
+- [docs/context-protocol-migration.md](context-protocol-migration.md)
+- [docs/context-protocol-migration.zh-CN.md](context-protocol-migration.zh-CN.md)
+
+短版结论是：
+
+- root-state refresh 仍然归 `skill-context-keeper`
+- `skill-phase-gate` 不再是连续性系统中心
+- subtask isolation 现在有了一等所有者：`skill-subtask-context`
+- 最小下一轮注入现在有了一等所有者：`skill-context-packet`
 
 ## 仓库边界规则
 
-这个仓库是公开可安装的 skill 库，所以套件文档必须尽量面向读者，且便于维护。
+这个仓库是公开可安装的 skill library，所以套件说明必须保持面向读者、便于维护。
 
-- 套件规范放在 `docs/`，不要写进运行中的 agent 状态文件。
-- 本任务不要创建根目录 `AGENTS.md`、`.agent-state/`，也不要写入 public-package 的 `.agents/skills` 内容。
-- `evals/cases.csv` 是触发覆盖的事实来源，但正文也要能独立读懂。
-- 先用通俗语言解释包边界，不要要求读者先去看实现文件。
-- 能匹配原子包的就优先匹配原子包，组合包不应该抢走本该由原子包处理的工作。
-- 把模糊情况写进矩阵，方便维护者看到“只是关键词出现”并不等于真正触发。
+- 公开架构说明放在 `docs/`，不要写进这个 public library 自己的 live repo state 文件里。
+- 把 `evals/cases.csv` 当成规范化路由矩阵，而不是内部草稿。
+- 能匹配单个原子包时，就不要让 suite entry package 抢走任务。
+- Beginner mode 必须对多数用户足够明显，不要求大家一开始就拆 subtasks。
+- 迁移说明必须足够直接，避免旧四包用户靠猜来理解新模型。
 
 ## 成功标准
 
-### 结果
+当下游 repo 可以在不重读整条线程的前提下走完这条路径时，这套东西才算成功：
 
-- 长任务可以在不中断意图的情况下恢复、暂停或转交。
-- 套件能覆盖四个目标包的误触发和漏触发情况。
-- 维护者不看包源码，也能理解整体架构和边界。
+1. bootstrap continuity starter files
+2. refresh root state
+3. split a bounded subtask
+4. inject only a packet into the next execution turn
+5. checkpoint a risky change when needed
+6. pause with a valid handoff
+7. resume from root 或 subtask artifacts without context bleed
 
-### 过程
+## 种子评估矩阵
 
-- 每个原子包都要有正触发和负触发用例。
-- 矩阵里要有组合包的启动用例，也要有边界保护用例。
-- 每个案例都要写清楚期望产物，以及必要时对应的工作流事件或命令形态。
-
-### 风格
-
-- 文档要简洁、面向读者、易于扫读。
-- 英文版和中文版保持相同的主要章节顺序。
-- 触发说明要像维护建议，不要像内部草稿。
-
-### 效率
-
-- 维护者可以只看文档和 CSV 就完成验证，不需要反推包实现。
-- 矩阵要足够小，方便持续扩展，而不是越写越乱。
-- 模糊提示只需要定义一次，之后就能作为回归覆盖重复使用。
-
-## 初始评估矩阵
-
-种子矩阵存放在 `evals/cases.csv`。下面这张表展示了初始覆盖的形状，以及在什么情况下应该关注哪些产物和流程事件。
+种子矩阵位于 `evals/cases.csv`。
+它现在校验的是 protocol model，而不是旧的扁平布局模型。
 
 | 用例 | 包 | 是否触发 | 提示形态 | 期望产物 | 期望事件 |
 | --- | --- | --- | --- | --- | --- |
-| `context_resume` | `skill-context-keeper` | 是 | 恢复最后已知状态，并把未完成工作带下去。 | `state/context.snapshot`、`state/continuity.note` | `context:reload`、`context:reconstruct`、`context:summary` |
-| `context_resume_not_needed` | `skill-context-keeper` | 否 | 回答一个一次性问题，没有连续性风险。 | `none` | `context:skip`、`direct:answer` |
-| `phase_gate_before_multi_step` | `skill-phase-gate` | 是 | 在开始编码前先把多步骤任务拆成阶段。 | `plan/phase.plan`、`plan/checkpoints.md`、`plan/exit-criteria.md` | `phase:split`、`phase:checkpoint`、`phase:gate` |
-| `tiny_edit_not_gate` | `skill-phase-gate` | 否 | 只做一个很小的本地修改，不需要分阶段。 | `none` | `phase:skip`、`direct:edit` |
-| `handoff_before_pause` | `skill-handoff-summary` | 是 | 暂停工作并交给另一个执行者。 | `handoff/HANDOFF.md`、`handoff/blockers.md`、`handoff/next-steps.md` | `handoff:capture`、`handoff:pause`、`handoff:transfer` |
-| `handoff_not_needed` | `skill-handoff-summary` | 否 | 直接给最终答案，不需要转交说明。 | `none` | `handoff:skip`、`direct:answer` |
-| `suite_bootstrap` | `skill-task-continuity` | 是 | 协调长任务套件，让三个原子包一起工作。 | `AGENTS.md`、`.agent-state/TASK_STATE.md`、`.agent-state/HANDOFF.md` | `bootstrap:agents_md`、`bootstrap:task_state`、`bootstrap:handoff` |
-| `suite_boundary_clean` | `skill-task-continuity` | 否 | 一个很小的编辑，只是碰巧提到了所有关键词。 | `none` | `bootstrap:skip`、`direct:edit` |
+| `root_state_refresh` | `skill-context-keeper` | 是 | 从 repo 刷新 root task 图景 | `root/task_state` | `root:refresh`、`root:reconcile`、`root:compress` |
+| `root_state_compress` | `skill-context-keeper` | 是 | 压缩 bloated root state，但不转成 packet-only 流程 | `root/task_state` | `root:refresh`、`root:reconcile`、`root:compress` |
+| `root_state_refresh_not_needed` | `skill-context-keeper` | 否 | 没有连续性风险的一次性小问题 | `none` | `root:skip`、`route:other` |
+| `subtask_split_from_root` | `skill-subtask-context` | 是 | 把有边界的 child work 从 root 线程拆出去 | `subtask/task_state` | `subtask:split`、`subtask:refresh`、`subtask:isolate` |
+| `subtask_resume_from_packet` | `skill-subtask-context` | 是 | 从 packet 恢复 child task 并刷新局部状态 | `subtask/task_state` | `subtask:split`、`subtask:refresh`、`subtask:isolate` |
+| `subtask_state_not_needed` | `skill-subtask-context` | 否 | 留在 root state，不打开 child task | `none` | `subtask:skip`、`route:root_or_packet` |
+| `packet_root_minimal_injection` | `skill-context-packet` | 是 | 把下一轮 root turn 压成最小 packet | `root/packet` | `packet:compose`、`packet:trim`、`packet:inject` |
+| `packet_not_needed_for_full_refresh` | `skill-context-packet` | 否 | 需要 full-state refresh，而不是 packet compression | `none` | `packet:skip`、`route:state_or_handoff` |
+| `phase_gate_risky_checkpoint` | `skill-phase-gate` | 是 | 为 risky multi-file work 加 checkpoint | `phase/preflight`、`phase/postflight` | `phase:preflight`、`phase:checkpoint`、`phase:postflight` |
+| `tiny_edit_not_gate` | `skill-phase-gate` | 否 | 只做一个 trivial local edit | `none` | `phase:skip`、`direct:edit` |
+| `handoff_subtask_pause` | `skill-handoff-summary` | 是 | 暂停 child task 并留下 restart note | `subtask/handoff` | `handoff:capture`、`handoff:pause`、`handoff:resume` |
+| `handoff_not_needed` | `skill-handoff-summary` | 否 | 直接给最终答案，不需要 continuation artifact | `none` | `handoff:skip`、`direct:answer` |
+| `suite_bootstrap_protocol` | `skill-task-continuity` | 是 | bootstrap protocol 并在套件内路由 | `suite/agents`、`suite/index`、root/subtask templates | `suite:bootstrap`、`suite:route`、`suite:explain` |
+| `suite_boundary_clean` | `skill-task-continuity` | 否 | trivial README fix 中顺带提到了 continuity 关键词 | `none` | `suite:skip`、`direct:edit` |
 
-## 阶段计划
+## 校验策略
 
-当前任务本身就是引导阶段：先定义套件、先种下矩阵、先把边界讲清楚。
+当前静态 harness 会检查：
 
-第一阶段要先把文档稳定下来，等包实现逐步成形后，再按需补充新的用例。重点不是堆数量，而是补能提高覆盖质量的案例。
+- 路由正负向
+- 精确事件命名空间
+- 严格产物映射
+- required file 存在性
+- workflow 文档覆盖
+- 已发布文档里的边界语言
 
-第二阶段可以扩展成更接近真实长线程的场景，尤其是那些容易让错误包误触发的情况。
-
-第三阶段则是把这套矩阵变成后续改动的回归护栏，确保触发行为一直保持窄而明确。
+这让维护者可以在不运行 live model 的情况下，把 protocol 当成可回归校验的对象。

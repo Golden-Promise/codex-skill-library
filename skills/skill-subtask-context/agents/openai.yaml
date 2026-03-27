@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Subtask Context"
+  short_description: "Maintain isolated child-task state without inflating root context"
+  default_prompt: "Use $skill-subtask-context when a bounded child task needs its own local state: open or refresh .agent-state/subtasks/<slug>/TASK_STATE.md, keep only the necessary parent facts, capture local scope, risks, and exit criteria, and avoid taking over root-state refresh, packet compression, workflow gates, or final handoffs."

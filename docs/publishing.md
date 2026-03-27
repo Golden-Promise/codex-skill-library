@@ -13,11 +13,12 @@ Use this guide if you are maintaining the repository itself rather than using on
 - keep install paths stable for `skill-installer`
 - keep repository docs clean and easy to read
 - keep package runtime docs separate from repository release notes
+- make the six-package context protocol easy to validate and publish
 
 ## Recommended Release Flow
 
-1. Review the package README files, repository indexes, and publishing docs for release clarity.
-2. Update [CHANGELOG.md](../CHANGELOG.md) with reader-visible changes and confirm the intended tag for this release.
+1. Review the package README files, repository indexes, migration docs, suite overview docs, and publishing docs for release clarity.
+2. Update [CHANGELOG.md](../CHANGELOG.md) with reader-visible changes and determine the next `<release-tag>` from the actual release scope.
 3. Run local package tests, eval tests, and the continuity seed matrix before opening or merging the PR.
 4. Let the PR checks workflow confirm the same core package and eval contracts.
 5. Run install smoke tests from a pushed release branch or from `main` before tagging.
@@ -40,14 +41,21 @@ Additional packaging sanity for `skill-governance`:
 (cd skills/skill-governance && python3 scripts/manage_skill.py --validate-only)
 ```
 
-Long-task continuity suite validation:
+Protocol-aware continuity validation:
 
 ```bash
 python3 -m unittest discover -s evals -p 'test_*.py' -v
 python3 evals/run_evals.py
 ```
 
-The suite runner now scores prompt polarity, event namespaces, and strict artifact mapping in addition to repository shape checks.
+Before tagging, also spot-check:
+
+- [docs/context-protocol-migration.md](context-protocol-migration.md)
+- [docs/context-protocol-migration.zh-CN.md](context-protocol-migration.zh-CN.md)
+- [docs/long-task-suite.md](long-task-suite.md)
+- [docs/long-task-suite.zh-CN.md](long-task-suite.zh-CN.md)
+
+The continuity runner now scores prompt polarity, event namespaces, and strict artifact mapping across root state, subtask state, packets, checkpoints, and handoffs.
 Routing quality also requires trigger guidance to remain visible in published `SKILL.md` and README files, and guardrail metadata is validated statically when optional columns are present.
 
 ## Pull Request Checks
@@ -60,8 +68,8 @@ That workflow is intentionally small: it runs package test directories under `sk
 - Use repository-level tags such as `v0.1.0`, `v0.2.0`, and `v1.0.0`.
 - Increase the minor version for backward-compatible additions.
 - Increase the major version when package layout or workflow changes in a breaking way.
-- Keep `skills/skill-governance` stable as the public install path.
-- After withdrawing the original `v0.6.0` tag, the current long-task continuity publication target is `v0.6.1`.
+- Keep public install paths stable under `skills/<skill-name>/` unless a deliberate breaking release says otherwise.
+- Derive the next `<release-tag>` from `CHANGELOG.md` and the actual reader-visible scope rather than reusing an older placeholder tag.
 
 ## Install Smoke Tests For The Continuity Packages
 
@@ -72,6 +80,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -91,6 +101,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -109,6 +121,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -116,7 +130,7 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.1 \
+    --ref <release-tag> \
     --dest "$tmpdir"
 done
 ```
