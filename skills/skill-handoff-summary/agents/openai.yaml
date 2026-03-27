@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Handoff Summary"
   short_description: "Write compact continuation handoffs for paused or transferred coding work"
-  default_prompt: "Use $skill-handoff-summary when a coding task is pausing or changing hands: write a compact continuation-oriented handoff, optionally to .agent-state/HANDOFF.md, with current status, session changes, preserved constraints, open problems, the exact next action, and a reusable resume prompt. Do not turn it into whole-project documentation, long-term state management, or workflow gating."
+  default_prompt: "Use $skill-handoff-summary when a coding task is pausing or changing hands: write a compact continuation-oriented handoff for the root task or a subtask, optionally to .agent-state/root/HANDOFF.md or .agent-state/subtasks/<slug>/HANDOFF.md, with current status, session changes, preserved constraints, open problems, the exact next action, and a reusable resume prompt. Do not turn it into whole-project documentation, root-state refresh, long-term state management, or workflow gating."

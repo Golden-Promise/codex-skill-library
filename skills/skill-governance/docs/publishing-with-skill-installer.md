@@ -47,13 +47,13 @@ python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --path skills/skill-governance
 ```
 
-If you want to pin the current release, use:
+If you want to pin a specific release, use:
 
 ```bash
 python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-governance \
-  --ref v0.6.1
+  --ref <release-tag>
 ```
 
 ## Repository Files In This Repo

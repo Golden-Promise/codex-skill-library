@@ -7,13 +7,17 @@ Use this checklist when preparing the long-task continuity suite for merge, tag 
 ## 1. Pre-Release Sanity
 
 - Confirm the worktree is clean: `git status --short`
-- Confirm the release target is still `v0.6.1`; if more user-visible scope landed, recalculate before tagging.
+- Confirm [CHANGELOG.md](../CHANGELOG.md) reflects the real release scope and use it to derive the next `<release-tag>`
 - Re-read the repository entry docs and indexes:
   - [README.md](../README.md)
   - [README.zh-CN.md](../README.zh-CN.md)
   - [skills/README.md](../skills/README.md)
   - [skills/README.zh-CN.md](../skills/README.zh-CN.md)
-- Confirm [CHANGELOG.md](../CHANGELOG.md) matches the release scope and does not describe unfinished work.
+- Re-read the protocol-facing maintainer docs:
+  - [docs/context-protocol-migration.md](context-protocol-migration.md)
+  - [docs/context-protocol-migration.zh-CN.md](context-protocol-migration.zh-CN.md)
+  - [docs/long-task-suite.md](long-task-suite.md)
+  - [docs/long-task-suite.zh-CN.md](long-task-suite.zh-CN.md)
 
 ## 2. Local Validation
 
@@ -40,14 +44,16 @@ python3 evals/run_evals.py
 
 ## 3. Docs And Index Verification
 
-- Confirm all four continuity packages are still discoverable from the root and `skills/` indexes.
+- Confirm all six continuity packages are discoverable from the root and `skills/` indexes.
 - Confirm package descriptions remain non-overlapping:
-  - `skill-context-keeper` = state refresh only
-  - `skill-phase-gate` = checkpoint only
-  - `skill-handoff-summary` = handoff only
-  - `skill-task-continuity` = suite bootstrap and composition only
+  - `skill-context-keeper` = root-state refresh and compression
+  - `skill-subtask-context` = bounded child-task state
+  - `skill-context-packet` = minimum next-turn packet
+  - `skill-phase-gate` = optional checkpoint only
+  - `skill-handoff-summary` = root or subtask handoff only
+  - `skill-task-continuity` = suite bootstrap and routing only
 - Confirm package `README.md` install sections still point to the published `skills/<skill-name>/` paths.
-- Confirm the publishing guides still link to this checklist and to the continuity smoke-test commands.
+- Confirm the publishing guides still link to this checklist and to the six-package smoke-test commands.
 
 ## 4. Install Smoke Tests From A Pushed Branch Or `main`
 
@@ -58,6 +64,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -77,6 +85,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -96,8 +106,8 @@ done
 
 ## 6. Changelog And Version Confirmation
 
-- Confirm the next release is still `v0.6.1`.
-- Confirm pinned install examples that reference a tag use `v0.6.1`.
+- Confirm the next release tag is derived from `CHANGELOG.md` rather than an older placeholder.
+- Confirm maintainer docs no longer hard-code a stale release target.
 - Confirm `CHANGELOG.md` is ready to ship with minimal or no editing.
 
 ## 7. Tag And GitHub Release
@@ -106,8 +116,8 @@ done
 - Create the tag:
 
 ```bash
-git tag v0.6.1
-git push origin v0.6.1
+git tag <release-tag>
+git push origin <release-tag>
 ```
 
 - Create the GitHub Release using the prepared release notes draft.
@@ -121,6 +131,8 @@ tmpdir="$(mktemp -d)"
 
 for path in \
   skills/skill-context-keeper \
+  skills/skill-subtask-context \
+  skills/skill-context-packet \
   skills/skill-phase-gate \
   skills/skill-handoff-summary \
   skills/skill-task-continuity
@@ -128,10 +140,10 @@ do
   python3 <path-to-skill-installer>/scripts/install-skill-from-github.py \
     --repo Golden-Promise/codex-skill-library \
     --path "$path" \
-    --ref v0.6.1 \
+    --ref <release-tag> \
     --dest "$tmpdir"
 done
 ```
 
 - Confirm the tagged installs resolve to the expected package paths.
-- Confirm the public GitHub release page points readers to the four published package directories under `skills/`.
+- Confirm the public GitHub release page points readers to the six published continuity package directories under `skills/`.

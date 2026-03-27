@@ -5,13 +5,13 @@
 ## 概述
 
 `skill-handoff-summary` 是一个专注型包，用于写出面向续做的暂停说明或转交说明。
-它服务的是诸如 `.agent-state/HANDOFF.md` 这样的紧凑下游产物，而不是整项目文档。
+它服务的是诸如 `.agent-state/root/HANDOFF.md` 或 `.agent-state/subtasks/<slug>/HANDOFF.md` 这样的紧凑下游产物，而不是整项目文档。
 
 ## 30 秒快速开始
 
 - 什么时候用：工作马上要暂停、换人，或者切进新的会话。
 - 你会得到什么：一份紧凑的重启说明，里面有当前状态、硬约束、开放问题和精确下一步。
-- 典型产物：更新 `.agent-state/HANDOFF.md`。
+- 典型产物：更新 `.agent-state/root/HANDOFF.md` 或 `.agent-state/subtasks/<slug>/HANDOFF.md`。
 
 如果你需要一份耐用的重启说明，就用它。
 如果你只是想在聊天里快速同步状态，就不要用它。
@@ -20,22 +20,22 @@
 
 先这样对 Codex 说：
 
-- `请用 skill-handoff-summary 在暂停前写一个紧凑、面向续做的交接摘要。`
+- `请用 skill-handoff-summary 在暂停前为根任务或某个子任务写一个紧凑、面向续做的交接摘要。`
 
 ## 安装
 
 你可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary。`
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary，并使用 ref v0.6.1。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-handoff-summary 安装 skill-handoff-summary，并使用 ref <tag-or-commit>。`
 
 如果你想看精确的 shell 命令，可以直接跳到后面的 [安装细节](#安装细节)。
 
 ## 会创建或更新什么文件？
 
-最典型的下游文件是 `.agent-state/HANDOFF.md`。
+最典型的下游文件是 `.agent-state/root/HANDOFF.md` 和 `.agent-state/subtasks/<slug>/HANDOFF.md`。
 
-当你希望这个文件帮你保留下列信息时，就该用这个包：
+当你希望这些文件帮你保留下列信息时，就该用这个包：
 
 - 任务摘要
 - 当前状态
@@ -48,13 +48,18 @@
 ## 不适合什么时候用
 
 - 你需要在继续工作前先重建当前任务状态
+- 你真正需要的是 root-state refresh，而不是暂停产物
 - 你需要给高风险或多文件改动加检查点
 - 你只是想在当前聊天里快速同步一下状态
 - 你要写的是整项目说明，而不是 continuation-oriented handoff
 
+这个包是 continuation-oriented，不负责 root-state refresh，也不负责 workflow gates。
+
 ## 相关技能
 
-- `skill-context-keeper`：适合刷新 `.agent-state/TASK_STATE.md`
+- `skill-context-keeper`：适合刷新 `.agent-state/root/TASK_STATE.md`
+- `skill-subtask-context`：适合处理 `.agent-state/subtasks/<slug>/TASK_STATE.md`
+- `skill-context-packet`：适合处理 packet-sized 的下一轮上下文
 - `skill-phase-gate`：适合 preflight / postflight 检查点
 - `skill-task-continuity`：适合第一次搭建流程和做套件级路由
 
@@ -76,5 +81,5 @@
 python3 /path/to/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-handoff-summary \
-  --ref v0.6.1
+  --ref <tag-or-commit>
 ```

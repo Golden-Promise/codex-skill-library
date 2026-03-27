@@ -4,8 +4,8 @@
 
 ## 概述
 
-`skill-phase-gate` 用于在有分量的编码工作前后加入紧凑的 preflight / postflight 检查点。
-如果“加一道检查点”这件事本身就有价值，就该用它。
+`skill-phase-gate` 用于在有分量的编码工作前后加入一个 optional operational checkpoint。
+如果这道检查点对 risky edits 本身有价值，就该用它。
 
 ## 30 秒快速开始
 
@@ -24,7 +24,7 @@
 你可以直接这样对 Codex 说：
 
 - `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate。`
-- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用 ref v0.6.1。`
+- `请用 skill-installer 从 Golden-Promise/codex-skill-library 的 skills/skill-phase-gate 安装 skill-phase-gate，并使用 ref <tag-or-commit>。`
 
 如果你想看精确的 shell 命令，可以直接跳到后面的 [安装细节](#安装细节)。
 
@@ -42,13 +42,19 @@
 - 这次改动只是一个琐碎的一行编辑
 - 这次工作只是纯解释、纯说明
 - 当前真正的问题是任务状态过旧，而不是检查点缺失
+- 当前真正的问题是 root-state refresh，而不是检查点缺失
+- 当前真正的问题是 packet compression，而不是检查点缺失
+- 当前真正的问题是 suite bootstrap，而不是检查点缺失
 - 你需要的是暂停或转交 handoff，而不是流程检查点
 
-这个包不适合 trivial one-line edits，也不适合 pure explanation tasks。
+这个包不适合 trivial one-line edits，也不适合 pure explanation tasks，也不适合 root-state refresh、packet compression 或 suite bootstrap。
+把它当成面向 risky edits 的 optional operational checkpoint 即可。
 
 ## 相关技能
 
-- `skill-context-keeper`：适合在重要工作前后重建任务状态
+- `skill-context-keeper`：适合在重要工作前后重建 root 任务状态
+- `skill-subtask-context`：适合维护边界清楚的子任务状态
+- `skill-context-packet`：适合压缩 packet-sized 的下一轮上下文
 - `skill-handoff-summary`：适合暂停或转交时写 handoff
 - `skill-task-continuity`：适合第一次搭建整套流程和做套件级路由
 
@@ -71,5 +77,5 @@
 python3 /path/to/install-skill-from-github.py \
   --repo Golden-Promise/codex-skill-library \
   --path skills/skill-phase-gate \
-  --ref v0.6.1
+  --ref <tag-or-commit>
 ```

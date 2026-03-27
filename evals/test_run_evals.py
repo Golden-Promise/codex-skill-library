@@ -1,10 +1,10 @@
 import csv
 import importlib.util
 import re
-import tempfile
-import sys
-import unittest
 import shutil
+import sys
+import tempfile
+import unittest
 from pathlib import Path
 
 
@@ -54,7 +54,7 @@ class RunEvalsTests(unittest.TestCase):
         with CASES_CSV.open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
 
-        self.assertEqual(len(rows), 8)
+        self.assertEqual(len(rows), 14)
         self.assertEqual(
             list(rows[0].keys()),
             [
@@ -69,48 +69,69 @@ class RunEvalsTests(unittest.TestCase):
             ],
         )
 
+    def test_package_rules_cover_protocol_packages(self):
+        self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
+        module = load_runner_module()
+
+        self.assertEqual(
+            set(module.PACKAGE_RULES),
+            {
+                "skill-context-keeper",
+                "skill-subtask-context",
+                "skill-context-packet",
+                "skill-phase-gate",
+                "skill-handoff-summary",
+                "skill-task-continuity",
+            },
+        )
+
     def test_load_cases_normalizes_seed_matrix(self):
         self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
         module = load_runner_module()
 
         cases = module.load_cases(CASES_CSV)
 
-        self.assertEqual(len(cases), 8)
-        context_resume = next(case for case in cases if case.case_id == "context_resume")
-        self.assertTrue(context_resume.should_trigger)
+        self.assertEqual(len(cases), 14)
+        root_refresh = next(case for case in cases if case.case_id == "root_state_refresh")
+        self.assertTrue(root_refresh.should_trigger)
+        self.assertEqual(root_refresh.expected_artifacts, ["root/task_state"])
         self.assertEqual(
-            context_resume.expected_artifacts,
-            ["state/context.snapshot", "state/continuity.note"],
+            root_refresh.expected_events,
+            ["root:refresh", "root:reconcile", "root:compress"],
         )
-        self.assertEqual(
-            context_resume.expected_events,
-            ["context:reload", "context:reconstruct", "context:summary"],
+
+        subtask_resume = next(
+            case for case in cases if case.case_id == "subtask_resume_from_packet"
         )
+        self.assertEqual(subtask_resume.package, "skill-subtask-context")
+        self.assertEqual(subtask_resume.expected_artifacts, ["subtask/task_state"])
 
         suite_boundary_clean = next(
             case for case in cases if case.case_id == "suite_boundary_clean"
         )
         self.assertFalse(suite_boundary_clean.should_trigger)
 
-    def test_run_evaluations_produces_case_and_dimension_results(self):
+    def test_run_evaluations_produces_passing_protocol_results(self):
         self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
         module = load_runner_module()
 
         result = module.run_evaluations(ROOT, CASES_CSV)
 
-        self.assertEqual(result["summary"]["cases"], 8)
-        self.assertIn("passed", result["summary"])
-        self.assertIn("failed", result["summary"])
+        self.assertEqual(result["summary"]["cases"], 14)
+        self.assertEqual(result["summary"]["failed"], 0)
+        self.assertEqual(result["summary"]["passed"], 14)
         self.assertIn("routing_quality", result["dimensions"])
         self.assertIn("artifact_presence", result["dimensions"])
         self.assertIn("workflow_completeness", result["dimensions"])
         self.assertIn("docs_clarity", result["dimensions"])
 
-        case = next(item for item in result["cases"] if item["case_id"] == "suite_bootstrap")
-        self.assertIn("routing_quality", case["dimensions"])
-        self.assertIn("artifact_presence", case["dimensions"])
-        self.assertIn("workflow_completeness", case["dimensions"])
-        self.assertIn("docs_clarity", case["dimensions"])
+        case = next(
+            item for item in result["cases"] if item["case_id"] == "suite_bootstrap_protocol"
+        )
+        self.assertEqual(case["dimensions"]["routing_quality"]["status"], "pass")
+        self.assertEqual(case["dimensions"]["artifact_presence"]["status"], "pass")
+        self.assertEqual(case["dimensions"]["workflow_completeness"]["status"], "pass")
+        self.assertEqual(case["dimensions"]["docs_clarity"]["status"], "pass")
 
     def test_optional_guardrail_columns_are_supported(self):
         self.assertTrue(RUNNER.exists(), "evaluation runner should exist")
@@ -123,12 +144,12 @@ class RunEvalsTests(unittest.TestCase):
                 [
                     {
                         "case_id": "demo",
-                        "package": "skill-context-keeper",
+                        "package": "skill-context-packet",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "Refresh state",
-                        "expected_artifacts": "assets/TASK_STATE.template.md",
-                        "expected_events": "context:reload",
+                        "user_prompt": "Compress the next root turn into a packet.",
+                        "expected_artifacts": "root/packet",
+                        "expected_events": "packet:compose",
                         "notes": "optional guardrails",
                         "max_commands": "3",
                         "max_verbosity": "low",
@@ -155,8 +176,8 @@ class RunEvalsTests(unittest.TestCase):
                         "scenario_type": "positive",
                         "should_trigger": "yes",
                         "user_prompt": "Please answer this one-off punctuation question in the README and do nothing else.",
-                        "expected_artifacts": "state/context.snapshot",
-                        "expected_events": "context:reload",
+                        "expected_artifacts": "root/task_state",
+                        "expected_events": "root:refresh|root:reconcile|root:compress",
                         "notes": "should fail if routing ignores polarity",
                     }
                 ],
@@ -183,7 +204,7 @@ class RunEvalsTests(unittest.TestCase):
                         "package": "skill-handoff-summary",
                         "scenario_type": "negative",
                         "should_trigger": "no",
-                        "user_prompt": "Please write a handoff with blockers and next steps for the pause.",
+                        "user_prompt": "Please write a root handoff with blockers and next steps for the pause.",
                         "expected_artifacts": "none",
                         "expected_events": "handoff:skip|direct:answer",
                         "notes": "should fail if negative polarity is ignored",
@@ -209,12 +230,12 @@ class RunEvalsTests(unittest.TestCase):
                 [
                     {
                         "case_id": "bad_events",
-                        "package": "skill-phase-gate",
+                        "package": "skill-context-packet",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "We need to split this multi-step refactor into phases before coding.",
-                        "expected_artifacts": "plan/phase.plan",
-                        "expected_events": "context:reload",
+                        "user_prompt": "Compress the next root turn into a packet and keep it minimal.",
+                        "expected_artifacts": "root/packet",
+                        "expected_events": "root:refresh",
                         "notes": "should fail if expected events are not scored",
                     }
                 ],
@@ -241,9 +262,9 @@ class RunEvalsTests(unittest.TestCase):
                         "package": "skill-handoff-summary",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "I need to stop for today; please write a handoff with blockers and next steps.",
-                        "expected_artifacts": "handoff/HANDOFF.md|handoff/missing.md",
-                        "expected_events": "handoff:capture",
+                        "user_prompt": "I need to stop for today; please write a subtask handoff with blockers and next steps.",
+                        "expected_artifacts": "subtask/handoff|subtask/missing",
+                        "expected_events": "handoff:capture|handoff:pause|handoff:resume",
                         "notes": "should fail if unmapped artifact tokens are ignored",
                     }
                 ],
@@ -267,7 +288,9 @@ class RunEvalsTests(unittest.TestCase):
             for relative in ["README.md", "README.zh-CN.md", "SKILL.md"]:
                 path = package_root / relative
                 text = path.read_text(encoding="utf-8")
-                for index, cue in enumerate(module.PACKAGE_RULES["skill-context-keeper"]["trigger_cues"]):
+                for index, cue in enumerate(
+                    module.PACKAGE_RULES["skill-context-keeper"]["trigger_cues"]
+                ):
                     text = re.sub(
                         re.escape(cue),
                         f"REMOVED_TRIGGER_{index}",
@@ -281,13 +304,13 @@ class RunEvalsTests(unittest.TestCase):
                 csv_path,
                 [
                     {
-                        "case_id": "context_resume",
+                        "case_id": "root_state_refresh",
                         "package": "skill-context-keeper",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "We’ve been iterating for a while; please resume from the last known state, summarize what changed, and carry forward unresolved TODOs.",
-                        "expected_artifacts": "state/context.snapshot|state/continuity.note",
-                        "expected_events": "context:reload|context:reconstruct|context:summary",
+                        "user_prompt": "Rebuild the current root task picture from the repo and update .agent-state/root/TASK_STATE.md.",
+                        "expected_artifacts": "root/task_state",
+                        "expected_events": "root:refresh|root:reconcile|root:compress",
                         "notes": "trigger docs should be required",
                     }
                 ],
@@ -295,7 +318,7 @@ class RunEvalsTests(unittest.TestCase):
 
             report = module.run_evaluations(repo_root, csv_path)
 
-        case = next(item for item in report["cases"] if item["case_id"] == "context_resume")
+        case = next(item for item in report["cases"] if item["case_id"] == "root_state_refresh")
         self.assertEqual(report["summary"]["failed"], 1)
         self.assertEqual(case["dimensions"]["routing_quality"]["status"], "fail")
         self.assertIn("routing docs", case["dimensions"]["routing_quality"]["reason"])
@@ -314,8 +337,8 @@ class RunEvalsTests(unittest.TestCase):
                         "package": "skill-phase-gate",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "We need to split this multi-step refactor into phases before coding.",
-                        "expected_artifacts": "plan/phase.plan",
+                        "user_prompt": "Run a checkpoint before and after this risky multi-file refactor.",
+                        "expected_artifacts": "phase/preflight",
                         "expected_events": "phase:anything",
                         "notes": "should fail when same-namespace nonsense tokens are used",
                     }
@@ -343,9 +366,9 @@ class RunEvalsTests(unittest.TestCase):
                         "package": "skill-task-continuity",
                         "scenario_type": "positive",
                         "should_trigger": "yes",
-                        "user_prompt": "Set up the long-task continuity suite and coordinate the context keeper, phase gate, and handoff packages.",
-                        "expected_artifacts": "AGENTS.md",
-                        "expected_events": "bootstrap:agents_md",
+                        "user_prompt": "Bootstrap the context protocol and route me to the right atomic skill.",
+                        "expected_artifacts": "suite/agents|suite/index",
+                        "expected_events": "suite:bootstrap|suite:route|suite:explain",
                         "notes": "invalid guardrail metadata should fail",
                         "max_commands": "0",
                         "max_verbosity": "extreme",

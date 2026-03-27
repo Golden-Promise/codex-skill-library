@@ -41,13 +41,15 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
         text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
         self.assertIn("continuation-oriented", text)
         self.assertIn("not whole-project documentation", text)
-        self.assertIn(".agent-state/handoff.md", text)
+        self.assertIn(".agent-state/root/handoff.md", text)
+        self.assertIn(".agent-state/subtasks/<slug>/handoff.md", text)
+        self.assertIn("does not own root-state refresh", text)
 
     def test_readme_includes_direct_natural_language_usage(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
         self.assertIn("if you want to tell codex exactly what to do", text)
         self.assertIn(
-            "use skill-handoff-summary to write a compact continuation-oriented handoff",
+            "use skill-handoff-summary to write a compact continuation-oriented handoff for the root task or a subtask",
             text,
         )
 
@@ -63,7 +65,8 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
     def test_resume_prompt_is_explicitly_present_in_template(self):
         text = (ROOT / "assets" / "HANDOFF.template.md").read_text(encoding="utf-8")
         self.assertIn("Resume Prompt", text)
-        self.assertIn("Resume this task from .agent-state/HANDOFF.md.", text)
+        self.assertIn("Resume this task from the recorded handoff.", text)
+        self.assertNotIn(".agent-state/HANDOFF.md", text)
 
     def test_chinese_references_use_natural_resume_prompt_wording(self):
         for path in [
@@ -71,7 +74,7 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
             ROOT / "references" / "prompt-templates.zh-CN.md",
         ]:
             text = path.read_text(encoding="utf-8")
-            self.assertIn("请从 .agent-state/HANDOFF.md 继续这个任务。", text)
+            self.assertIn("请从记录好的 handoff 继续这个任务。", text)
 
     def test_readme_has_fast_entry_sections(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -84,7 +87,8 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
         ]:
             self.assertIn(heading, text)
         self.assertIn("Typical output:", text)
-        self.assertIn(".agent-state/HANDOFF.md", text)
+        self.assertIn(".agent-state/root/HANDOFF.md", text)
+        self.assertIn(".agent-state/subtasks/<slug>/HANDOFF.md", text)
         self.assertIn("Try this first:", text)
         self.assertIn("Use skill-handoff-summary", text)
         self.assertIn("Just need a quick status update in chat?", text)
@@ -100,7 +104,8 @@ class SkillHandoffSummaryPackageTests(unittest.TestCase):
         ]:
             self.assertIn(heading, text)
         self.assertIn("典型产物：", text)
-        self.assertIn(".agent-state/HANDOFF.md", text)
+        self.assertIn(".agent-state/root/HANDOFF.md", text)
+        self.assertIn(".agent-state/subtasks/<slug>/HANDOFF.md", text)
         self.assertIn("先这样对 Codex 说：", text)
         self.assertIn("请用 skill-handoff-summary", text)
         self.assertIn("如果你只是想在聊天里快速同步状态", text)

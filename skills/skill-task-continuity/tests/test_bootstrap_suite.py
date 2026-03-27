@@ -11,11 +11,19 @@ LIBRARY_ROOT = ROOT.parents[1]
 REPO_ROOT = ROOT.parents[1]
 TEMPLATE_MAP = {
     "AGENTS.md": "assets/AGENTS.repo-template.md",
-    ".agent-state/TASK_STATE.md": "assets/agent-state/TASK_STATE.template.md",
-    ".agent-state/HANDOFF.md": "assets/agent-state/HANDOFF.template.md",
-    ".agent-state/DECISIONS.md": "assets/agent-state/DECISIONS.template.md",
-    ".agent-state/RUN_LOG.md": "assets/agent-state/RUN_LOG.template.md",
+    ".agent-state/INDEX.md": "assets/agent-state/INDEX.template.md",
+    ".agent-state/root/TASK_STATE.md": "assets/agent-state/root/TASK_STATE.template.md",
+    ".agent-state/root/PACKET.md": "assets/agent-state/root/PACKET.template.md",
+    ".agent-state/root/HANDOFF.md": "assets/agent-state/root/HANDOFF.template.md",
+    ".agent-state/root/DECISIONS.md": "assets/agent-state/root/DECISIONS.template.md",
+    ".agent-state/root/RUN_LOG.md": "assets/agent-state/root/RUN_LOG.template.md",
 }
+STARTER_DIRECTORIES = [
+    ".agent-state/subtasks",
+    ".agent-state/archive/root",
+    ".agent-state/archive/subtasks",
+    ".agent-state/archive/packets",
+]
 
 
 class BootstrapSuiteTests(unittest.TestCase):
@@ -98,6 +106,11 @@ class BootstrapSuiteTests(unittest.TestCase):
                     (target / relative_path).exists(),
                     f"expected downstream file to exist: {relative_path}",
                 )
+            for relative_path in STARTER_DIRECTORIES:
+                self.assertTrue(
+                    (target / relative_path).is_dir(),
+                    f"expected downstream directory to exist: {relative_path}",
+                )
 
     def test_bootstrap_never_mutates_public_library_root(self):
         for relative_path in TEMPLATE_MAP:
@@ -124,8 +137,8 @@ class BootstrapSuiteTests(unittest.TestCase):
             target = Path(tmpdir) / "consumer-repo"
             target.mkdir()
 
-            existing = target / ".agent-state" / "RUN_LOG.md"
-            existing.parent.mkdir()
+            existing = target / ".agent-state" / "root" / "RUN_LOG.md"
+            existing.parent.mkdir(parents=True, exist_ok=True)
             existing.write_text("keep me\n", encoding="utf-8")
 
             result = self.run_bootstrap(target)
@@ -138,8 +151,8 @@ class BootstrapSuiteTests(unittest.TestCase):
             target = Path(tmpdir) / "consumer-repo"
             target.mkdir()
 
-            existing = target / ".agent-state" / "RUN_LOG.md"
-            existing.parent.mkdir()
+            existing = target / ".agent-state" / "root" / "RUN_LOG.md"
+            existing.parent.mkdir(parents=True, exist_ok=True)
             existing.write_text("old value\n", encoding="utf-8")
 
             result = self.run_bootstrap(target, "--force")
@@ -148,14 +161,17 @@ class BootstrapSuiteTests(unittest.TestCase):
             self.assertNotEqual(existing.read_text(encoding="utf-8"), "old value\n")
 
     def test_task_state_and_handoff_templates_match_atomic_assets(self):
-        suite_task_state = ROOT / "assets" / "agent-state" / "TASK_STATE.template.md"
+        suite_task_state = ROOT / "assets" / "agent-state" / "root" / "TASK_STATE.template.md"
         atomic_task_state = (
             ROOT.parents[0]
             / "skill-context-keeper"
             / "assets"
             / "TASK_STATE.template.md"
         )
-        suite_handoff = ROOT / "assets" / "agent-state" / "HANDOFF.template.md"
+        suite_handoff = ROOT / "assets" / "agent-state" / "root" / "HANDOFF.template.md"
+        suite_subtask_handoff = (
+            ROOT / "assets" / "agent-state" / "subtasks" / "HANDOFF.template.md"
+        )
         atomic_handoff = (
             ROOT.parents[0]
             / "skill-handoff-summary"
@@ -165,6 +181,7 @@ class BootstrapSuiteTests(unittest.TestCase):
 
         self.assertTrue(suite_task_state.exists())
         self.assertTrue(suite_handoff.exists())
+        self.assertTrue(suite_subtask_handoff.exists())
         self.assertEqual(
             suite_task_state.read_text(encoding="utf-8"),
             atomic_task_state.read_text(encoding="utf-8"),
@@ -172,6 +189,47 @@ class BootstrapSuiteTests(unittest.TestCase):
         self.assertEqual(
             suite_handoff.read_text(encoding="utf-8"),
             atomic_handoff.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            suite_subtask_handoff.read_text(encoding="utf-8"),
+            atomic_handoff.read_text(encoding="utf-8"),
+        )
+
+    def test_subtask_and_packet_templates_match_atomic_assets(self):
+        suite_subtask_state = (
+            ROOT / "assets" / "agent-state" / "subtasks" / "TASK_STATE.template.md"
+        )
+        atomic_subtask_state = (
+            ROOT.parents[0]
+            / "skill-subtask-context"
+            / "assets"
+            / "TASK_STATE.template.md"
+        )
+        suite_root_packet = ROOT / "assets" / "agent-state" / "root" / "PACKET.template.md"
+        suite_subtask_packet = (
+            ROOT / "assets" / "agent-state" / "subtasks" / "PACKET.template.md"
+        )
+        atomic_packet = (
+            ROOT.parents[0]
+            / "skill-context-packet"
+            / "assets"
+            / "PACKET.template.md"
+        )
+
+        self.assertTrue(suite_subtask_state.exists())
+        self.assertTrue(suite_root_packet.exists())
+        self.assertTrue(suite_subtask_packet.exists())
+        self.assertEqual(
+            suite_subtask_state.read_text(encoding="utf-8"),
+            atomic_subtask_state.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            suite_root_packet.read_text(encoding="utf-8"),
+            atomic_packet.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(
+            suite_subtask_packet.read_text(encoding="utf-8"),
+            atomic_packet.read_text(encoding="utf-8"),
         )
 
 

@@ -48,6 +48,14 @@ class SkillPhaseGatePackageTests(unittest.TestCase):
         text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
         self.assertIn("not for trivial one-line edits", text)
         self.assertIn("not for pure explanation tasks", text)
+        self.assertIn("not for root-state refresh", text)
+        self.assertIn("not for packet compression", text)
+        self.assertIn("not for suite bootstrap", text)
+
+    def test_readme_describes_optional_checkpoint_boundary(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+        self.assertIn("optional operational checkpoint", text)
+        self.assertIn("risky edits", text)
 
     def test_readme_includes_direct_natural_language_usage(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8").lower()
@@ -69,6 +77,8 @@ class SkillPhaseGatePackageTests(unittest.TestCase):
         self.assertIn("POSTFLIGHT.template.md", text)
         self.assertIn("Try this first:", text)
         self.assertIn("Use skill-phase-gate", text)
+        self.assertIn("skill-context-packet", text)
+        self.assertIn("skill-subtask-context", text)
 
     def test_chinese_readme_has_fast_entry_sections(self):
         text = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
@@ -85,6 +95,8 @@ class SkillPhaseGatePackageTests(unittest.TestCase):
         self.assertIn("POSTFLIGHT.template.md", text)
         self.assertIn("先这样对 Codex 说：", text)
         self.assertIn("请用 skill-phase-gate", text)
+        self.assertIn("skill-context-packet", text)
+        self.assertIn("skill-subtask-context", text)
 
 
 if __name__ == "__main__":
