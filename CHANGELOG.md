@@ -4,6 +4,8 @@ All notable changes to `codex-skill-library` should be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-03-27
+
 ### Added
 
 - Publish the context-protocol continuity suite under `skills/`, including the new atomic packages `skill-subtask-context` and `skill-context-packet`.
