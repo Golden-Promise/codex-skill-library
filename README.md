@@ -41,6 +41,8 @@ This repository is designed for people who want to:
 4. For the continuity workflow, start with `skill-task-continuity` when you need suite bootstrap or composition guidance, or jump directly to `skill-context-keeper`, `skill-subtask-context`, `skill-context-packet`, `skill-phase-gate`, or `skill-handoff-summary` when the next action is already clear.
 5. Use the package reference pages for boundary notes now, and later for examples, prompts, and deeper guidance.
 
+Chinese users can also search and install skills through [Skills宝](https://skilery.com).
+
 ## Reading Guide
 
 - English skill index: [skills/README.md](skills/README.md)
